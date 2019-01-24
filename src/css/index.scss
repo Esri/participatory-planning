@@ -1,0 +1,107 @@
+$blue: #0079c1;
+$gray: #efefef;
+$white: #fff;
+
+// Calcite panel tweeks
+
+html,
+body,
+#scene,
+#sceneView {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#scene {
+  position: relative;
+}
+
+#sceneView,
+#sceneSlides {
+  position: absolute;
+}
+
+.scene-slides {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.scene-slides .slide {
+  position: relative;
+  margin: 10px;
+  float: left;
+  div {
+    position: absolute;
+    bottom: 0px;
+    color: white;
+    left: 5px;
+    text-shadow: 1px 1px #000000;
+  }
+}
+
+$panelWidth: 300px;
+
+[class^="icon-ui-"]:before, [class*=" icon-ui-"]:before {
+  padding-right: 0px
+}
+
+.panel {
+  max-width: 360px;
+}
+
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  max-height: 400px;
+  overflow-x: hidden;
+}
+
+.gallery-grid-item {
+  display: flex;
+  padding: 6px;
+}
+
+.calcite-panels {
+  padding-right: $panelWidth;
+}
+
+.menu-bar .gallery-grid-item {
+  width: 25%;
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 1px solid #4c4c4c;
+}
+
+.menu-bar {
+  padding-top: 50px;
+  height: 100%;
+  width: $panelWidth;
+  background-color: #4c4c4c;
+  position: absolute;
+  z-index: 10;
+  left: auto;
+  right: 0px;
+}
+
+.menu-bar .btn-link {
+  margin: 10px;
+  color: white;
+}
+
+.menu-bar .btn {
+  width: 100%;
+  text-align: center;
+  color: white;
+  background-color: #00000000;
+  border-bottom-color: white;
+  border-top-color: white;
+//  border-left-width: 0px;
+//  border-right-width: 0px;
+}
+
+.menu-bar .is-active {
+  color: #4c4c4c;
+  background-color: white;
+}
