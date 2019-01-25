@@ -16,7 +16,20 @@ export default class App extends declared(Widget) {
   public render() {
     return (
       <div>
+        <div id="topMenu" />
         <div id="scene" bind={ this } afterCreate={ this._attachScene } />
+        <div id="bottomMenu" class="center">
+          <div class="menu primary-menu">
+          {
+            ["feature-layer", "line-chart", "organization", "map-pin"]
+            .map((item) => (
+              <div class="menuItem">
+                <span class={ "vcenter font-size-6 icon-ui-" + item } />
+              </div>
+            ))
+          }
+          </div>
+        </div>
       </div>
     );
   }

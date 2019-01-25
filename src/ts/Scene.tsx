@@ -88,7 +88,7 @@ export default class Scene extends declared(Widget) {
     return (
       <div>
         <div id="sceneView" bind={ this } afterCreate={ this._attachSceneView } />
-        <div id="sceneSlides" class="scene-slides" bind={ this } afterCreate={ this._attachSlides }></div>
+        <div id="sceneSlides" class="scene-slides center" bind={ this } afterCreate={ this._attachSlides }></div>
       </div>
     );
   }

@@ -14,20 +14,80 @@ body,
   width: 100%;
 }
 
+// Disable selection & highlighting
+body {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+#app,
 #scene {
   position: relative;
 }
 
+#topMenu,
+#bottomMenu,
 #sceneView,
 #sceneSlides {
   position: absolute;
 }
 
-.scene-slides {
-  position: absolute;
+.center {
   left: 50%;
   transform: translate(-50%, 0);
 }
+
+.vcenter {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#bottomMenu {
+  bottom: 0px;
+}
+
+.menuItem {
+  float: left;
+}
+
+.menuItem > * {
+  position: absolute;
+}
+
+// Make bottom menu circled
+.primary-menu .menuItem {
+  background-color: $transparent-black;
+  color: white;
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  // text-align: center;
+  // vertical-align: middle;
+  position: relative;
+  box-shadow: inset -10px -10px 100px #000, 10px 10px 20px black, inset 0px 0px 10px #0005;
+  display: inline-block;
+  margin: 10px;
+}
+
+/*
+.primary-menu .menuItem::after {
+  background-color: rgba(255, 255, 255, 0.3);
+  content: '';
+  height: 45%;
+  width: 12%;
+  position: absolute;
+  top: 4%;
+  left: 15%;
+  border-radius: 50%;
+  transform: rotate(40deg);
+}
+*/
 
 .scene-slides .slide {
   position: relative;

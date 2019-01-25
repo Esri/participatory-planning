@@ -2,7 +2,7 @@ import "./config";
 
 import "@dojo/framework/shim/Promise";
 
-import App from "./widgets/App";
+import App from "./ts/App";
 
 /**
  * Initialize application
