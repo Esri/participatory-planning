@@ -144,6 +144,7 @@ export default class Scene extends declared(Widget) {
 
     let timeline = anime.timeline({}).add({
       targets: movingPoint,
+      duration: 0,
       delay: 1000,
     });
     waypoints.forEach((point, index) => {
