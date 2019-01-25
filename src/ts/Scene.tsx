@@ -63,11 +63,13 @@ export default class Scene extends declared(Widget) {
     },
   } as any);
 
-  private sceneLayer: SceneLayer;
+  @property({
+    readOnly: true,
+  })
+  public readonly drawLayer: GraphicsLayer = new GraphicsLayer();
 
-  private graphicsLayer: GraphicsLayer = new GraphicsLayer({
-    visible: true,
-  });
+  private sceneLayer: SceneLayer;
+  private graphicsLayer: GraphicsLayer = new GraphicsLayer();
 
   public postInitialize() {
 

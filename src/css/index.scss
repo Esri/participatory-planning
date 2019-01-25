@@ -49,6 +49,7 @@ body {
 }
 
 #bottomMenu {
+  width: 100%;
   bottom: 0px;
 }
 
@@ -102,30 +103,19 @@ body {
   }
 }
 
-$panelWidth: 300px;
-
 [class^="icon-ui-"]:before, [class*=" icon-ui-"]:before {
   padding-right: 0px
 }
 
-.panel {
-  max-width: 360px;
-}
-
 .gallery-grid {
-  display: flex;
-  flex-wrap: wrap;
-  max-height: 400px;
-  overflow-x: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
 }
 
 .gallery-grid-item {
-  display: flex;
   padding: 6px;
-}
-
-.calcite-panels {
-  padding-right: $panelWidth;
+  display: inline-block;
 }
 
 .menu-bar .gallery-grid-item {
@@ -137,7 +127,6 @@ $panelWidth: 300px;
 .menu-bar {
   padding-top: 50px;
   height: 100%;
-  width: $panelWidth;
   background-color: #4c4c4c;
   position: absolute;
   z-index: 10;
