@@ -6,7 +6,7 @@ import {
 
 // esri
 import Color from "esri/Color";
-import promiseUtils from "esri/core/promiseUtils";
+import { eachAlways } from "esri/core/promiseUtils";
 import { whenNotOnce } from "esri/core/watchUtils";
 import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
@@ -126,17 +126,24 @@ export default class Scene extends declared(Widget) {
 
     const polylineGraphic = new Graphic({
       symbol: {
-        type: "simple-line", // autocasts as SimpleLineSymbol()
-        color: [226, 119, 40],
-        width: 4,
+        type: "line-3d", // autocasts as SimpleLineSymbol()
+        symbolLayers: [{
+          type: "path",  // autocasts as new PathSymbol3DLayer()
+          size: 4,  // 20 meters in diameter
+          material: { color: [226, 119, 40] },
+        }],
       },
     } as any);
 
     this.graphicsLayer.removeAll();
     this.sceneLayer.definitionExpression = "";
+
     this.graphicsLayer.add(polylineGraphic);
 
-    let timeline = anime.timeline({});
+    let timeline = anime.timeline({}).add({
+      targets: movingPoint,
+      delay: 1000,
+    });
     waypoints.forEach((point, index) => {
       timeline = timeline.add({
         targets: movingPoint,
@@ -177,7 +184,8 @@ export default class Scene extends declared(Widget) {
         color,
         type: "simple-fill", // autocasts as new SimpleFillSymbol()
         outline: { // autocasts as new SimpleLineSymbol()
-          width: 0,
+          width: 4,
+          color: [226, 119, 40],
         },
       },
     } as any);
@@ -212,28 +220,24 @@ export default class Scene extends declared(Widget) {
         a: 0,
         duration: 300,
         easing: "easeInOutExpo",
+        complete: () => {
+          this.graphicsLayer.removeMany(this.graphicsLayer.graphics.filter(
+            (graphic) => graphic !== polygonGraphic).toArray(),
+          );
+        },
       })
       .finished;
   }
 
   private _goToSlide(slide: Slide): IPromise {
-    const promise = slide.applyTo(this.view).then(() => {
-      console.log("Slide applied");
-      console.log("Slide applied", this.graphicsLayer.visible);
+    return slide.applyTo(this.view).then(() => {
 
-      const promises = this.view.layerViews.map((layerView) => {
-        console.log("Waiting for layer", layerView.layer.title);
-        return whenNotOnce(layerView, "updating").then(() => {
-          console.log("Layer done updating", layerView.layer.title);
-        });
-      });
-      return promiseUtils.eachAlways(promises);
+      this.graphicsLayer.visible = true;
+      // Wait for all layers to update after applying a new slide
+      return eachAlways(this.view.layerViews.map((layerView) => {
+        return whenNotOnce(layerView, "updating");
+      }));
     });
-
-    // Keep graphics layer visible
-    this.graphicsLayer.visible = true;
-
-    return promise;
   }
 
   private _attachSlides(sceneSlidesDiv: HTMLDivElement) {
@@ -265,10 +269,15 @@ export default class Scene extends declared(Widget) {
         slideElement.addEventListener("click", () => {
           this._goToSlide(slide)
           .then(() => {
-            if (index === 2) {
-              this._animateArea().then(() => this._animateMask() );
+            if (index === 1) {
+              // Animate mask
+              this._animateArea()
+              .then(() => this._animateMask() )
+              .then(() => this._goToSlide(this.map.presentation.slides.getItemAt(2)));
+
             }
-          });
+          })
+          .catch((error) => console.error(error));
         });
       });
     });
