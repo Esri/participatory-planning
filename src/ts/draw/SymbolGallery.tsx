@@ -8,24 +8,26 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import PortalItem from "esri/portal/PortalItem";
-import { renderable, tsx } from "esri/widgets/support/widget";
-
+import Collection = require("esri/core/Collection");
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
-import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
-import View from "esri/views/SceneView";
-import Widget from "esri/widgets/Widget";
-
 import Portal from "esri/portal/Portal";
 import PortalGroup from "esri/portal/PortalGroup";
+import PortalItem from "esri/portal/PortalItem";
 import PortalQueryParams from "esri/portal/PortalQueryParams";
 import PortalQueryResult from "esri/portal/PortalQueryResult";
+import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
+import View from "esri/views/SceneView";
+import { renderable, tsx } from "esri/widgets/support/widget";
+import Widget from "esri/widgets/Widget";
 
-import Collection = require("esri/core/Collection");
+// interactjs
+import interact, { InteractEvent } from "interactjs";
 
 import SymbolGroup from "./SymbolGallery/SymbolGroup";
 import SymbolItem from "./SymbolGallery/SymbolItem";
+import ScreenPoint = require('esri/geometry/ScreenPoint');
+import Point = require('esri/geometry/Point');
 
 // import interact from "interactjs";
 
@@ -61,14 +63,12 @@ export default class SymbolGallery extends declared(Widget) {
   })
   public readonly iconClass = "icon-ui-collection";
 
-  @property({
-    type: WebStyleSymbol,
-  })
-  public dragSymbol: WebStyleSymbol | null;
-
   private portal: Portal | null = null;
 
   private loadingPromise: IPromise;
+
+  private dragGraphic: Graphic | null = null;
+  private dragSymbol: WebStyleSymbol | null;
 
   constructor(params?: any) {
     super(params);
@@ -131,22 +131,87 @@ export default class SymbolGallery extends declared(Widget) {
   private _renderSymbolItem(item: SymbolItem) {
     // console.log("Rendering an item", item);
     const href = item.thumbnailHref;
+    const key = item.group.category + item.name;
     return (
-      <div class="gallery-grid-item" key={item.group.category + item.name} bind={this} afterCreate={this.addInteract}>
-        <img src={href} data-item={item} draggable="true" bind={this} ondragstart={ this.startDrag } />
+      <div class="gallery-grid-item" key={key} bind={this} afterCreate={this._addInteract} data-item={item}>
+        <img src={href} />
       </div>
     );
     // draggable="true" bind={this} ondragstart={ this.startDrag }
   }
 
-  private addInteract(element: HTMLDivElement) {
-    // interact(element)
-    //   .draggable({
-    //     inertia: true,
-    //     onmove: (event) => {
-    //       console.log("Moving", event);
-    //     },
-    //   });
+  private _addInteract(element: HTMLDivElement) {
+    interact(element)
+      .draggable({
+        inertia: true,
+        onmove: (event) => this._onDrag(event),
+      })
+      .on("dragstart", (event) => this._onDragStart(event))
+      .on("dragend",  (event) => this._onDragEnd(event));
+  }
+
+  private _onDragStart(event: InteractEvent) {
+    const item = event.target["data-item"] as SymbolItem;
+    if (item != null) {
+      this.dragSymbol = new WebStyleSymbol({
+        name: item.name,
+        styleName: item.group.category,
+      });
+      this.dragSymbol.fetchSymbol();
+
+      this.dragGraphic = new Graphic({
+        symbol: this.dragSymbol,
+      });
+      this.scene.drawLayer.add(this.dragGraphic);
+    }
+  }
+
+  private _onDrag(event: InteractEvent) {
+    const target = event.target;
+       // keep the dragged position in the data-x/data-y attributes
+    const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+    const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+
+    // translate the element
+    // target.style.webkitTransform =
+    // target.style.transform =
+    //  'translate(' + x + 'px, ' + y + 'px)';
+
+    // update the posiion attributes
+    // target.setAttribute('data-x', x);
+    // target.setAttribute('data-y', y);
+
+    if (this.dragGraphic && this.dragSymbol) {
+      this.scene.drawLayer.remove(this.dragGraphic);
+      this.dragGraphic = this.dragGraphic.clone();
+      this.dragGraphic.symbol = this.dragSymbol;
+
+      const mapPoint = this._mapPointForEvent(event); // this.scene.view.toMap(screenPoint);
+      this.dragGraphic.geometry = mapPoint;
+      this.scene.drawLayer.add(this.dragGraphic);
+    }
+  }
+
+  private _mapPointForEvent(event: {clientX: number, clientY: number}): Point {
+    const a = new ScreenPoint({x: event.clientX, y: event.clientY});
+    const b = new ScreenPoint({x: event.clientX, y: event.clientY - 50});
+    const aMap = this.scene.view.toMap(a);
+    const bMap = this.scene.view.toMap(b);
+
+    const result = new Point({
+      x: aMap.x + 2 * (bMap.x - aMap.x),
+      y: aMap.y + 2 * (bMap.y - aMap.y),
+      spatialReference: aMap.spatialReference,
+    });
+
+    return result;
+  }
+
+  private _onDragEnd(event: InteractEvent) {
+    if (this.dragGraphic) {
+      // this.scene.drawLayer.remove(this.dragGraphic);
+      this.dragGraphic = null;
+    }
   }
 
   private startDrag(event: DragEvent) {

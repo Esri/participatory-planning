@@ -6,12 +6,14 @@ import {
 
 // esri
 import Color from "esri/Color";
+import Collection from "esri/core/Collection";
 import { eachAlways } from "esri/core/promiseUtils";
 import { whenNotOnce } from "esri/core/watchUtils";
 import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
+import Layer from "esri/layers/Layer";
 import SceneLayer from "esri/layers/SceneLayer";
 import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
 import SceneView from "esri/views/SceneView";
@@ -22,6 +24,8 @@ import Widget from "esri/widgets/Widget";
 
 // animejs
 import anime from "animejs";
+import Point = require('esri/geometry/Point');
+import ScreenPoint = require('esri/geometry/ScreenPoint');
 
 // Hard coded constants
 
@@ -66,7 +70,13 @@ export default class Scene extends declared(Widget) {
   @property({
     readOnly: true,
   })
-  public readonly drawLayer: GraphicsLayer = new GraphicsLayer();
+  public readonly drawLayer: GraphicsLayer = new GraphicsLayer({
+    elevationInfo: {
+      mode: "relative-to-scene",
+    },
+  });
+
+  private mapLayers: Layer[] = [];
 
   private sceneLayer: SceneLayer;
   private graphicsLayer: GraphicsLayer = new GraphicsLayer();
@@ -74,12 +84,14 @@ export default class Scene extends declared(Widget) {
   public postInitialize() {
 
     this.map.when(() => {
+      this.mapLayers = this.map.layers.toArray();
       this.map.add(this.graphicsLayer);
+      this.map.add(this.drawLayer);
       this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
     });
 
-    this.view.on("click", (event) => {
-        console.log("Clicked", event.mapPoint.x, event.mapPoint.y);
+    this.view.on("click", (event: any) => {
+        console.log("Clicked A", event.mapPoint.x, event.mapPoint.y, event.mapPoint);
     });
 
     // Leave a reference of the view on the window for debugging
@@ -233,9 +245,12 @@ export default class Scene extends declared(Widget) {
   }
 
   private _goToSlide(slide: Slide): IPromise {
-    return slide.applyTo(this.view).then(() => {
+    return this.view.goTo(slide.viewpoint).then(() => {
 
-      this.graphicsLayer.visible = true;
+      this.mapLayers.forEach((layer) => {
+        layer.visible = 0 <= slide.visibleLayers.findIndex((visibleLayer) => visibleLayer.id === layer.id);
+      });
+
       // Wait for all layers to update after applying a new slide
       return eachAlways(this.view.layerViews.map((layerView) => {
         return whenNotOnce(layerView, "updating");

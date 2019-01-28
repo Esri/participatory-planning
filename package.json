@@ -4,7 +4,7 @@
   "devDependencies": {
     "@theintern/istanbul-loader": "^1.0.0-beta.2",
     "@types/animejs": "^2.0.1",
-    "@types/arcgis-js-api": "^4.9.0",
+    "@types/arcgis-js-api": "^4.10.0",
     "@types/sinon": "^5.0.5",
     "animejs": "^3.0.1",
     "calcite-web": "github:esri/calcite-web",
