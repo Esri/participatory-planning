@@ -21,7 +21,8 @@
     "noEmitOnError": false,
     "noUnusedLocals": true,
     "importHelpers": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots" : ["./nodes_modules/@types", "./typings"]
   },
   "types": [
     "arcgis-js-api",
