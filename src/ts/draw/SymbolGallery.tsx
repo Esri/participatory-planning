@@ -1,5 +1,5 @@
 
-import Scene from "../../Scene";
+import Scene from "../Scene";
 
 // esri
 import {
@@ -16,6 +16,7 @@ import Portal from "esri/portal/Portal";
 import PortalItem from "esri/portal/PortalItem";
 import PortalQueryParams from "esri/portal/PortalQueryParams";
 import PortalQueryResult from "esri/portal/PortalQueryResult";
+import EsriSymbol from "esri/symbols/Symbol";
 import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
@@ -23,8 +24,8 @@ import Widget from "esri/widgets/Widget";
 // interactjs
 import interact, { InteractEvent } from "interactjs";
 
-import SymbolGroup from "./SymbolGroup";
-import SymbolItem from "./SymbolItem";
+import SymbolGroup from "./SymbolGallery/SymbolGroup";
+import SymbolItem from "./SymbolGallery/SymbolItem";
 
 import {nearestCoordinate} from "esri/geometry/geometryEngine";
 
@@ -59,11 +60,26 @@ export default class SymbolGallery extends declared(Widget) {
 
   private loadingPromise: IPromise;
 
-  private dragGraphic: Graphic | null = null;
-  private preloadedSymbols: Graphic[] = [];
+  private dragGraphic: Graphic = new Graphic();
+
+  private dragSymbol: EsriSymbol;
+
+  private placeholderSymbol: EsriSymbol;
 
   constructor(params?: any) {
     super(params);
+  }
+
+  public postInitialize() {
+    this._load();
+    const symbol = new WebStyleSymbol({
+      name: "Pushpin 4",
+      styleName: "EsriIconsStyle",
+    });
+    this.placeholderSymbol = symbol;
+    symbol.fetchSymbol().then((actualSymbol) => {
+      this.placeholderSymbol = actualSymbol;
+    });
   }
 
   public render() {
@@ -81,19 +97,20 @@ export default class SymbolGallery extends declared(Widget) {
     } else if (this.groups.length) {
       return (
         <div>
-          <nav class="leader-1">
-          {
-            this.groups.toArray().map((group) => (
-              <button class="btn btn-grouped" onclick={
-                () => this._selectGroup(group)
-              } >{ group.title }</button>
-            ))
-          }
-          </nav>
+          <div class="menu">
+            {
+              this.groups.toArray().map((group, index) => (
+                <div class="menu-item" key={ index }>
+                  <button class="btn btn-grouped" onclick={
+                    () => this._selectGroup(group)
+                  } >{ group.title }</button>
+                </div>
+              ))
+            }
+          </div>
         </div>
       );
     } else {
-      this._load();
       return (
         <div>
           <div class="loader is-active padding-leader-3 padding-trailer-3">
@@ -123,24 +140,6 @@ export default class SymbolGallery extends declared(Widget) {
     this.selectedGroup = group;
     this.selectedGroup.loadItems().then(() => {
       this.scheduleRender();
-
-      group.items.forEach((item) => {
-        item.symbol.fetchSymbol();
-        // .then((actualSymbol) => {
-        //   item.actualSymbol = actualSymbol;
-        // });
-      });
-
-      this.scene.drawLayer.removeMany(this.preloadedSymbols);
-      this.preloadedSymbols = group.items.toArray().map((item) => new Graphic({
-        symbol: item.symbol,
-        geometry: new Point({
-          x: -8234917.705127965,
-          y: 4966988.590590364,
-          spatialReference: SpatialReference.WebMercator,
-        }),
-      }));
-      this.scene.drawLayer.addMany(this.preloadedSymbols);
     });
   }
 
@@ -150,7 +149,7 @@ export default class SymbolGallery extends declared(Widget) {
     const key = item.group.category + item.name;
 
     return (
-      <div class="gallery-grid-item" key={key} bind={this} afterCreate={this._addInteract} data-item={item.symbol}>
+      <div class="gallery-grid-item" key={key} bind={this} afterCreate={this._addInteract} data-item={item}>
         <img src={href} />
       </div>
     );
@@ -168,12 +167,16 @@ export default class SymbolGallery extends declared(Widget) {
   }
 
   private _onDragStart(event: InteractEvent) {
-    const item = event.target["data-item"] as WebStyleSymbol;
+    const item = event.target["data-item"] as SymbolItem;
     if (item != null) {
-      this.dragGraphic = new Graphic({
-        symbol: item,
+      this.dragSymbol = this.placeholderSymbol;
+      item.fetchSymbol().then((actualSymbol) => {
+        this.dragSymbol = actualSymbol;
+        // this.dragGraphic.symbol = item;
+        this._redrawDragGraphic();
       });
-      this.scene.drawLayer.add(this.dragGraphic);
+      // this.scene.drawLayer.add(this.dragGraphic);
+      this._onDrag(event);
     }
   }
 
@@ -192,16 +195,20 @@ export default class SymbolGallery extends declared(Widget) {
     // target.setAttribute('data-x', x);
     // target.setAttribute('data-y', y);
 
-    if (this.dragGraphic) {
-      this.scene.drawLayer.remove(this.dragGraphic);
-      const clone = this.dragGraphic.clone();
-      clone.symbol = this.dragGraphic.symbol;
+    const mapPoint = this._mapPointForEvent(event); // this.scene.view.toMap(screenPoint);
+    // this.dragGraphic.geometry = mapPoint;
+    this._redrawDragGraphic(mapPoint);
+  }
 
-      const mapPoint = this._mapPointForEvent(event); // this.scene.view.toMap(screenPoint);
-      clone.geometry = mapPoint;
-      this.scene.drawLayer.add(clone);
-      this.dragGraphic = clone;
+  private _redrawDragGraphic(geometry?: any) {
+    this.scene.drawLayer.remove(this.dragGraphic);
+    const clone = this.dragGraphic.clone();
+    clone.symbol = this.dragSymbol;
+    if (geometry) {
+      clone.geometry = geometry;
     }
+    this.scene.drawLayer.add(clone);
+    this.dragGraphic = clone;
   }
 
   private _mapPointForEvent(event: {clientX: number, clientY: number}): Point {
@@ -221,10 +228,7 @@ export default class SymbolGallery extends declared(Widget) {
   }
 
   private _onDragEnd(event: InteractEvent) {
-    if (this.dragGraphic) {
-      // this.scene.drawLayer.remove(this.dragGraphic);
-      this.dragGraphic = null;
-    }
+    this.dragGraphic = new Graphic();
   }
 
   private _load(): IPromise {

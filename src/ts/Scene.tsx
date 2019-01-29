@@ -246,6 +246,7 @@ export default class Scene extends declared(Widget) {
   }
 
   private _goToSlide(slide: Slide): IPromise {
+
     return this.view.goTo(slide.viewpoint).then(() => {
 
       this.mapLayers.forEach((layer) => {

@@ -6,6 +6,7 @@ import {
 import { tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
+import CreateBuilding from "./draw/CreateBuilding";
 import SymbolGallery from "./draw/SymbolGallery";
 import Scene from "./Scene";
 
@@ -14,8 +15,14 @@ export default class App extends declared(Widget) {
 
   private scene: Scene = new Scene();
 
+  private activeWidget: Widget;
+
+  private createBuilding: CreateBuilding = new CreateBuilding({
+    scene: this.scene,
+  });
+
   private symbolGallery: SymbolGallery = new SymbolGallery({
-      scene: this.scene,
+    scene: this.scene,
   });
 
   public render() {
@@ -23,16 +30,19 @@ export default class App extends declared(Widget) {
       <div>
         <div id="topMenu" />
         <div id="scene" bind={ this } afterCreate={ this._attachScene } />
-        <div id="bottomMenu" class="center">
-          <div id="secondaryMenu" class="menu secondary-menu">
+        <div class="bottom">
+          <div id="secondaryMenu">
 
           </div>
-          <div class="menu primary-menu">
+
+          <div class="menu">
           {
             ["feature-layer", "line-chart", "organization", "map-pin"]
             .map((item) => (
-              <div class="menuItem" onclick={ () => this._selectMenu(item) }>
-                <span class={ "vcenter font-size-6 icon-ui-" + item } />
+              <div class="menu-item">
+                <button class="btn btn-large" onclick={ () => this._selectMenu(item) }>
+                  <span class={ "font-size-6 icon-ui-" + item } />
+                </button>
               </div>
             ))
           }
@@ -47,9 +57,15 @@ export default class App extends declared(Widget) {
   }
 
   private _selectMenu(item: string) {
-    if (item === "map-pin") {
-      this.symbolGallery.selectedGroup = null;
-      this.symbolGallery.container = "secondaryMenu";
+
+    switch (item) {
+      case "organization":
+        this.createBuilding.container = "secondaryMenu";
+        break;
+      case "map-pin":
+        this.symbolGallery.selectedGroup = null;
+        this.symbolGallery.container = "secondaryMenu";
+        break;
     }
   }
 

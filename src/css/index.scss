@@ -30,6 +30,25 @@ body {
   position: relative;
 }
 
+.bottom {
+  width: 100%;
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.menu {
+  width: 100%;
+  text-align: center;
+}
+
+.menu-item {
+  display: inline-block;
+  margin:10px;
+}
+
+
 #topMenu,
 #bottomMenu,
 #sceneView,
@@ -42,27 +61,8 @@ body {
   transform: translate(-50%, 0);
 }
 
-.vcenter {
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-#bottomMenu {
-  width: 100%;
-  bottom: 0px;
-}
-
-.menuItem {
-  float: left;
-}
-
-.menuItem > * {
-  position: absolute;
-}
-
 // Make bottom menu circled
-.primary-menu .menuItem {
+.shaded-menu {
   background-color: $transparent-black;
   color: white;
   height: 100px;
