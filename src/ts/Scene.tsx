@@ -25,7 +25,7 @@ import Widget from "esri/widgets/Widget";
 // animejs
 import anime from "animejs";
 import Point = require('esri/geometry/Point');
-import ScreenPoint = require('esri/geometry/ScreenPoint');
+import Polygon = require('esri/geometry/Polygon');
 
 // Hard coded constants
 
@@ -37,7 +37,7 @@ const MASKED_OBJIDS = [
 
 const MASK_ANIMATION_DURATION = 2000;
 
-const MASKED_AREA = [
+const MASK_AREA = [
   [-8235924.058660398, 4968738.274357371],
   [-8235409.000644938, 4968717.325404106],
   [-8235333.439527529, 4968898.289607817],
@@ -74,6 +74,11 @@ export default class Scene extends declared(Widget) {
     elevationInfo: {
       mode: "relative-to-scene",
     },
+  });
+
+  public readonly maskPolygon = new Polygon({
+    rings: [MASK_AREA],
+    spatialReference: SpatialReference.WebMercator,
   });
 
   private mapLayers: Layer[] = [];
@@ -113,15 +118,15 @@ export default class Scene extends declared(Widget) {
 
   private _animateArea(): Promise<void> {
 
-    const start = MASKED_AREA[0];
-    const waypoints = MASKED_AREA.slice(1);
+    const start = MASK_AREA[0];
+    const waypoints = MASK_AREA.slice(1);
 
     const durations: number[] = [];
     let totalLength = 0;
 
     waypoints.forEach((point, index) => {
-      const a = point[0] - MASKED_AREA[index][0];
-      const b = point[1] - MASKED_AREA[index][1];
+      const a = point[0] - MASK_AREA[index][0];
+      const b = point[1] - MASK_AREA[index][1];
       const length = Math.sqrt(a * a + b * b); // Math.abs(a * b);
       durations.push(length);
       totalLength += length;
@@ -190,11 +195,7 @@ export default class Scene extends declared(Widget) {
     });
 
     const polygonGraphic = new Graphic({
-      geometry: {
-        type: "polygon", // autocasts as new Polygon()
-        rings: MASKED_AREA,
-        spatialReference: SpatialReference.WebMercator,
-      },
+      geometry: this.maskPolygon,
       symbol: {
         color,
         type: "simple-fill", // autocasts as new SimpleFillSymbol()
@@ -250,6 +251,8 @@ export default class Scene extends declared(Widget) {
       this.mapLayers.forEach((layer) => {
         layer.visible = 0 <= slide.visibleLayers.findIndex((visibleLayer) => visibleLayer.id === layer.id);
       });
+
+      this.map.basemap = slide.basemap;
 
       // Wait for all layers to update after applying a new slide
       return eachAlways(this.view.layerViews.map((layerView) => {
