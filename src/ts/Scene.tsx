@@ -253,7 +253,7 @@ export default class Scene extends declared(Widget) {
         layer.visible = 0 <= slide.visibleLayers.findIndex((visibleLayer) => visibleLayer.id === layer.id);
       });
 
-      this.map.basemap = slide.basemap;
+      // this.map.basemap = slide.basemap;
 
       // Wait for all layers to update after applying a new slide
       return eachAlways(this.view.layerViews.map((layerView) => {
