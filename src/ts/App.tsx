@@ -9,23 +9,28 @@ import Widget from "esri/widgets/Widget";
 import Timeline from "./Timeline";
 
 import CreateBuilding from "./draw/CreateBuilding";
+import CreatePath from "./draw/CreatePath";
 import SymbolGallery from "./draw/SymbolGallery";
 import Scene from "./Scene";
 
 @subclass("app.widgets.webmapview")
 export default class App extends declared(Widget) {
 
-  private scene: Scene = new Scene();
+  private scene = new Scene();
 
-  private timeline: Timeline = new Timeline({
+  private timeline = new Timeline({
     scene: this.scene,
   });
 
-  private createBuilding: CreateBuilding = new CreateBuilding({
+  private createPath = new CreatePath({
     scene: this.scene,
   });
 
-  private symbolGallery: SymbolGallery = new SymbolGallery({
+  private createBuilding = new CreateBuilding({
+    scene: this.scene,
+  });
+
+  private symbolGallery = new SymbolGallery({
     scene: this.scene,
   });
 
@@ -41,6 +46,7 @@ export default class App extends declared(Widget) {
         </div>
         <div class="bottom">
           <div id="secondaryMenu" class="secondary-menu">
+            <div afterCreate={ this._attachMenu.bind(this, this.createPath) } />
             <div afterCreate={ this._attachMenu.bind(this, this.createBuilding) } />
             <div afterCreate={ this._attachMenu.bind(this, this.symbolGallery) } />
           </div>
@@ -103,6 +109,9 @@ export default class App extends declared(Widget) {
       (this.selectedWidget.container as HTMLElement).style.display = "";
     }
     switch (item) {
+      case "line-chart":
+        this._showWidget(this.createPath);
+        break;
       case "organization":
         this._showWidget(this.createBuilding);
         break;

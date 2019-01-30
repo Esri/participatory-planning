@@ -29,6 +29,9 @@ import Renderer = require('esri/renderers/Renderer');
 
 // Hard coded constants
 
+// One of low, medium, high
+export const QUALITY = "high";
+
 export const MASKED_OBJIDS = [
   158321, 106893, 158711, 158613, 158632, 159047, 158099, 158249, 147102, 106899, 107439, 158654, 158247, 158307,
   158610, 158963, 154542, 158869, 158814, 158900, 107340, 107395, 107172, 158336, 158784, 158571, 158600, 158348,
@@ -63,7 +66,7 @@ export default class Scene extends declared(Widget) {
     ui: {
       components: [],
     },
-    qualityProfile: "low",
+    qualityProfile: QUALITY,
   } as any);
 
   @property({
@@ -118,9 +121,6 @@ export default class Scene extends declared(Widget) {
   }
 
   public showMaskedBuildings(color?: any) {
-
-    console.log("Mask!", color);
-
     if (color) {
       const renderer = new UniqueValueRenderer({
         // field: "OBJECTID",

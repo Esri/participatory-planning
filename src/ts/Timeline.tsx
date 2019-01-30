@@ -59,7 +59,6 @@ export default class Timeline extends declared(Widget) {
       this.introSlide = slides.getItemAt(0);
       this.beforeSlide = slides.getItemAt(1);
       this.afterSlide = slides.getItemAt(2);
-      this._goToSlide(this.introSlide);
 
       this.maskPolyline = new Graphic({
         symbol: {
@@ -83,6 +82,10 @@ export default class Timeline extends declared(Widget) {
           },
         },
       } as any);
+    });
+
+    this.scene.view.when(() => {
+      this._goToSlide(this.introSlide);
     });
   }
 
@@ -147,15 +150,17 @@ export default class Timeline extends declared(Widget) {
 
       // Toggle layer visibility
       this.scene.map.layers.forEach((layer) => {
+        if (!layer.visible) {
+          layer.visible = true;
+        }
         if (layer.get("url")) {
-          layer.visible = true;
-          if (0 <= slide.visibleLayers.findIndex((visibleLayer) => visibleLayer.id === layer.id)) {
-            layer.opacity = 1;
-          } else {
-            layer.opacity = 0.1;
+          let opacity = 1;
+          if (slide.visibleLayers.findIndex((visibleLayer) => visibleLayer.id === layer.id) < 0) {
+            opacity = 0.01;
           }
-        } else {
-          layer.visible = true;
+          if (layer.opacity !== opacity) {
+            layer.opacity = opacity;
+          }
         }
       });
 
@@ -220,9 +225,7 @@ export default class Timeline extends declared(Widget) {
         },
       });
     });
-    return timeline.finished.then(() => {
-      console.log("Path has symbols ", paths);
-    });
+    return timeline.finished;
   }
 
   private _animateMask(): Promise<void> {
@@ -273,7 +276,6 @@ export default class Timeline extends declared(Widget) {
         easing: "easeInOutExpo",
         update,
         begin: () => {
-          console.log("Hide buildings");
           this.scene.showMaskedBuildings();
         },
         complete: () => {
