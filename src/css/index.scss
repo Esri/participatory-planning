@@ -30,12 +30,31 @@ body {
   position: relative;
 }
 
-.bottom {
+.top, .bottom, .intro {
   width: 100%;
   position: absolute;
-  bottom: 0px;
+}
+
+.intro {
+  background-color: #000A;
+  height: 100%;
+  width: 100%;
+}
+
+.intro > div {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.top, .bottom {
   left: 50%;
   transform: translate(-50%, 0);
+}
+
+.bottom {
+  bottom: 0px;
 }
 
 .menu {
@@ -45,7 +64,11 @@ body {
 
 .menu-item {
   display: inline-block;
-  margin:10px;
+  margin: 5px;
+}
+
+.primary-menu .menu-item {
+  margin: 10px;
 }
 
 

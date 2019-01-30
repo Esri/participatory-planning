@@ -22,13 +22,15 @@ import Widget from "esri/widgets/Widget";
 
 import Draw from "esri/views/draw/Draw";
 
-@subclass("app.widgets.SymbolGallery")
+@subclass("app.draw.CreateBuilding")
 export default class CreateBuilding extends declared(Widget) {
 
   @property()
   public scene: Scene;
 
   private draw: Draw;
+
+  private stories: number = 3;
 
   constructor(params?: any) {
     super(params);
@@ -43,15 +45,24 @@ export default class CreateBuilding extends declared(Widget) {
   public render() {
     return (
       <div>
-        <nav class="leader-1">
-        <button class="btn btn-grouped" bind={ this } onclick={ this._startDrawing }>New Building</button>
-        </nav>
+        <div class="menu">
+          <div class="menu-item">
+            <button class="btn" onclick={ this._startDrawing.bind(this, 3) }>3-Story Building</button>
+          </div>
+          <div class="menu-item">
+            <button class="btn" onclick={ this._startDrawing.bind(this, 5) }>5-Story Building</button>
+          </div>
+          <div class="menu-item">
+            <button class="btn" onclick={ this._startDrawing.bind(this, 10) }>10-Story Building</button>
+          </div>
+        </div>
       </div>
     );
   }
 
-  private _startDrawing() {
+  private _startDrawing(stories: number) {
 
+    this.stories = stories;
     this.draw.reset();
 
     const action = this.draw.create("polygon", {mode: "click"});
@@ -115,7 +126,7 @@ export default class CreateBuilding extends declared(Widget) {
             color: "#4d5b18",
             size: 1.5,
           },
-          size: 50,
+          size: this.stories * 3,
         }],
       },
     } as any);

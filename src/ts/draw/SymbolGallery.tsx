@@ -31,7 +31,7 @@ import {nearestCoordinate} from "esri/geometry/geometryEngine";
 
 const SymbolGroupCollection = Collection.ofType<SymbolGroup>(SymbolGroup);
 
-@subclass("app.widgets.SymbolGallery")
+@subclass("app.draw.SymbolGallery")
 export default class SymbolGallery extends declared(Widget) {
 
   @property() public scene: Scene;
@@ -84,42 +84,35 @@ export default class SymbolGallery extends declared(Widget) {
 
   public render() {
 
-    if (this.selectedGroup) {
-      return (
-        <div>
-          <div class="gallery-grid">
+    const galleryItems = this.selectedGroup ? this.selectedGroup.items.toArray() : [];
+    const showGroups = !galleryItems.length && this.groups.length;
+    const showLoading = !(galleryItems.length || showGroups);
+    return (
+      <div>
+        <div class="gallery-grid" style={ galleryItems.length ? "" : "display:none;"}>
+        {
+          galleryItems.map((item) => this._renderSymbolItem(item))
+        }
+        </div>
+        <div class="menu" style={ showGroups ? "" : "display:none;"}>
           {
-            this.selectedGroup.items.toArray().map((item) => this._renderSymbolItem(item))
+            this.groups.toArray().map((group, index) => (
+              <div class="menu-item" key={ index }>
+                <button class="btn btn-grouped" onclick={
+                  () => this._selectGroup(group)
+                } >{ group.title }</button>
+              </div>
+            ))
           }
-          </div>
         </div>
-      );
-    } else if (this.groups.length) {
-      return (
-        <div>
-          <div class="menu">
-            {
-              this.groups.toArray().map((group, index) => (
-                <div class="menu-item" key={ index }>
-                  <button class="btn btn-grouped" onclick={
-                    () => this._selectGroup(group)
-                  } >{ group.title }</button>
-                </div>
-              ))
-            }
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div>
+        <div style={ showLoading ? "" : "display:none;"}>
           <div class="loader is-active padding-leader-3 padding-trailer-3">
             <div class="loader-bars"></div>
             <div class="loader-text">Loading...</div>
           </div>
         </div>
-      );
-    }
+      </div>
+    );
 
     // const sourceLoading = false;
     // const rootClasses = {
