@@ -24,6 +24,8 @@ import Widget from "esri/widgets/Widget";
 
 import Point = require('esri/geometry/Point');
 import Polygon = require('esri/geometry/Polygon');
+import UniqueValueRenderer = require('esri/renderers/UniqueValueRenderer');
+import Renderer = require('esri/renderers/Renderer');
 
 // Hard coded constants
 
@@ -56,11 +58,12 @@ export default class Scene extends declared(Widget) {
   @property({
     readOnly: true,
   })
-  public readonly view: SceneView = new SceneView({
+  public readonly view = new SceneView({
     map: this.map,
     ui: {
       components: [],
     },
+    qualityProfile: "low",
   } as any);
 
   @property({
@@ -86,17 +89,16 @@ export default class Scene extends declared(Widget) {
     spatialReference: SpatialReference.WebMercator,
   });
 
-  private mapLayers: Layer[] = [];
-
   private sceneLayer: SceneLayer;
+  private defaultSceneLayerRenderer: Renderer;
 
   public postInitialize() {
-
     this.map.when(() => {
-      this.mapLayers = this.map.layers.toArray();
       this.map.add(this.drawLayer);
       this.map.add(this.highlightLayer);
       this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
+      this.defaultSceneLayerRenderer = this.sceneLayer.renderer;
+      this.showMaskedBuildings("white");
     });
 
     this.view.on("click", (event: any) => {
@@ -115,35 +117,44 @@ export default class Scene extends declared(Widget) {
     );
   }
 
-  public showMaskedBuildings(show: boolean) {
-    if (show) {
+  public showMaskedBuildings(color?: any) {
+
+    console.log("Mask!", color);
+
+    if (color) {
+      const renderer = new UniqueValueRenderer({
+        // field: "OBJECTID",
+        valueExpression: "When(indexof([" + MASKED_OBJIDS.join(",") + "], $feature.OBJECTID) < 0, 'show', 'hide')",
+          // When(OBJECTID IN (" + MASKED_OBJIDS.join(",") + "), 'hide', 'show')",
+        defaultSymbol: {
+          type: "mesh-3d",
+        },
+        uniqueValueInfos: [{
+          value: "hide", // "hide",
+          symbol: {
+            type: "mesh-3d",
+            symbolLayers: [{
+              type: "fill",  // autocasts as new FillSymbol3DLayer()
+              material: {
+                color,
+                colorMixMode: "replace",
+              },
+            }],
+          },
+        }],
+      } as any);
       this.sceneLayer.definitionExpression = "";
       this.drawLayer.visible = false;
+      this.sceneLayer.renderer = renderer;
     } else {
       this.sceneLayer.definitionExpression = "OBJECTID NOT IN (" + MASKED_OBJIDS.join(",") + ")";
+      this.sceneLayer.renderer = this.defaultSceneLayerRenderer;
       this.drawLayer.visible = true;
     }
   }
 
   private _attachSceneView(sceneViewDiv: HTMLDivElement) {
     this.view.container = sceneViewDiv;
-  }
-
-  private _goToSlide(slide: Slide): IPromise {
-
-    return this.view.goTo(slide.viewpoint).then(() => {
-
-      this.mapLayers.forEach((layer) => {
-        layer.visible = 0 <= slide.visibleLayers.findIndex((visibleLayer) => visibleLayer.id === layer.id);
-      });
-
-      // this.map.basemap = slide.basemap;
-
-      // Wait for all layers to update after applying a new slide
-      return eachAlways(this.view.layerViews.map((layerView) => {
-        return whenNotOnce(layerView, "updating");
-      }));
-    });
   }
 
 }

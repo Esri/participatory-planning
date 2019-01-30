@@ -119,12 +119,12 @@ export default class CreateBuilding extends declared(Widget) {
         symbolLayers: [{
           type: "extrude", // autocasts as new ExtrudeSymbol3DLayer()
           material: {
-            color: "#A7C636",
+            color: "#FFF",
           },
           edges: {
             type: "solid",
-            color: "#4d5b18",
-            size: 1.5,
+            color: "#AAA",
+            size: 0.5,
           },
           size: this.stories * 3,
         }],

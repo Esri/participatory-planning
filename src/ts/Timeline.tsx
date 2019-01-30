@@ -130,19 +130,22 @@ export default class Timeline extends declared(Widget) {
   private _showBefore(): IPromise {
     return this
       ._goToSlide(this.beforeSlide)
-      .then(() => this.scene.showMaskedBuildings(true));
+      .then(() => this.scene.showMaskedBuildings("white"));
   }
 
   private _showAfter(): IPromise {
+    this.scene.showMaskedBuildings();
     return this
-      ._goToSlide(this.afterSlide)
-      .then(() => this.scene.showMaskedBuildings(false));
+      ._goToSlide(this.afterSlide);
   }
 
   private _goToSlide(slide: Slide): IPromise {
     const view = this.scene.view;
     return view.goTo(slide.viewpoint).then(() => {
-      // this.map.basemap = slide.basemap;
+
+      this.scene.view.environment = slide.environment;
+
+      // Toggle layer visibility
       this.scene.map.layers.forEach((layer) => {
         if (layer.get("url")) {
           layer.visible = true;
@@ -190,39 +193,36 @@ export default class Timeline extends declared(Widget) {
       y: start[1],
     };
 
-    this.scene.showMaskedBuildings(true);
     const layer = this.scene.highlightLayer;
 
-    let timeline = anime.timeline({}).add({
-      targets: movingPoint,
-      duration: 0,
-      delay: 1000,
+    let timeline = anime.timeline({
+      update: () => {
+        layer.remove(this.maskPolyline);
+        const clonedMaskPolygon = this.maskPolyline.clone();
+        clonedMaskPolygon.symbol = this.maskPolyline.symbol;
+        clonedMaskPolygon.geometry = new Polyline({
+          paths: [paths.concat([[movingPoint.x, movingPoint.y]])],
+          spatialReference: SpatialReference.WebMercator,
+        } as any);
+        this.maskPolyline = clonedMaskPolygon;
+        layer.add(clonedMaskPolygon);
+      },
     });
     waypoints.forEach((point, index) => {
       timeline = timeline.add({
         targets: movingPoint,
         x: point[0],
         y: point[1],
-        duration: durations[index], // durations[i],
-        // easing: "easeInOutExpo",
-        easing: "linear",
-        update: () => {
-          layer.remove(this.maskPolyline);
-          const clonedMaskPolygon = this.maskPolyline.clone();
-          clonedMaskPolygon.symbol = this.maskPolyline.symbol;
-          clonedMaskPolygon.geometry = new Polyline({
-            paths: [paths.concat([[movingPoint.x, movingPoint.y]])],
-            spatialReference: SpatialReference.WebMercator,
-          } as any);
-          this.maskPolyline = clonedMaskPolygon;
-          layer.add(clonedMaskPolygon);
-        },
+        duration: durations[index],
+        easing: "easeInOutExpo",
         complete: () => {
           paths.push([movingPoint.x, movingPoint.y]);
         },
       });
     });
-    return timeline.finished;
+    return timeline.finished.then(() => {
+      console.log("Path has symbols ", paths);
+    });
   }
 
   private _animateMask(): Promise<void> {
@@ -233,45 +233,54 @@ export default class Timeline extends declared(Widget) {
       a: 0,
     });
 
+    const buildingColor = new Color({
+      r: 256,
+      g: 256,
+      b: 256,
+    });
+
     const layer = this.scene.highlightLayer;
 
-    return anime
-      .timeline({
-        update: () => {
-          // Graphic is only redrawn when symbol changes
-          const clone = this.maskPolygon.clone();
-          layer.remove(this.maskPolygon);
-          clone.symbol = (this.maskPolygon.symbol as SimpleFillSymbol).clone();
-          clone.symbol.color = color;
-          layer.add(clone);
-          this.maskPolygon = clone;
-        },
-      })
-      .add({
-        targets: color,
-        a: 0.6,
-        duration: 1500,
-        easing: "easeInOutExpo",
-        complete: () => {
-          this.scene.showMaskedBuildings(false);
-        },
-      })
-      .add({
-        targets: color,
-        a: 0.6,
-        duration: 500,
-        easing: "easeInOutExpo",
-      })
-      .add({
+    const update = () => {
+      // Graphic is only redrawn when symbol changes
+      const clone = this.maskPolygon.clone();
+      layer.remove(this.maskPolygon);
+      clone.symbol = (this.maskPolygon.symbol as SimpleFillSymbol).clone();
+      clone.symbol.color = color;
+      layer.add(clone);
+      this.maskPolygon = clone;
+    };
+
+    return anime({
+      update: () => {
+        update();
+        this.scene.showMaskedBuildings(buildingColor);
+      },
+      targets: [color, buildingColor],
+      r: 226,
+      g: 119,
+      b: 40,
+      a: 0.6,
+      easing: "easeInOutExpo",
+    }).finished
+    .then(() =>
+      anime({
         targets: color,
         a: 0,
+        delay: 500,
         duration: 500,
+        endDelay: 1500,
         easing: "easeInOutExpo",
+        update,
+        begin: () => {
+          console.log("Hide buildings");
+          this.scene.showMaskedBuildings();
+        },
         complete: () => {
           layer.remove(this.maskPolygon);
         },
-      })
-      .finished;
+      }).finished,
+    );
   }
 
 }
