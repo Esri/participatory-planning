@@ -3,28 +3,16 @@ import Scene from "../Scene";
 
 // esri
 import {
-  aliasOf,
   declared,
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import Collection = require("esri/core/Collection");
-import Point from "esri/geometry/Point";
-import SpatialReference from "esri/geometry/SpatialReference";
-import Graphic from "esri/Graphic";
-import Portal from "esri/portal/Portal";
-import PortalItem from "esri/portal/PortalItem";
-import PortalQueryParams from "esri/portal/PortalQueryParams";
-import PortalQueryResult from "esri/portal/PortalQueryResult";
-import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
-import { renderable, tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
-
-import Draw from "esri/views/draw/Draw";
-import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
-
 import { contains, nearestCoordinate } from "esri/geometry/geometryEngine";
-import Polyline = require('esri/geometry/Polyline');
+import Point from "esri/geometry/Point";
+import Polyline from "esri/geometry/Polyline";
+import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
+import { tsx } from "esri/widgets/support/widget";
+import Widget from "esri/widgets/Widget";
 
 @subclass("app.draw.CreatePath")
 export default class CreatePath extends declared(Widget) {
@@ -47,6 +35,7 @@ export default class CreatePath extends declared(Widget) {
 
     this.sketchModel.polylineSymbol =  {
       type: "simple-line", // autocasts as SimpleLineSymbol()
+      cap: "round",
       color: "#b2b3b2",
       width: 20,
     } as any;
@@ -120,7 +109,6 @@ export default class CreatePath extends declared(Widget) {
     const polyline = event.graphic.geometry as Polyline;
     // const paths = polyline.paths[0];
     if (this._fixPaths(polyline.paths)) {
-      // console.log("Fixed one or more points", this._fixPaths(polyline.paths));
       // event.graphic.geometry = event.graphic.geometry.clone();
       // this.sketchModel.createGraphic.geometry = event.graphic.geometry;
 

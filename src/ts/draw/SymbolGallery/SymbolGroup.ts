@@ -4,11 +4,10 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
+import Collection = require("esri/core/Collection");
 import PortalItem from "esri/portal/PortalItem";
-
 import SymbolItem from "./SymbolItem";
 
-import Collection = require("esri/core/Collection");
 export const SymbolItemCollection = Collection.ofType<SymbolItem>(SymbolItem);
 
 @subclass("draw.symbolgallery.SymbolGroup")

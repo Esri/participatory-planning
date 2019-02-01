@@ -6,13 +6,12 @@ import {
 import { tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
-import Timeline from "./Timeline";
-
-import CreateBuilding from "./draw/CreateBuilding";
 import CreateArea from "./draw/CreateArea";
+import CreateBuilding from "./draw/CreateBuilding";
 import CreatePath from "./draw/CreatePath";
 import SymbolGallery from "./draw/SymbolGallery";
 import Scene from "./Scene";
+import Timeline from "./Timeline";
 
 @subclass("app.widgets.webmapview")
 export default class App extends declared(Widget) {

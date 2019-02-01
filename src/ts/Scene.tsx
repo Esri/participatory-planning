@@ -1,23 +1,22 @@
+
+// esri
 import {
   declared,
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-
-// esri
+import Polygon from "esri/geometry/Polygon";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import SceneLayer from "esri/layers/SceneLayer";
+import UniqueValueRenderer from "esri/renderers/UniqueValueRenderer";
 import SceneView from "esri/views/SceneView";
 import WebScene from "esri/WebScene";
 import { tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
-import Polygon from "esri/geometry/Polygon";
-import UniqueValueRenderer from "esri/renderers/UniqueValueRenderer";
-
-import { computeBoundingPolygon } from "./utils/geometry";
+import { computeBoundingPolygon } from "./support/geometry";
 
 // Hard coded constants
 
@@ -38,13 +37,6 @@ export const MASK_AREA = [
   [-8236134.357229519, 4969027.878528339],
   [-8236138.632189713, 4968850.261903069],
   [-8235919.081131686, 4968836.806196137],
-];
-
-const BOUNDING_POINTS = [
-  [-8267393.318890517, 4946292.164110351],
-  [-8226396.259688563, 4954709.431707434],
-  [-8217325.82357407, 4981609.915253013],
-  [-8260147.792707985, 4987721.921045153],
 ];
 
 @subclass("app.widgets.webmapview")
@@ -147,14 +139,13 @@ export default class Scene extends declared(Widget) {
     const uniqueValueInfos = [];
     if (color) {
 
-      // Show masked buildings with provided colorMixMode, all other buildings are white
-
+      // Show masked buildings with provided color, all other buildings are white
       uniqueValueInfos.push({
-        value: "hide", // "hide",
+        value: "hide",
         symbol: {
           type: "mesh-3d",
           symbolLayers: [{
-            type: "fill",  // autocasts as new FillSymbol3DLayer()
+            type: "fill",
             material: {
               color,
               colorMixMode: "replace",
@@ -173,12 +164,14 @@ export default class Scene extends declared(Widget) {
       this.groundLayer.visible = false;
       this.symbolLayer.visible = false;
     } else {
+
+      // Do not show masked buildings and dimm surounding ones
       uniqueValueInfos.push({
-        value: "show", // "hide",
+        value: "show",
         symbol: {
           type: "mesh-3d",
           symbolLayers: [{
-            type: "fill",  // autocasts as new FillSymbol3DLayer()
+            type: "fill",
             material: {
               color: [180, 180, 180],
               colorMixMode: "replace",

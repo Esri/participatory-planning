@@ -3,27 +3,14 @@ import Scene from "../Scene";
 
 // esri
 import {
-  aliasOf,
   declared,
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import Collection = require("esri/core/Collection");
-import Point from "esri/geometry/Point";
-import SpatialReference from "esri/geometry/SpatialReference";
-import Graphic from "esri/Graphic";
-import Portal from "esri/portal/Portal";
-import PortalItem from "esri/portal/PortalItem";
-import PortalQueryParams from "esri/portal/PortalQueryParams";
-import PortalQueryResult from "esri/portal/PortalQueryResult";
-import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
-import { renderable, tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
-
-import Draw from "esri/views/draw/Draw";
+import { contains } from "esri/geometry/geometryEngine";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
-
-import { contains, nearestCoordinate } from "esri/geometry/geometryEngine";
+import { tsx } from "esri/widgets/support/widget";
+import Widget from "esri/widgets/Widget";
 
 @subclass("app.draw.CreateArea")
 export default class CreateArea extends declared(Widget) {

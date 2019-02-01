@@ -10,7 +10,6 @@ import {
 } from "esri/core/accessorSupport/decorators";
 import Collection = require("esri/core/Collection");
 import Point from "esri/geometry/Point";
-import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import Portal from "esri/portal/Portal";
 import PortalItem from "esri/portal/PortalItem";
@@ -137,7 +136,6 @@ export default class SymbolGallery extends declared(Widget) {
   }
 
   private _renderSymbolItem(item: SymbolItem) {
-    // console.log("Rendering an item", item);
     const href = item.thumbnailHref;
     const key = item.group.category + item.name;
 
@@ -233,7 +231,6 @@ export default class SymbolGallery extends declared(Widget) {
         .then((symbolGroups) => {
           this.groups.removeAll();
           this.groups.addMany(symbolGroups);
-          console.log("Groups loaded", this.groups);
         });
     }
 
@@ -250,7 +247,6 @@ export default class SymbolGallery extends declared(Widget) {
   }
 
   private _querySymbolGroups(portal: Portal): IPromise<PortalItem[]> {
-    console.log("Querying the portal", portal.symbolSetsGroupQuery);
     return portal.queryGroups({
       query: "title:\"Esri Styles\" AND owner:esri_en",
     })

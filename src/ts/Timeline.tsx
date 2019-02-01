@@ -1,36 +1,24 @@
 
-import Scene, {MASK_AREA} from "./Scene";
-
 // esri
+import Color from "esri/Color";
 import {
-  aliasOf,
   declared,
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import Collection from "esri/core/Collection";
 import { eachAlways } from "esri/core/promiseUtils";
 import { whenNotOnce } from "esri/core/watchUtils";
-import Point from "esri/geometry/Point";
+import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
-import Portal from "esri/portal/Portal";
-import PortalItem from "esri/portal/PortalItem";
-import PortalQueryParams from "esri/portal/PortalQueryParams";
-import PortalQueryResult from "esri/portal/PortalQueryResult";
-import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
-import { renderable, tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
-
-import Draw from "esri/views/draw/Draw";
 import Slide from "esri/webscene/Slide";
+import { tsx } from "esri/widgets/support/widget";
+import Widget from "esri/widgets/Widget";
 
 // animejs
 import anime from "animejs";
-import Polyline = require('esri/geometry/Polyline');
-import Color = require('esri/Color');
-import SimpleFillSymbol = require('esri/symbols/SimpleFillSymbol');
 
+import Scene, {MASK_AREA} from "./Scene";
 import { redraw } from "./support/graphics";
 
 export const AREA_ANIMATION_DURATION = 2000;
@@ -65,7 +53,7 @@ export default class Timeline extends declared(Widget) {
 
       this.maskPolyline = new Graphic({
         symbol: {
-          type: "line-3d", // autocasts as SimpleLineSymbol()
+          type: "line-3d",
           symbolLayers: [{
             type: "path",  // autocasts as new PathSymbol3DLayer()
             size: 6,  // 20 meters in diameter
@@ -78,7 +66,6 @@ export default class Timeline extends declared(Widget) {
         geometry: this.scene.maskPolygon,
         symbol: {
           type: "simple-fill", // autocasts as new SimpleFillSymbol()
-          color: this.maskColor.clone().setColor({a: 0}),
           outline: { // autocasts as new SimpleLineSymbol()
             width: 6,
             color: this.maskColor,

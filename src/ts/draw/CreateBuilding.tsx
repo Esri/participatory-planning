@@ -3,24 +3,14 @@ import Scene from "../Scene";
 
 // esri
 import {
-  aliasOf,
   declared,
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import Collection = require("esri/core/Collection");
-import Point from "esri/geometry/Point";
-import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
-import Portal from "esri/portal/Portal";
-import PortalItem from "esri/portal/PortalItem";
-import PortalQueryParams from "esri/portal/PortalQueryParams";
-import PortalQueryResult from "esri/portal/PortalQueryResult";
-import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
-import { renderable, tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
-
 import Draw from "esri/views/draw/Draw";
+import { tsx } from "esri/widgets/support/widget";
+import Widget from "esri/widgets/Widget";
 
 @subclass("app.draw.CreateBuilding")
 export default class CreateBuilding extends declared(Widget) {
@@ -81,7 +71,6 @@ export default class CreateBuilding extends declared(Widget) {
 
   private _drawPolygon(event: any) {
     // create a new graphic presenting the polyline that is being drawn on the view
-    console.log("Event", event);
     const view = this.scene.view;
     view.graphics.removeAll();
 
