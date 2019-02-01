@@ -55,12 +55,13 @@ export default class Timeline extends declared(Widget) {
         symbol: {
           type: "line-3d",
           symbolLayers: [{
-            type: "path",  // autocasts as new PathSymbol3DLayer()
-            size: 6,  // 20 meters in diameter
+            type: "path",
+            size: 6,
             material: { color: this.maskColor },
           }],
         },
       } as any);
+      this.scene.highlightLayer.add(this.maskPolyline);
 
       this.maskPolygon = new Graphic({
         geometry: this.scene.maskPolygon,
@@ -72,6 +73,7 @@ export default class Timeline extends declared(Widget) {
           },
         },
       } as any);
+      this.scene.highlightLayer.add(this.maskPolygon);
     });
 
     this.scene.view.when(() => {
@@ -109,8 +111,6 @@ export default class Timeline extends declared(Widget) {
   }
 
   private _showIntro(): IPromise {
-    this.scene.highlightLayer.graphics.remove(this.maskPolyline);
-    this.scene.highlightLayer.graphics.remove(this.maskPolygon);
     return this._showBefore()
     .then(() => {
       this
@@ -189,19 +189,13 @@ export default class Timeline extends declared(Widget) {
       y: start[1],
     };
 
-    const layer = this.scene.highlightLayer;
-
     let timeline = anime.timeline({
       update: () => {
-        layer.remove(this.maskPolyline);
-        const clonedMaskPolygon = this.maskPolyline.clone();
-        clonedMaskPolygon.symbol = this.maskPolyline.symbol;
-        clonedMaskPolygon.geometry = new Polyline({
+        this.maskPolyline = redraw(this.maskPolyline, "geometry", {
+          type: "polyline",
           paths: [paths.concat([[movingPoint.x, movingPoint.y]])],
           spatialReference: SpatialReference.WebMercator,
-        } as any);
-        this.maskPolyline = clonedMaskPolygon;
-        layer.add(clonedMaskPolygon);
+        });
       },
     });
     waypoints.forEach((point, index) => {
@@ -233,25 +227,11 @@ export default class Timeline extends declared(Widget) {
       b: 256,
     });
 
-    const layer = this.scene.highlightLayer;
-
-    layer.add(this.maskPolygon);
-    const update = () => {
-      // Graphic is only redrawn when symbol changes
-      this.maskPolygon = redraw(this.maskPolygon, "symbol.color", color);
-
-/*      const clone = this.maskPolygon.clone();
-      layer.remove(this.maskPolygon);
-      clone.symbol = (this.maskPolygon.symbol as SimpleFillSymbol).clone();
-      clone.symbol.color = color;
-      layer.add(clone);
-      this.maskPolygon = clone;
-      */
-    };
+    const polylinecolor = color.clone();
 
     return anime.timeline({
       update: () => {
-        update();
+        this.maskPolygon = redraw(this.maskPolygon, "symbol.color", color);
         this.scene.showMaskedBuildings(buildingColor);
       },
     }).add({
@@ -263,15 +243,12 @@ export default class Timeline extends declared(Widget) {
       duration: MASK_ANIMATION_DURATION / 2,
       easing: "easeInOutCubic",
     }).add({
-      targets: [color, buildingColor],
+      targets: [color, buildingColor, polylinecolor],
       a: 0,
       delay: 100,
       duration: MASK_ANIMATION_DURATION / 2,
       endDelay: 1500,
       easing: "easeInOutCubic",
-      complete: () => {
-        layer.remove(this.maskPolyline);
-      },
     }).finished;
   }
 
