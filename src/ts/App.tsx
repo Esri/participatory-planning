@@ -1,9 +1,11 @@
 
 import {
+  aliasOf,
   declared,
+  property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import { tsx } from "esri/widgets/support/widget";
+import { renderable, tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
 import CreateArea from "./draw/CreateArea";
@@ -16,7 +18,12 @@ import Timeline from "./Timeline";
 @subclass("app.widgets.webmapview")
 export default class App extends declared(Widget) {
 
-  private scene = new Scene();
+  @aliasOf("scene.map.portalItem.title")
+  @renderable()
+  public title: string;
+
+  @property()
+  public scene = new Scene();
 
   private timeline = new Timeline({
     scene: this.scene,
@@ -81,7 +88,7 @@ export default class App extends declared(Widget) {
                 </div>
               </figure>
               <div class="card-content">
-                <h4 class="trailer-half"><a href="#">Participatory Planning</a></h4>
+                <h4 class="trailer-half"><a href="#">{ this.title }</a></h4>
                 <p class="font-size--1 trailer-half">Wide cards are just like standard cards except that
                   they are displayed in landscape orientation. This is useful in situations where there
                   is too much content to display well in a standard card.</p>

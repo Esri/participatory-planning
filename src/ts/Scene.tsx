@@ -42,6 +42,7 @@ export const MASK_AREA = [
 @subclass("app.widgets.webmapview")
 export default class Scene extends declared(Widget) {
 
+  @property()
   public readonly map: WebScene = new WebScene({
     portalItem: {
       id: "8dd394c07205432bad112c21cbbc307f",
