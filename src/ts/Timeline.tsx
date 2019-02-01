@@ -31,7 +31,10 @@ import Polyline = require('esri/geometry/Polyline');
 import Color = require('esri/Color');
 import SimpleFillSymbol = require('esri/symbols/SimpleFillSymbol');
 
-export const MASK_ANIMATION_DURATION = 2000;
+import { redraw } from "./support/graphics";
+
+export const AREA_ANIMATION_DURATION = 2000;
+export const MASK_ANIMATION_DURATION = 1000;
 
 @subclass("app.widgets.Timeline")
 export default class Timeline extends declared(Widget) {
@@ -75,7 +78,7 @@ export default class Timeline extends declared(Widget) {
         geometry: this.scene.maskPolygon,
         symbol: {
           type: "simple-fill", // autocasts as new SimpleFillSymbol()
-          color: this.maskColor,
+          color: this.maskColor.clone().setColor({a: 0}),
           outline: { // autocasts as new SimpleLineSymbol()
             width: 6,
             color: this.maskColor,
@@ -146,7 +149,7 @@ export default class Timeline extends declared(Widget) {
     const view = this.scene.view;
     return view.goTo(slide.viewpoint).then(() => {
 
-      this.scene.view.environment = slide.environment;
+      view.environment = slide.environment;
 
       // Toggle layer visibility
       this.scene.map.layers.forEach((layer) => {
@@ -165,7 +168,7 @@ export default class Timeline extends declared(Widget) {
       });
 
       // Wait for all layers to update after applying a new slide
-      return eachAlways(view.layerViews.map((layerView) => {
+      return eachAlways(view.allLayerViews.map((layerView) => {
         return whenNotOnce(layerView, "updating");
       }));
     });
@@ -175,6 +178,7 @@ export default class Timeline extends declared(Widget) {
 
     const start = MASK_AREA[0];
     const waypoints = MASK_AREA.slice(1);
+    waypoints.push(start);
 
     const durations: number[] = [];
     let totalLength = 0;
@@ -188,7 +192,7 @@ export default class Timeline extends declared(Widget) {
     });
 
     durations.forEach((duration, index) => {
-      durations[index] = duration * MASK_ANIMATION_DURATION / totalLength;
+      durations[index] = duration * AREA_ANIMATION_DURATION / totalLength;
     });
 
     const paths = [start];
@@ -219,7 +223,7 @@ export default class Timeline extends declared(Widget) {
         x: point[0],
         y: point[1],
         duration: durations[index],
-        easing: "easeInOutExpo",
+        easing: "easeInOutCubic",
         complete: () => {
           paths.push([movingPoint.x, movingPoint.y]);
         },
@@ -244,45 +248,44 @@ export default class Timeline extends declared(Widget) {
 
     const layer = this.scene.highlightLayer;
 
+    layer.add(this.maskPolygon);
     const update = () => {
       // Graphic is only redrawn when symbol changes
-      const clone = this.maskPolygon.clone();
+      this.maskPolygon = redraw(this.maskPolygon, "symbol.color", color);
+
+/*      const clone = this.maskPolygon.clone();
       layer.remove(this.maskPolygon);
       clone.symbol = (this.maskPolygon.symbol as SimpleFillSymbol).clone();
       clone.symbol.color = color;
       layer.add(clone);
       this.maskPolygon = clone;
+      */
     };
 
-    return anime({
+    return anime.timeline({
       update: () => {
         update();
         this.scene.showMaskedBuildings(buildingColor);
       },
+    }).add({
       targets: [color, buildingColor],
       r: 226,
       g: 119,
       b: 40,
       a: 0.6,
-      easing: "easeInOutExpo",
-    }).finished
-    .then(() =>
-      anime({
-        targets: color,
-        a: 0,
-        delay: 500,
-        duration: 500,
-        endDelay: 1500,
-        easing: "easeInOutExpo",
-        update,
-        begin: () => {
-          this.scene.showMaskedBuildings();
-        },
-        complete: () => {
-          layer.remove(this.maskPolygon);
-        },
-      }).finished,
-    );
+      duration: MASK_ANIMATION_DURATION / 2,
+      easing: "easeInOutCubic",
+    }).add({
+      targets: [color, buildingColor],
+      a: 0,
+      delay: 100,
+      duration: MASK_ANIMATION_DURATION / 2,
+      endDelay: 1500,
+      easing: "easeInOutCubic",
+      complete: () => {
+        layer.remove(this.maskPolyline);
+      },
+    }).finished;
   }
 
 }

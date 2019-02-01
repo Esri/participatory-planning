@@ -5,27 +5,19 @@ import {
 } from "esri/core/accessorSupport/decorators";
 
 // esri
-import Color from "esri/Color";
-import Collection from "esri/core/Collection";
-import { eachAlways } from "esri/core/promiseUtils";
-import { whenNotOnce } from "esri/core/watchUtils";
-import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
-import Layer from "esri/layers/Layer";
 import SceneLayer from "esri/layers/SceneLayer";
-import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
 import SceneView from "esri/views/SceneView";
 import WebScene from "esri/WebScene";
-import Slide from "esri/webscene/Slide";
 import { tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
-import Point = require('esri/geometry/Point');
-import Polygon = require('esri/geometry/Polygon');
-import UniqueValueRenderer = require('esri/renderers/UniqueValueRenderer');
-import Renderer = require('esri/renderers/Renderer');
+import Polygon from "esri/geometry/Polygon";
+import UniqueValueRenderer from "esri/renderers/UniqueValueRenderer";
+
+import { computeBoundingPolygon } from "./utils/geometry";
 
 // Hard coded constants
 
@@ -46,7 +38,13 @@ export const MASK_AREA = [
   [-8236134.357229519, 4969027.878528339],
   [-8236138.632189713, 4968850.261903069],
   [-8235919.081131686, 4968836.806196137],
-  [-8235924.058660398, 4968738.274357371],
+];
+
+const BOUNDING_POINTS = [
+  [-8267393.318890517, 4946292.164110351],
+  [-8226396.259688563, 4954709.431707434],
+  [-8217325.82357407, 4981609.915253013],
+  [-8260147.792707985, 4987721.921045153],
 ];
 
 @subclass("app.widgets.webmapview")
@@ -72,9 +70,15 @@ export default class Scene extends declared(Widget) {
   @property({
     readOnly: true,
   })
-  public readonly drawLayer: GraphicsLayer = new GraphicsLayer({
+  public readonly symbolLayer: GraphicsLayer = new GraphicsLayer({
     elevationInfo: {
       mode: "relative-to-scene",
+    },
+  });
+
+  public readonly groundLayer: GraphicsLayer = new GraphicsLayer({
+    elevationInfo: {
+      mode: "on-the-ground",
     },
   });
 
@@ -92,20 +96,38 @@ export default class Scene extends declared(Widget) {
     spatialReference: SpatialReference.WebMercator,
   });
 
+  public readonly boundingPolygon = computeBoundingPolygon(this.maskPolygon);
+
   private sceneLayer: SceneLayer;
-  private defaultSceneLayerRenderer: Renderer;
+
+  private sceneLayerRenderer = new UniqueValueRenderer({
+    // field: "OBJECTID",
+    valueExpression: "When(indexof([" + MASKED_OBJIDS.join(",") + "], $feature.OBJECTID) < 0, 'show', 'hide')",
+    // When(OBJECTID IN (" + MASKED_OBJIDS.join(",") + "), 'hide', 'show')",
+    defaultSymbol: {
+      type: "mesh-3d",
+    },
+  } as any);
+
+  private boundingPolygonGraphic = new Graphic({
+    geometry: this.boundingPolygon,
+  });
 
   public postInitialize() {
     this.map.when(() => {
-      this.map.add(this.drawLayer);
+      this.map.add(this.symbolLayer);
+      this.map.add(this.groundLayer);
       this.map.add(this.highlightLayer);
+      this.highlightLayer.add(this.boundingPolygonGraphic);
       this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
-      this.defaultSceneLayerRenderer = this.sceneLayer.renderer;
+      this.sceneLayer.renderer = this.sceneLayerRenderer;
       this.showMaskedBuildings("white");
     });
 
     this.view.on("click", (event: any) => {
-        console.log("Clicked A", event.mapPoint.x, event.mapPoint.y, event.mapPoint);
+      if (event.mapPoint) {
+        console.log("[" + event.mapPoint.x + ", " + event.mapPoint.y + "]");
+      }
     });
 
     // Leave a reference of the view on the window for debugging
@@ -121,36 +143,62 @@ export default class Scene extends declared(Widget) {
   }
 
   public showMaskedBuildings(color?: any) {
+
+    const uniqueValueInfos = [];
     if (color) {
-      const renderer = new UniqueValueRenderer({
-        // field: "OBJECTID",
-        valueExpression: "When(indexof([" + MASKED_OBJIDS.join(",") + "], $feature.OBJECTID) < 0, 'show', 'hide')",
-          // When(OBJECTID IN (" + MASKED_OBJIDS.join(",") + "), 'hide', 'show')",
-        defaultSymbol: {
+
+      // Show masked buildings with provided colorMixMode, all other buildings are white
+
+      uniqueValueInfos.push({
+        value: "hide", // "hide",
+        symbol: {
           type: "mesh-3d",
+          symbolLayers: [{
+            type: "fill",  // autocasts as new FillSymbol3DLayer()
+            material: {
+              color,
+              colorMixMode: "replace",
+            },
+          }],
         },
-        uniqueValueInfos: [{
-          value: "hide", // "hide",
-          symbol: {
-            type: "mesh-3d",
-            symbolLayers: [{
-              type: "fill",  // autocasts as new FillSymbol3DLayer()
-              material: {
-                color,
-                colorMixMode: "replace",
-              },
-            }],
-          },
-        }],
       } as any);
+      this.boundingPolygonGraphic.symbol = {
+          type: "simple-fill",
+          color: [0, 0, 0, 0],
+          outline: {
+            width: 0,
+          },
+        } as any;
       this.sceneLayer.definitionExpression = "";
-      this.drawLayer.visible = false;
-      this.sceneLayer.renderer = renderer;
+      this.groundLayer.visible = false;
+      this.symbolLayer.visible = false;
     } else {
+      uniqueValueInfos.push({
+        value: "show", // "hide",
+        symbol: {
+          type: "mesh-3d",
+          symbolLayers: [{
+            type: "fill",  // autocasts as new FillSymbol3DLayer()
+            material: {
+              color: [180, 180, 180],
+              colorMixMode: "replace",
+            },
+          }],
+        },
+      } as any);
       this.sceneLayer.definitionExpression = "OBJECTID NOT IN (" + MASKED_OBJIDS.join(",") + ")";
-      this.sceneLayer.renderer = this.defaultSceneLayerRenderer;
-      this.drawLayer.visible = true;
+      this.groundLayer.visible = true;
+      this.symbolLayer.visible = true;
+      this.boundingPolygonGraphic.symbol = {
+          type: "simple-fill",
+          color: [0, 0, 0, 0.3],
+          outline: {
+            width: 0,
+          },
+        } as any;
     }
+    this.sceneLayerRenderer.uniqueValueInfos = uniqueValueInfos;
+    this.sceneLayer.renderer = this.sceneLayerRenderer.clone();
   }
 
   private _attachSceneView(sceneViewDiv: HTMLDivElement) {

@@ -194,13 +194,13 @@ export default class SymbolGallery extends declared(Widget) {
   }
 
   private _redrawDragGraphic(geometry?: any) {
-    this.scene.drawLayer.remove(this.dragGraphic);
+    this.scene.symbolLayer.remove(this.dragGraphic);
     const clone = this.dragGraphic.clone();
     clone.symbol = this.dragSymbol;
     if (geometry) {
       clone.geometry = geometry;
     }
-    this.scene.drawLayer.add(clone);
+    this.scene.symbolLayer.add(clone);
     this.dragGraphic = clone;
   }
 

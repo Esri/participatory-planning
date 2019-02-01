@@ -9,6 +9,7 @@ import Widget from "esri/widgets/Widget";
 import Timeline from "./Timeline";
 
 import CreateBuilding from "./draw/CreateBuilding";
+import CreateArea from "./draw/CreateArea";
 import CreatePath from "./draw/CreatePath";
 import SymbolGallery from "./draw/SymbolGallery";
 import Scene from "./Scene";
@@ -19,6 +20,10 @@ export default class App extends declared(Widget) {
   private scene = new Scene();
 
   private timeline = new Timeline({
+    scene: this.scene,
+  });
+
+  private createArea = new CreateArea({
     scene: this.scene,
   });
 
@@ -46,6 +51,7 @@ export default class App extends declared(Widget) {
         </div>
         <div class="bottom">
           <div id="secondaryMenu" class="secondary-menu">
+            <div afterCreate={ this._attachMenu.bind(this, this.createArea) } />
             <div afterCreate={ this._attachMenu.bind(this, this.createPath) } />
             <div afterCreate={ this._attachMenu.bind(this, this.createBuilding) } />
             <div afterCreate={ this._attachMenu.bind(this, this.symbolGallery) } />
@@ -109,6 +115,9 @@ export default class App extends declared(Widget) {
       (this.selectedWidget.container as HTMLElement).style.display = "";
     }
     switch (item) {
+      case "feature-layer":
+        this._showWidget(this.createArea);
+        break;
       case "line-chart":
         this._showWidget(this.createPath);
         break;

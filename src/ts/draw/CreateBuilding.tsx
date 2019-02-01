@@ -131,7 +131,7 @@ export default class CreateBuilding extends declared(Widget) {
       },
     } as any);
 
-    this.scene.drawLayer.add(building);
+    this.scene.symbolLayer.add(building);
   }
 
   private _createGeometry(event: any): any {

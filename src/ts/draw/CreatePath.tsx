@@ -21,9 +21,12 @@ import { renderable, tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
 import Draw from "esri/views/draw/Draw";
-import SketchViewModel = require('esri/widgets/Sketch/SketchViewModel');
+import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 
-@subclass("app.draw.CreateBuilding")
+import { contains, nearestCoordinate } from "esri/geometry/geometryEngine";
+import Polyline = require('esri/geometry/Polyline');
+
+@subclass("app.draw.CreatePath")
 export default class CreatePath extends declared(Widget) {
 
   @property()
@@ -37,8 +40,34 @@ export default class CreatePath extends declared(Widget) {
 
   public postInitialize() {
     this.sketchModel = new SketchViewModel({
-      layer: this.scene.drawLayer,
+      layer: this.scene.groundLayer,
       view: this.scene.view,
+    });
+    this.sketchModel.on("create", this._onSketchModelEvent.bind(this));
+
+    this.sketchModel.polylineSymbol =  {
+      type: "simple-line", // autocasts as SimpleLineSymbol()
+      color: "#b2b3b2",
+      width: 20,
+    } as any;
+
+    // Listen to sketch model state changes
+    let listener: {remove: () => void} | null;
+    this.sketchModel.watch("state", () => {
+
+      if (this.sketchModel.state === "active") {
+        listener = this.scene.view.on(["pointer-move", "pointer-down"], (event) => {
+          const mapPoint = this.scene.view.toMap({x: event.x, y: event.y});
+          if (!contains(this.scene.maskPolygon, mapPoint)) {
+            event.stopPropagation();
+          }
+        });
+      } else {
+        if (listener) {
+          listener.remove();
+          listener = null;
+        }
+      }
     });
   }
 
@@ -60,6 +89,75 @@ export default class CreatePath extends declared(Widget) {
   private _startDrawing(stories: number) {
     this.sketchModel.reset();
     this.sketchModel.create("polyline");
+  }
+
+  private _fixPaths(paths: number[][][]): boolean {
+    let fixed = false;
+    paths.forEach((path) => {
+      path.forEach((point, index) => {
+        const mapPoint = new Point({
+          x: point[0],
+          y: point[1],
+          spatialReference: this.scene.view.spatialReference,
+        });
+        if (!contains(this.scene.maskPolygon, mapPoint)) {
+          const nearestPoint = nearestCoordinate(this.scene.maskPolygon, mapPoint);
+          point[0] = nearestPoint.coordinate.x;
+          point[1] = nearestPoint.coordinate.y;
+          fixed = true;
+        }
+      });
+    });
+    return fixed;
+  }
+
+  private _onSketchModelEvent(event: any) {
+
+    if (!event.graphic.geometry) {
+      return;
+    }
+
+    const polyline = event.graphic.geometry as Polyline;
+    // const paths = polyline.paths[0];
+    if (this._fixPaths(polyline.paths)) {
+      // console.log("Fixed one or more points", this._fixPaths(polyline.paths));
+      // event.graphic.geometry = event.graphic.geometry.clone();
+      // this.sketchModel.createGraphic.geometry = event.graphic.geometry;
+
+    }
+
+    // const mousePoint = this._pointFromEventInfo(event.toolEventInfo);
+    // if (mousePoint) {
+    //   if (!contains(this.scene.maskPolygon, mousePoint)) {
+    //     if (event.toolEventInfo.type === "vertex-add") {
+    //       this.sketchModel.undo();
+    //     }
+    //   }
+    // }
+  }
+
+  private _coordinatesFromEventInfo(eventInfo: any | null): number[] | undefined {
+    if (eventInfo) {
+      switch (eventInfo.type) {
+        case "cursor-update":
+          return eventInfo.coordinates;
+        case "vertex-add":
+          return eventInfo.added;
+        default:
+          break;
+        }
+    }
+  }
+
+  private _pointFromEventInfo(eventInfo: any): Point | undefined {
+    const coordinates = this._coordinatesFromEventInfo(eventInfo);
+    if (coordinates) {
+      return new Point({
+        x: coordinates[0],
+        y: coordinates[1],
+        spatialReference: this.scene.view.spatialReference,
+      });
+    }
   }
 
 }
