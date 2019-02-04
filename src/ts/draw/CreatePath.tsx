@@ -1,5 +1,6 @@
 
 import Scene from "../Scene";
+import DrawWidget from "./DrawWidget";
 
 // esri
 import {
@@ -7,15 +8,14 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import { contains, nearestCoordinate } from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
 import Polyline from "esri/geometry/Polyline";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import { tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
+import { contains } from 'esri/geometry/geometryEngine';
 
 @subclass("app.draw.CreatePath")
-export default class CreatePath extends declared(Widget) {
+export default class CreatePath extends declared(DrawWidget) {
 
   @property()
   public scene: Scene;
@@ -47,9 +47,9 @@ export default class CreatePath extends declared(Widget) {
       if (this.sketchModel.state === "active") {
         listener = this.scene.view.on(["pointer-move", "pointer-down"], (event) => {
           const mapPoint = this.scene.view.toMap({x: event.x, y: event.y});
-          if (!contains(this.scene.maskPolygon, mapPoint)) {
-            event.stopPropagation();
-          }
+          // if (!contains(this.scene.maskPolygon, mapPoint)) {
+          //   event.stopPropagation();
+          // }
         });
       } else {
         if (listener) {
@@ -80,48 +80,34 @@ export default class CreatePath extends declared(Widget) {
     this.sketchModel.create("polyline");
   }
 
-  private _fixPaths(paths: number[][][]): boolean {
-    let fixed = false;
-    paths.forEach((path) => {
-      path.forEach((point, index) => {
-        const mapPoint = new Point({
-          x: point[0],
-          y: point[1],
-          spatialReference: this.scene.view.spatialReference,
-        });
-        if (!contains(this.scene.maskPolygon, mapPoint)) {
-          const nearestPoint = nearestCoordinate(this.scene.maskPolygon, mapPoint);
-          point[0] = nearestPoint.coordinate.x;
-          point[1] = nearestPoint.coordinate.y;
-          fixed = true;
-        }
-      });
-    });
-    return fixed;
-  }
-
   private _onSketchModelEvent(event: any) {
 
     if (!event.graphic.geometry) {
       return;
     }
 
-    const polyline = event.graphic.geometry as Polyline;
-    // const paths = polyline.paths[0];
-    if (this._fixPaths(polyline.paths)) {
-      // event.graphic.geometry = event.graphic.geometry.clone();
-      // this.sketchModel.createGraphic.geometry = event.graphic.geometry;
-
+    const point = this._pointFromEventInfo(event.toolEventInfo);
+    if (point && !contains(this.scene.maskPolygon, point)) {
+      console.log("Baaaaad");
+      this.sketchModel.polylineSymbol =  {
+        type: "simple-line", // autocasts as SimpleLineSymbol()
+        cap: "round",
+        color: "#FF0000",
+        width: 20,
+      } as any;
+    } else {
+      console.log("Goooood");
+      this.sketchModel.polylineSymbol =  {
+        type: "simple-line", // autocasts as SimpleLineSymbol()
+        cap: "round",
+        color: "#b2b3b2",
+        width: 20,
+      } as any;
     }
 
-    // const mousePoint = this._pointFromEventInfo(event.toolEventInfo);
-    // if (mousePoint) {
-    //   if (!contains(this.scene.maskPolygon, mousePoint)) {
-    //     if (event.toolEventInfo.type === "vertex-add") {
-    //       this.sketchModel.undo();
-    //     }
-    //   }
-    // }
+
+    // const paths = polyline.paths[0];
+
   }
 
   private _coordinatesFromEventInfo(eventInfo: any | null): number[] | undefined {

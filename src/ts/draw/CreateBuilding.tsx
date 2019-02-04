@@ -1,5 +1,6 @@
 
 import Scene from "../Scene";
+import DrawWidget from "./DrawWidget";
 
 // esri
 import {
@@ -7,29 +8,17 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
+import Polygon from "esri/geometry/Polygon";
 import Graphic from "esri/Graphic";
-import Draw from "esri/views/draw/Draw";
 import { tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
 
 @subclass("app.draw.CreateBuilding")
-export default class CreateBuilding extends declared(Widget) {
-
-  @property()
-  public scene: Scene;
-
-  private draw: Draw;
+export default class CreateBuilding extends declared(DrawWidget) {
 
   private stories: number = 3;
 
   constructor(params?: any) {
     super(params);
-  }
-
-  public postInitialize() {
-    this.draw = new Draw({
-      view: this.scene.view,
-    });
   }
 
   public render() {
@@ -50,58 +39,8 @@ export default class CreateBuilding extends declared(Widget) {
     );
   }
 
-  private _startDrawing(stories: number) {
-
-    this.stories = stories;
-    this.draw.reset();
-
-    const action = this.draw.create("polygon", {mode: "click"});
-    action.on([
-        "vertex-add",
-        "vertex-remove",
-        "cursor-update",
-        "redo",
-        "undo",
-      ] as any,
-      this._drawPolygon.bind(this),
-    );
-    action.on("draw-complete", this._completePolygon.bind(this));
-    this.scene.view.focus();
-  }
-
-  private _drawPolygon(event: any) {
-    // create a new graphic presenting the polyline that is being drawn on the view
-    const view = this.scene.view;
-    view.graphics.removeAll();
-
-    const geometry = this._createGeometry(event);
-
-    // a graphic representing the polyline that is being drawn
-    const graphic = new Graphic({
-      geometry,
-      symbol: {
-        type: "simple-line", // autocasts as new SimpleFillSymbol
-        color: [4, 90, 141],
-        width: 4,
-        cap: "round",
-        join: "round",
-      },
-    } as any);
-
-    // check if the polyline intersects itself.
-    view.graphics.add(graphic);
-  }
-
-  private _completePolygon(event: any) {
-    this.scene.view.graphics.removeAll();
-
-    const geometry = this._createGeometry(event);
-
-    if (geometry.type !== "polygon") {
-      return;
-    }
-
-    const building =  new Graphic({
+  protected onPolygonCreated(geometry: Polygon) {
+    const building = new Graphic({
       geometry,
       symbol: {
         type: "polygon-3d", // autocasts as new PolygonSymbol3D()
@@ -120,24 +59,12 @@ export default class CreateBuilding extends declared(Widget) {
       },
     } as any);
 
-    this.scene.symbolLayer.add(building);
+    this.scene.groundLayer.add(building);
   }
 
-  private _createGeometry(event: any): any {
-    const vertices = event.vertices;
-    if (vertices.length > 2) {
-      return {
-        type: "polygon",
-        rings: vertices,
-        spatialReference: this.scene.view.spatialReference,
-      };
-    } else {
-      return {
-        type: "polyline",
-        paths: vertices,
-        spatialReference: this.scene.view.spatialReference,
-      };
-    }
+  private _startDrawing(stories: number) {
+    this.stories = stories;
+    this.createPolygon();
   }
 
 }

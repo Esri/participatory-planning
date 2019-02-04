@@ -11,6 +11,7 @@ import Widget from "esri/widgets/Widget";
 import CreateArea from "./draw/CreateArea";
 import CreateBuilding from "./draw/CreateBuilding";
 import CreatePath from "./draw/CreatePath";
+import DrawWidget, { DrawWidgetState } from "./draw/DrawWidget";
 import SymbolGallery from "./draw/SymbolGallery";
 import Scene from "./Scene";
 import Timeline from "./Timeline";
@@ -45,7 +46,27 @@ export default class App extends declared(Widget) {
     scene: this.scene,
   });
 
-  private selectedWidget: Widget | null = null;
+  private selectedWidget: DrawWidget | null = null;
+
+  private activeWidget: DrawWidget | null = null;
+
+  public postInitialize() {
+    const view = this.scene.view;
+    view.on("click", (event: any) => {
+      if (event.mapPoint) {
+        console.log("[" + event.mapPoint.x + ", " + event.mapPoint.y + "]");
+      }
+
+      if (!this.activeWidget) {
+        view.hitTest(event)
+        .then((response) => {
+          // check if a feature is returned from the hurricanesLayer
+          // do something with the result graphic
+          console.log("HitTest", response.results[0].graphic);
+        });
+      }
+    });
+  }
 
   public render() {
     return (
@@ -111,9 +132,22 @@ export default class App extends declared(Widget) {
     this.timeline.container = element;
   }
 
-  private _attachMenu(menu: Widget, element: HTMLDivElement) {
+  private _attachMenu(menu: DrawWidget, element: HTMLDivElement) {
     menu.container = element;
     this._hideWidget(menu);
+
+    menu.watch("state", () => {
+      if (menu.state === DrawWidgetState.Idle) {
+        if (this.activeWidget === menu) {
+          this.activeWidget = null;
+        }
+      } else {
+        if (this.activeWidget !== menu) {
+          this.activeWidget = menu;
+        }
+      }
+      console.log("Widget " + menu + " changed state", menu.state);
+    });
   }
 
   private _selectMenu(item: string) {
@@ -137,11 +171,11 @@ export default class App extends declared(Widget) {
     }
   }
 
-  private _hideWidget(widget: Widget) {
+  private _hideWidget(widget: DrawWidget) {
     (widget.container as HTMLElement).style.display = "none";
   }
 
-  private _showWidget(widget: Widget) {
+  private _showWidget(widget: DrawWidget) {
     if (this.selectedWidget) {
       this._hideWidget(this.selectedWidget);
     }

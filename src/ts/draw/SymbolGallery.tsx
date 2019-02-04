@@ -1,5 +1,6 @@
 
 import Scene from "../Scene";
+import DrawWidget from "./DrawWidget";
 
 // esri
 import {
@@ -18,7 +19,6 @@ import PortalQueryResult from "esri/portal/PortalQueryResult";
 import EsriSymbol from "esri/symbols/Symbol";
 import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
 
 // interactjs
 import interact, { InteractEvent } from "interactjs";
@@ -31,7 +31,7 @@ import {nearestCoordinate} from "esri/geometry/geometryEngine";
 const SymbolGroupCollection = Collection.ofType<SymbolGroup>(SymbolGroup);
 
 @subclass("app.draw.SymbolGallery")
-export default class SymbolGallery extends declared(Widget) {
+export default class SymbolGallery extends declared(DrawWidget) {
 
   @property() public scene: Scene;
 

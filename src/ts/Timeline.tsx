@@ -8,7 +8,6 @@ import {
 } from "esri/core/accessorSupport/decorators";
 import { eachAlways } from "esri/core/promiseUtils";
 import { whenNotOnce } from "esri/core/watchUtils";
-import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import Slide from "esri/webscene/Slide";
@@ -67,6 +66,7 @@ export default class Timeline extends declared(Widget) {
         geometry: this.scene.maskPolygon,
         symbol: {
           type: "simple-fill", // autocasts as new SimpleFillSymbol()
+          color: this.maskColor.clone().setColor({a: 0}),
           outline: { // autocasts as new SimpleLineSymbol()
             width: 6,
             color: this.maskColor,
@@ -77,7 +77,11 @@ export default class Timeline extends declared(Widget) {
     });
 
     this.scene.view.when(() => {
-      this._goToSlide(this.introSlide);
+      // this._goToSlide(this.introSlide);
+
+      // Remove this for initial animation
+      this._showAfter();
+      (document.getElementsByClassName("intro")[0] as any).style.visibility = "hidden";
     });
   }
 

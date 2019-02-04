@@ -1,5 +1,6 @@
 
 import Scene from "../Scene";
+import DrawWidget from "./DrawWidget";
 
 // esri
 import {
@@ -10,10 +11,9 @@ import {
 import { contains } from "esri/geometry/geometryEngine";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import { tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
 
 @subclass("app.draw.CreateArea")
-export default class CreateArea extends declared(Widget) {
+export default class CreateArea extends declared(DrawWidget) {
 
   @property()
   public scene: Scene;
@@ -46,6 +46,37 @@ export default class CreateArea extends declared(Widget) {
           listener.remove();
           listener = null;
         }
+      }
+    });
+
+    const validSymbol = {
+      type: "simple-fill",
+      style: "solid",
+      color: [0, 170, 255, 0.8],
+      outline: {
+        color: [255, 255, 255],
+        width: 2,
+      },
+    };
+    const invalidSymbol = {
+      type: "simple-fill",
+      style: "diagonal-cross",
+      color: [255, 0, 0],
+      outline: {
+        color: [255, 0, 0],
+        width: 4,
+      },
+    };
+
+    this.sketchModel.on(["create", "update", "undo", "redo"] as any, (event) => {
+      // do tnog
+      const graphic = event.graphic; // s[0]
+      if (graphic) {
+        // if (contains(this.scene.maskPolygon, graphic)) {
+        //   graphic.symbol = validSymbol;
+        // } else {
+        //   graphic.symbol = invalidSymbol;
+        // }
       }
     });
   }

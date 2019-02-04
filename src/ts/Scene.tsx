@@ -117,12 +117,6 @@ export default class Scene extends declared(Widget) {
       this.showMaskedBuildings("white");
     });
 
-    this.view.on("click", (event: any) => {
-      if (event.mapPoint) {
-        console.log("[" + event.mapPoint.x + ", " + event.mapPoint.y + "]");
-      }
-    });
-
     // Leave a reference of the view on the window for debugging
     (window as any).view = this.view;
   }
