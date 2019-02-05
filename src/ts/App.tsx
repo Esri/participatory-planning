@@ -5,13 +5,15 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
+import GraphicsLayer from "esri/layers/GraphicsLayer";
 import { renderable, tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
 import CreateArea from "./draw/CreateArea";
 import CreateBuilding from "./draw/CreateBuilding";
 import CreatePath from "./draw/CreatePath";
-import DrawWidget, { DrawWidgetState } from "./draw/DrawWidget";
+import DrawWidget from "./draw/DrawWidget";
+import CreatePolygon from "./draw/operation/CreatePolygon";
 import SymbolGallery from "./draw/SymbolGallery";
 import Scene from "./Scene";
 import Timeline from "./Timeline";
@@ -48,8 +50,6 @@ export default class App extends declared(Widget) {
 
   private selectedWidget: DrawWidget | null = null;
 
-  private activeWidget: DrawWidget | null = null;
-
   public postInitialize() {
     const view = this.scene.view;
     view.on("click", (event: any) => {
@@ -57,12 +57,21 @@ export default class App extends declared(Widget) {
         console.log("[" + event.mapPoint.x + ", " + event.mapPoint.y + "]");
       }
 
-      if (!this.activeWidget) {
+      if (!CreatePolygon.activeOperation) {
         view.hitTest(event)
         .then((response) => {
           // check if a feature is returned from the hurricanesLayer
           // do something with the result graphic
-          console.log("HitTest", response.results[0].graphic);
+          response.results.forEach((result) => {
+            const graphic = result.graphic;
+            if (graphic) {
+              console.log("Removing", response.results[0].graphic);
+              const layer = graphic.layer as GraphicsLayer;
+              if (layer) {
+                layer.remove(graphic);
+              }
+            }
+          });
         });
       }
     });
@@ -135,19 +144,6 @@ export default class App extends declared(Widget) {
   private _attachMenu(menu: DrawWidget, element: HTMLDivElement) {
     menu.container = element;
     this._hideWidget(menu);
-
-    menu.watch("state", () => {
-      if (menu.state === DrawWidgetState.Idle) {
-        if (this.activeWidget === menu) {
-          this.activeWidget = null;
-        }
-      } else {
-        if (this.activeWidget !== menu) {
-          this.activeWidget = menu;
-        }
-      }
-      console.log("Widget " + menu + " changed state", menu.state);
-    });
   }
 
   private _selectMenu(item: string) {

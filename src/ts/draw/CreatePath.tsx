@@ -1,6 +1,5 @@
 
 import Scene from "../Scene";
-import DrawWidget from "./DrawWidget";
 
 // esri
 import {
@@ -8,14 +7,14 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
+import { contains } from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
-import Polyline from "esri/geometry/Polyline";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import { tsx } from "esri/widgets/support/widget";
-import { contains } from 'esri/geometry/geometryEngine';
+import Widget from "esri/widgets/Widget";
 
 @subclass("app.draw.CreatePath")
-export default class CreatePath extends declared(DrawWidget) {
+export default class CreatePath extends declared(Widget) {
 
   @property()
   public scene: Scene;
@@ -28,7 +27,7 @@ export default class CreatePath extends declared(DrawWidget) {
 
   public postInitialize() {
     this.sketchModel = new SketchViewModel({
-      layer: this.scene.groundLayer,
+      // layer: this.scene.groundLayer,
       view: this.scene.view,
     });
     this.sketchModel.on("create", this._onSketchModelEvent.bind(this));
@@ -104,9 +103,6 @@ export default class CreatePath extends declared(DrawWidget) {
         width: 20,
       } as any;
     }
-
-
-    // const paths = polyline.paths[0];
 
   }
 

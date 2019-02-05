@@ -1,8 +1,10 @@
 
 import Scene from "../Scene";
 import DrawWidget from "./DrawWidget";
+import CreatePolygon from "./operation/CreatePolygon";
 
 // esri
+import Color from "esri/Color";
 import {
   declared,
   property,
@@ -39,32 +41,36 @@ export default class CreateBuilding extends declared(DrawWidget) {
     );
   }
 
-  protected onPolygonCreated(geometry: Polygon) {
-    const building = new Graphic({
-      geometry,
-      symbol: {
-        type: "polygon-3d", // autocasts as new PolygonSymbol3D()
-        symbolLayers: [{
-          type: "extrude", // autocasts as new ExtrudeSymbol3DLayer()
-          material: {
-            color: "#FFF",
-          },
-          edges: {
-            type: "solid",
-            color: "#AAA",
-            size: 0.5,
-          },
-          size: this.stories * 3,
-        }],
-      },
-    } as any);
+  private _extrudeBuildings(polygons: Polygon[]) {
+    polygons.forEach((geometry) => {
+      const building = new Graphic({
+        geometry,
+        symbol: {
+          type: "polygon-3d", // autocasts as new PolygonSymbol3D()
+          symbolLayers: [{
+            type: "extrude", // autocasts as new ExtrudeSymbol3DLayer()
+            material: {
+              color: "#FFF",
+            },
+            edges: {
+              type: "solid",
+              color: "#FFF",
+              size: 0,
+            },
+            size: this.stories * 3,
+          }],
+        },
+      } as any);
 
-    this.scene.groundLayer.add(building);
+      this.scene.groundLayer.add(building);
+    });
   }
 
   private _startDrawing(stories: number) {
     this.stories = stories;
-    this.createPolygon();
+    this.createPolygon(new Color("blue")).then((polygons) => {
+      this._extrudeBuildings(polygons);
+    });
   }
 
 }

@@ -72,6 +72,11 @@ export default class Scene extends declared(Widget) {
   @property({
     readOnly: true,
   })
+  public readonly sketchLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" } });
+
+  @property({
+    readOnly: true,
+  })
   public readonly groundLayer: GraphicsLayer = new GraphicsLayer({
     elevationInfo: {
       mode: "on-the-ground",
@@ -113,6 +118,7 @@ export default class Scene extends declared(Widget) {
     this.map.when(() => {
       this.map.add(this.symbolLayer);
       this.map.add(this.groundLayer);
+      this.map.add(this.sketchLayer);
       this.map.add(this.highlightLayer);
       this.highlightLayer.add(this.boundingPolygonGraphic);
       this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
