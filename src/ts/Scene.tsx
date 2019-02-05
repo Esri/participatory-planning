@@ -69,6 +69,9 @@ export default class Scene extends declared(Widget) {
     },
   });
 
+  @property({
+    readOnly: true,
+  })
   public readonly groundLayer: GraphicsLayer = new GraphicsLayer({
     elevationInfo: {
       mode: "on-the-ground",

@@ -62,14 +62,15 @@ export default class Timeline extends declared(Widget) {
       } as any);
       this.scene.highlightLayer.add(this.maskPolyline);
 
+      const transparent = this.maskColor.clone().setColor({a: 0});
       this.maskPolygon = new Graphic({
         geometry: this.scene.maskPolygon,
         symbol: {
           type: "simple-fill", // autocasts as new SimpleFillSymbol()
-          color: this.maskColor.clone().setColor({a: 0}),
+          color: transparent,
           outline: { // autocasts as new SimpleLineSymbol()
             width: 6,
-            color: this.maskColor,
+            color: transparent,
           },
         },
       } as any);
@@ -77,11 +78,7 @@ export default class Timeline extends declared(Widget) {
     });
 
     this.scene.view.when(() => {
-      // this._goToSlide(this.introSlide);
-
-      // Remove this for initial animation
-      this._showAfter();
-      (document.getElementsByClassName("intro")[0] as any).style.visibility = "hidden";
+      this._goToSlide(this.introSlide);
     });
   }
 
