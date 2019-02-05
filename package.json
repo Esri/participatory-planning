@@ -34,6 +34,7 @@
   },
   "license": "Apache-2.0",
   "scripts": {
+    "prepare": "mkdir -p typings/arcgis-js-api && curl -o typings/arcgis-js-api/index.d.ts https://jscore.esri.com/javascript/latest/api-reference/typings/arcgis-js-api-4.11.d.ts",
     "start": "webpack-dev-server --mode development --open",
     "build": "webpack --mode production",
     "serve": "webpack-dev-server --mode production --open --https --compress",
