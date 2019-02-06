@@ -1,7 +1,5 @@
 
-import Scene from "../Scene";
 import DrawWidget from "./DrawWidget";
-import CreatePolygon from "./operation/CreatePolygon";
 
 // esri
 import Color from "esri/Color";
@@ -68,7 +66,7 @@ export default class CreateBuilding extends declared(DrawWidget) {
 
   private _startDrawing(stories: number) {
     this.stories = stories;
-    this.createPolygon(new Color("blue")).then((polygons) => {
+    this.createPolygon(new Color("#d6bb7a")).then((polygons) => {
       this._extrudeBuildings(polygons);
     });
   }

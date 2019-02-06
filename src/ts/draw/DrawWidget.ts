@@ -6,10 +6,12 @@ import {
   subclass,
 } from "esri/core/accessorSupport/decorators";
 import Polygon from "esri/geometry/Polygon";
+import Polyline from "esri/geometry/Polyline";
 import Widget from "esri/widgets/Widget";
 
 import Scene from "../Scene";
 import CreatePolygon from "./operation/CreatePolygon";
+import CreatePolyline from "./operation/CreatePolyline";
 
 @subclass("app.draw.DrawWidget")
 export default class DrawWidget extends declared(Widget) {
@@ -18,12 +20,11 @@ export default class DrawWidget extends declared(Widget) {
   public scene: Scene;
 
   protected createPolygon(color: Color): IPromise<Polygon[]> {
-    const operation = new CreatePolygon({
-      color,
-      scene: this.scene,
-    });
-    operation.start();
-    return operation.result;
+    return new CreatePolygon(this.scene, color).finished;
+  }
+
+  protected createPolyline(color: Color): IPromise<Polyline[]> {
+    return new CreatePolyline(this.scene, color).finished;
   }
 
 }
