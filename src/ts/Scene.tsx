@@ -141,7 +141,7 @@ export default class Scene extends declared(Widget) {
   public showMaskedBuildings(color?: any) {
 
     const uniqueValueInfos = [];
-    if (color) {
+    if (color && color.a !== 0) {
 
       // Show masked buildings with provided color, all other buildings are white
       uniqueValueInfos.push({

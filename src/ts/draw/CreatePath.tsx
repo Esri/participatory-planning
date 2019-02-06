@@ -23,40 +23,6 @@ export default class CreatePath extends declared(DrawWidget) {
     super(params);
   }
 
-  public postInitialize() {
-    // this.sketchModel = new SketchViewModel({
-    //   // layer: this.scene.groundLayer,
-    //   view: this.scene.view,
-    // });
-    // this.sketchModel.on("create", this._onSketchModelEvent.bind(this));
-    //
-    // this.sketchModel.polylineSymbol =  {
-    //   type: "simple-line", // autocasts as SimpleLineSymbol()
-    //   cap: "round",
-    //   color: "#b2b3b2",
-    //   width: 20,
-    // } as any;
-    //
-    // // Listen to sketch model state changes
-    // let listener: {remove: () => void} | null;
-    // this.sketchModel.watch("state", () => {
-    //
-    //   if (this.sketchModel.state === "active") {
-    //     listener = this.scene.view.on(["pointer-move", "pointer-down"], (event) => {
-    //       const mapPoint = this.scene.view.toMap({x: event.x, y: event.y});
-    //       // if (!contains(this.scene.maskPolygon, mapPoint)) {
-    //       //   event.stopPropagation();
-    //       // }
-    //     });
-    //   } else {
-    //     if (listener) {
-    //       listener.remove();
-    //       listener = null;
-    //     }
-    //   }
-    // });
-  }
-
   public render() {
     return (
       <div>
@@ -79,7 +45,7 @@ export default class CreatePath extends declared(DrawWidget) {
           geometry,
           symbol: {
             type: "simple-line", // autocasts as SimpleLineSymbol()
-            color: new Color("#e5e5e5"),
+            color: new Color("#cbcbcb"),
             width: 20,
           },
         } as any);

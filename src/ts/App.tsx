@@ -67,7 +67,7 @@ export default class App extends declared(Widget) {
             if (graphic) {
               console.log("Removing", response.results[0].graphic);
               const layer = graphic.layer as GraphicsLayer;
-              if (layer) {
+              if (layer === this.scene.groundLayer || layer === this.scene.symbolLayer) {
                 layer.remove(graphic);
               }
             }

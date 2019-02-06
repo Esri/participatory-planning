@@ -103,9 +103,8 @@ export default class CreateOperation<ResultType extends Geometry> extends Operat
       });
       if (!ge.contains(this.scene.maskPolygon, mapPoint)) {
         const nearestPoint = ge.nearestCoordinate(this.scene.maskPolygon, mapPoint);
-        return [nearestPoint.coordinate.x, nearestPoint.coordinate.y];
-      } else {
-        return point;
+        point[0] = nearestPoint.coordinate.x;
+        point[1] = nearestPoint.coordinate.y;
       }
     });
   }

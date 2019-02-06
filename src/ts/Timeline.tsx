@@ -35,9 +35,35 @@ export default class Timeline extends declared(Widget) {
 
   private maskColor = new Color([226, 119, 40]);
 
-  private maskPolyline: Graphic;
+  private maskPolyline = new Graphic();
 
-  private maskPolygon: Graphic;
+  private maskPolygon = new Graphic({
+    symbol: {
+      type: "simple-fill", // autocasts as new SimpleFillSymbol()
+      color: this.maskColor.withAlpha(0),
+      outline: { // autocasts as new SimpleLineSymbol()
+        width: 0,
+      },
+    },
+  } as any);
+
+  private volumetricSymbolLine = {
+    type: "line-3d",
+    symbolLayers: [{
+      type: "path",
+      size: 6,
+      material: { color: this.maskColor },
+    }],
+  };
+
+  private flatSymbolLine = {
+    type: "line-3d",
+    symbolLayers: [{
+      type: "line",
+      size: 6,
+      material: { color: this.maskColor },
+    }],
+  };
 
   constructor(params?: any) {
     super(params);
@@ -50,30 +76,9 @@ export default class Timeline extends declared(Widget) {
       this.beforeSlide = slides.getItemAt(1);
       this.afterSlide = slides.getItemAt(2);
 
-      this.maskPolyline = new Graphic({
-        symbol: {
-          type: "line-3d",
-          symbolLayers: [{
-            type: "path",
-            size: 6,
-            material: { color: this.maskColor },
-          }],
-        },
-      } as any);
-      this.scene.highlightLayer.add(this.maskPolyline);
+      this.maskPolygon.geometry = this.scene.maskPolygon;
 
-      const transparent = this.maskColor.clone().setColor({a: 0});
-      this.maskPolygon = new Graphic({
-        geometry: this.scene.maskPolygon,
-        symbol: {
-          type: "simple-fill", // autocasts as new SimpleFillSymbol()
-          color: transparent,
-          outline: { // autocasts as new SimpleLineSymbol()
-            width: 6,
-            color: transparent,
-          },
-        },
-      } as any);
+      this.scene.highlightLayer.add(this.maskPolyline);
       this.scene.highlightLayer.add(this.maskPolygon);
     });
 
@@ -190,6 +195,8 @@ export default class Timeline extends declared(Widget) {
       y: start[1],
     };
 
+    this.maskPolyline.set("symbol", this.volumetricSymbolLine);
+
     let timeline = anime.timeline({
       update: () => {
         this.maskPolyline = redraw(this.maskPolyline, "geometry", {
@@ -244,12 +251,15 @@ export default class Timeline extends declared(Widget) {
       duration: MASK_ANIMATION_DURATION / 2,
       easing: "easeInOutCubic",
     }).add({
-      targets: [color, buildingColor, polylinecolor],
+      targets: [color, buildingColor],
       a: 0,
       delay: 100,
       duration: MASK_ANIMATION_DURATION / 2,
       endDelay: 1500,
       easing: "easeInOutCubic",
+      changeComplete: () => {
+        this.maskPolyline.set("symbol", this.flatSymbolLine);
+      },
     }).finished;
   }
 
