@@ -4,7 +4,7 @@ import Accessor from "esri/core/Accessor";
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import { create as createPromise } from "esri/core/promiseUtils";
 import Geometry from "esri/geometry/Geometry";
-import { contains, intersect, nearestCoordinate } from "esri/geometry/geometryEngine";
+import ge from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
 import Polygon from "esri/geometry/Polygon";
 import Polyline from "esri/geometry/Polyline";
@@ -44,6 +44,9 @@ export default class CreatePolygon extends declared(Accessor) {
   public polylineSymbol: SimpleLineSymbol;
 
   @property()
+  public invalidPolylineSymbol: SimpleLineSymbol;
+
+  @property()
   public result: IPromise<Polygon[]>;
 
   protected polylineGraphic: Graphic;
@@ -61,11 +64,8 @@ export default class CreatePolygon extends declared(Accessor) {
 
     const color = params.color || DEFAULT_COLOR;
     this.polygonSymbol = this.createPolygonSymbol(color);
-
-    this.polylineSymbol = new SimpleLineSymbol({
-      color,
-      width: 4,
-    });
+    this.polylineSymbol = this.createPolylineSymbol(color);
+    this.invalidPolylineSymbol = this.createPolylineSymbol(new Color("red"));
 
     this.result = createPromise(((resolve: (_: Polygon[]) => void, reject: (error?: any) => void) => {
       this.resolve = resolve;
@@ -113,16 +113,42 @@ export default class CreatePolygon extends declared(Accessor) {
 
   protected createPolygonSymbol(color: Color): SimpleFillSymbol {
     return new SimpleFillSymbol({
-     color: color.withAlpha(0.5),
+     color: color.withAlpha(0.3),
      style: "diagonal-cross",
      outline: {  // autocasts as new SimpleLineSymbol()
-       color: color.withAlpha(0.3),
+       color: color.withAlpha(0.2),
        width: "0.5px",
      },
    });
   }
 
+  protected createPolylineSymbol(color: Color): SimpleFillSymbol {
+    return new SimpleLineSymbol({
+      color,
+      width: 1,
+    });
+  }
+
+  private _isSelfIntersecting(polyline: Polyline): boolean {
+    const length = polyline.paths.length ? polyline.paths[0].length : 0;
+    if (length < 3) {
+      return false;
+    }
+    const line = polyline.clone();
+
+    const spatialReference = this.scene.view.spatialReference;
+    const lastSegment = new Polyline({
+      paths: line.paths[0].slice(length-2),
+      spatialReference,
+    });
+    line.removePoint(0, length - 1);
+
+    // returns true if the line intersects itself, false otherwise
+    return ge.crosses(lastSegment, line);
+  }
+
   private _drawNewPolygon(event: DrawEvent) {
+    const layer = this.scene.sketchLayer;
     this.scene.view.container.style.cursor = "crosshair";
     // create a new graphic presenting the polyline that is being drawn on the view
     const vertices = this._snappedVertices(event);
@@ -131,19 +157,20 @@ export default class CreatePolygon extends declared(Accessor) {
 
     if (polyline) {
 
-      this.polylineGraphic = redraw(this.polylineGraphic, "geometry", polyline);
+      if (this._isSelfIntersecting(polyline)) {
+        this.polylineGraphic.symbol = this.invalidPolylineSymbol;
 
-      const polygon = this._createPolygon(vertices);
-      if (polygon) {
-        if (polygon.isSelfIntersecting) {
-          this.polygonGraphic.symbol = this.createPolygonSymbol(new Color("red"));
-          event.preventDefault();
-        } else {
-          this.polygonGraphic.symbol = this.polygonSymbol;
+        layer.remove(this.polygonGraphic);
+        event.preventDefault();
+      } else {
+        this.polylineGraphic.symbol = this.polylineSymbol;
+
+        const polygon = this._createPolygon(vertices);
+        if (polygon) {
+          this.polygonGraphic = redraw(this.polygonGraphic, "geometry", polygon, layer);
         }
-
-        this.polygonGraphic = redraw(this.polygonGraphic, "geometry", polygon);
       }
+      this.polylineGraphic = redraw(this.polylineGraphic, "geometry", polyline);
     }
   }
 
@@ -165,8 +192,8 @@ export default class CreatePolygon extends declared(Accessor) {
         y: point[1],
         spatialReference,
       });
-      if (!contains(this.scene.maskPolygon, mapPoint)) {
-        const nearestPoint = nearestCoordinate(this.scene.maskPolygon, mapPoint);
+      if (!ge.contains(this.scene.maskPolygon, mapPoint)) {
+        const nearestPoint = ge.nearestCoordinate(this.scene.maskPolygon, mapPoint);
         return [nearestPoint.coordinate.x, nearestPoint.coordinate.y];
       } else {
         return point;
@@ -203,7 +230,7 @@ export default class CreatePolygon extends declared(Accessor) {
    }
 
   private _clippedPolygons(polygon: Polygon): Polygon[] {
-    const clips = intersect(this.scene.maskPolygon, polygon);
+    const clips = ge.intersect(this.scene.maskPolygon, polygon);
     if (clips instanceof Array) {
       return clips.map((clip) => this._distinctPolygon(clip)).reduce((result, val) => result.concat(val));
     } else {

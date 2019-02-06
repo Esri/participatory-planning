@@ -21,8 +21,6 @@ export default class CreateArea extends declared(DrawWidget) {
   @property()
   public scene: Scene;
 
-  private currentColor: Color;
-
   constructor(params?: any) {
     super(params);
   }
@@ -32,7 +30,7 @@ export default class CreateArea extends declared(DrawWidget) {
       <div>
         <div class="menu">
         <div class="menu-item">
-          <button class="btn" onclick={ this._startDrawing.bind(this, "#ffffff") }>Create Ground</button>
+          <button class="btn" onclick={ this._startDrawing.bind(this, "#f0f0f0") }>Create Ground</button>
         </div>
           <div class="menu-item">
             <button class="btn" onclick={ this._startDrawing.bind(this, "#bdce8a") }>Create Lawn</button>
@@ -46,23 +44,26 @@ export default class CreateArea extends declared(DrawWidget) {
   }
 
   protected onPolygonCreated(geometry: Polygon) {
-    const building = new Graphic({
-      geometry,
-      symbol: {
-        type: "simple-fill",
-        color: this.currentColor,
-        outline: {
-          width: 0,
-        },
-      },
-    } as any);
 
-    this.scene.groundLayer.add(building);
   }
 
   private _startDrawing(color: string) {
-    this.currentColor = new Color(color);
-    this.createPolygon(this.currentColor);
+    this.createPolygon(new Color(color)).then((polygons) => {
+      polygons.forEach((geometry) => {
+        const building = new Graphic({
+          geometry,
+          symbol: {
+            type: "simple-fill",
+            color,
+            outline: {
+              width: 0,
+            },
+          },
+        } as any);
+
+        this.scene.groundLayer.add(building);
+      });
+    });
   }
 
 }
