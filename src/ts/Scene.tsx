@@ -22,7 +22,6 @@ import Widget from "esri/widgets/Widget";
 import Operation from "./draw/operation/Operation";
 import { computeBoundingPolygon } from "./support/geometry";
 import { redraw } from "./support/graphics";
-import SceneLayerView = require('esri/views/layers/SceneLayerView');
 
 // Hard coded constants
 
@@ -103,7 +102,8 @@ export default class Scene extends declared(Widget) {
         },
         edges: {
           type: "solid",
-          color: [50, 50, 50, 0.5],
+          color: [150, 150, 150],
+          size: .5,
         },
       }],
     },
@@ -122,6 +122,7 @@ export default class Scene extends declared(Widget) {
       this.sceneLayer.renderer = this.sceneLayerRenderer;
       this.showMaskedBuildings("white");
     });
+    this.view.set("environment.lighting.ambientOcclusionEnabled", true);
 
     this.watch("currentOperation", () => {
       this._dimmInactiveLayers();
@@ -159,7 +160,8 @@ export default class Scene extends declared(Widget) {
             },
             edges: {
               type: "solid",
-              color: [50, 50, 50, color.a],
+              color: [150, 150, 150, color.a],
+              size: .5,
             },
           }],
         },
@@ -188,7 +190,8 @@ export default class Scene extends declared(Widget) {
             },
             edges: {
               type: "solid",
-              color: [50, 50, 50, 0.5],
+              color: [100, 100, 100],
+              size: .5,
             },
           }],
         },

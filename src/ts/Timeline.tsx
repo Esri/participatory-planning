@@ -133,9 +133,9 @@ export default class Timeline extends declared(Widget) {
   }
 
   private _showAfter(): IPromise {
-    this.scene.showMaskedBuildings();
     return this
-      ._goToSlide(this.afterSlide);
+      ._goToSlide(this.afterSlide)
+      .then(() => this.scene.showMaskedBuildings());
   }
 
   private _goToSlide(slide: Slide): IPromise {
@@ -234,8 +234,6 @@ export default class Timeline extends declared(Widget) {
       g: 256,
       b: 256,
     });
-
-    const polylinecolor = color.clone();
 
     return anime.timeline({
       update: () => {

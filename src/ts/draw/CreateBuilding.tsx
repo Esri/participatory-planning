@@ -57,8 +57,9 @@ export default class CreateBuilding extends declared(DrawWidget) {
               color: "#FFF",
             },
             edges: {
-              type: "solid",
-              color: [50, 50, 50],
+              type: "sketch",
+              color: [100, 100, 100],
+              extensionLength: 5,
             },
             size: this.stories * 3,
           }],
