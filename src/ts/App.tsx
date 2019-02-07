@@ -57,7 +57,7 @@ export default class App extends declared(Widget) {
         console.log("[" + event.mapPoint.x + ", " + event.mapPoint.y + "]");
       }
 
-      if (!CreatePolygon.activeOperation) {
+      if (!this.scene.currentOperation) {
         view.hitTest(event)
         .then((response) => {
           // check if a feature is returned from the hurricanesLayer
@@ -67,14 +67,18 @@ export default class App extends declared(Widget) {
             if (graphic) {
               console.log("Removing", response.results[0].graphic);
               const layer = graphic.layer as GraphicsLayer;
-              if (layer === this.scene.groundLayer || layer === this.scene.symbolLayer) {
+              if (layer !== this.scene.highlightLayer || layer !== this.scene.sketchLayer) {
                 layer.remove(graphic);
+                this.scene.adjustSymbleHeights();
               }
             }
           });
         });
       }
     });
+
+    // Leave a reference of the view on the window for debugging
+    (window as any).app = this;
   }
 
   public render() {

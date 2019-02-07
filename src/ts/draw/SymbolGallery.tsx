@@ -23,10 +23,11 @@ import { renderable, tsx } from "esri/widgets/support/widget";
 // interactjs
 import interact, { InteractEvent } from "interactjs";
 
+import { redraw } from "../support/graphics";
 import SymbolGroup from "./SymbolGallery/SymbolGroup";
 import SymbolItem from "./SymbolGallery/SymbolItem";
 
-import {nearestCoordinate} from "esri/geometry/geometryEngine";
+import { nearestCoordinate } from "esri/geometry/geometryEngine";
 
 const SymbolGroupCollection = Collection.ofType<SymbolGroup>(SymbolGroup);
 
@@ -34,6 +35,9 @@ const SymbolGroupCollection = Collection.ofType<SymbolGroup>(SymbolGroup);
 export default class SymbolGallery extends declared(DrawWidget) {
 
   @property() public scene: Scene;
+
+  @property()
+  public symbolLayer = this.createGraphicsLayer(false);
 
   @renderable()
   @property() public groups = new SymbolGroupCollection();
@@ -64,10 +68,6 @@ export default class SymbolGallery extends declared(DrawWidget) {
   private dragSymbol: EsriSymbol;
 
   private placeholderSymbol: EsriSymbol;
-
-  constructor(params?: any) {
-    super(params);
-  }
 
   public postInitialize() {
     this._load();
@@ -188,18 +188,15 @@ export default class SymbolGallery extends declared(DrawWidget) {
 
     const mapPoint = this._mapPointForEvent(event); // this.scene.view.toMap(screenPoint);
     // this.dragGraphic.geometry = mapPoint;
+
+    mapPoint.z = this.scene.heightAtPoint(mapPoint);
+
     this._redrawDragGraphic(mapPoint);
   }
 
   private _redrawDragGraphic(geometry?: any) {
-    this.scene.symbolLayer.remove(this.dragGraphic);
-    const clone = this.dragGraphic.clone();
-    clone.symbol = this.dragSymbol;
-    if (geometry) {
-      clone.geometry = geometry;
-    }
-    this.scene.symbolLayer.add(clone);
-    this.dragGraphic = clone;
+    this.dragGraphic.symbol = this.dragSymbol;
+    this.dragGraphic = redraw(this.dragGraphic, "geometry", geometry, this.symbolLayer);
   }
 
   private _mapPointForEvent(event: {clientX: number, clientY: number}): Point {

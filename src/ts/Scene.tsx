@@ -5,6 +5,9 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
+import Collection from "esri/core/Collection";
+import geometryEngine from "esri/geometry/geometryEngine";
+import Point from "esri/geometry/Point";
 import Polygon from "esri/geometry/Polygon";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
@@ -16,7 +19,10 @@ import WebScene from "esri/WebScene";
 import { tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
+import Operation from "./draw/operation/Operation";
 import { computeBoundingPolygon } from "./support/geometry";
+import { redraw } from "./support/graphics";
+import SceneLayerView = require('esri/views/layers/SceneLayerView');
 
 // Hard coded constants
 
@@ -38,6 +44,8 @@ export const MASK_AREA = [
   [-8236138.632189713, 4968850.261903069],
   [-8235919.081131686, 4968836.806196137],
 ];
+
+export const GraphicsLayerCollection = Collection.ofType<GraphicsLayer>(GraphicsLayer);
 
 @subclass("app.widgets.webmapview")
 export default class Scene extends declared(Widget) {
@@ -63,34 +71,15 @@ export default class Scene extends declared(Widget) {
   @property({
     readOnly: true,
   })
-  public readonly symbolLayer: GraphicsLayer = new GraphicsLayer({
-    elevationInfo: {
-      mode: "relative-to-scene",
-    },
-  });
+  public readonly sketchLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" }});
 
   @property({
     readOnly: true,
   })
-  public readonly sketchLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" } });
+  public readonly highlightLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" }});
 
-  @property({
-    readOnly: true,
-  })
-  public readonly groundLayer: GraphicsLayer = new GraphicsLayer({
-    elevationInfo: {
-      mode: "on-the-ground",
-    },
-  });
-
-  @property({
-    readOnly: true,
-  })
-  public readonly highlightLayer: GraphicsLayer = new GraphicsLayer({
-    elevationInfo: {
-      mode: "on-the-ground",
-    },
-  });
+  @property()
+  public currentOperation: Operation | null;
 
   public readonly maskPolygon = new Polygon({
     rings: [MASK_AREA],
@@ -107,6 +96,16 @@ export default class Scene extends declared(Widget) {
     // When(OBJECTID IN (" + MASKED_OBJIDS.join(",") + "), 'hide', 'show')",
     defaultSymbol: {
       type: "mesh-3d",
+      symbolLayers: [{
+        type: "fill",
+        material: {
+          color: "white",
+        },
+        edges: {
+          type: "solid",
+          color: [50, 50, 50, 0.5],
+        },
+      }],
     },
   } as any);
 
@@ -116,8 +115,6 @@ export default class Scene extends declared(Widget) {
 
   public postInitialize() {
     this.map.when(() => {
-      this.map.add(this.symbolLayer);
-      this.map.add(this.groundLayer);
       this.map.add(this.sketchLayer);
       this.map.add(this.highlightLayer);
       this.highlightLayer.add(this.boundingPolygonGraphic);
@@ -126,8 +123,14 @@ export default class Scene extends declared(Widget) {
       this.showMaskedBuildings("white");
     });
 
-    // Leave a reference of the view on the window for debugging
-    (window as any).view = this.view;
+    this.watch("currentOperation", () => {
+      this._dimmInactiveLayers();
+      if (this.currentOperation) {
+        this.currentOperation.finished.then(() => {
+          this.adjustSymbleHeights();
+        });
+      }
+    });
   }
 
   public render() {
@@ -154,6 +157,10 @@ export default class Scene extends declared(Widget) {
               color,
               colorMixMode: "replace",
             },
+            edges: {
+              type: "solid",
+              color: [50, 50, 50, color.a],
+            },
           }],
         },
       } as any);
@@ -165,8 +172,7 @@ export default class Scene extends declared(Widget) {
           },
         } as any;
       this.sceneLayer.definitionExpression = "";
-      this.groundLayer.visible = false;
-      this.symbolLayer.visible = false;
+      this._drawLayers().forEach((layer) => layer.visible = false);
     } else {
 
       // Do not show masked buildings and dimm surounding ones
@@ -180,12 +186,15 @@ export default class Scene extends declared(Widget) {
               color: [180, 180, 180],
               colorMixMode: "replace",
             },
+            edges: {
+              type: "solid",
+              color: [50, 50, 50, 0.5],
+            },
           }],
         },
       } as any);
       this.sceneLayer.definitionExpression = "OBJECTID NOT IN (" + MASKED_OBJIDS.join(",") + ")";
-      this.groundLayer.visible = true;
-      this.symbolLayer.visible = true;
+      this._drawLayers().forEach((layer) => layer.visible = true);
       this.boundingPolygonGraphic.symbol = {
           type: "simple-fill",
           color: [0, 0, 0, 0.3],
@@ -196,6 +205,47 @@ export default class Scene extends declared(Widget) {
     }
     this.sceneLayerRenderer.uniqueValueInfos = uniqueValueInfos;
     this.sceneLayer.renderer = this.sceneLayerRenderer.clone();
+  }
+
+  public adjustSymbleHeights() {
+    this._drawLayers().forEach((layer) => {
+      layer.graphics.toArray().forEach((graphic) => {
+        const point = graphic.geometry as Point;
+        if (point && point.hasZ) {
+          const height = this.heightAtPoint(point);
+          if (height !== point.z) {
+            redraw(graphic, "geometry.z", height);
+          }
+        }
+      });
+    });
+  }
+
+  public heightAtPoint(mapPoint: Point): number {
+    return this._drawLayers().reduceRight((max1, layer) => {
+      return layer.graphics.reduceRight((max2, graphic) => {
+        const layers = graphic.get<any>("symbol.symbolLayers");
+        const extrusion = layers && layers.getItemAt(0).size;
+        if (max2 < extrusion && geometryEngine.contains(graphic.geometry, mapPoint)) {
+          return extrusion;
+        }
+        return max2;
+      }, max1);
+    }, 0);
+  }
+
+  private _dimmInactiveLayers() {
+    const hasOperation = !!this.currentOperation;
+    this._drawLayers().forEach((layer) => layer.opacity = hasOperation ? 0.2 : 1);
+  }
+
+  private _drawLayers(): Collection<GraphicsLayer> {
+    return this.map.layers.filter((layer) => {
+      if (layer instanceof GraphicsLayer) {
+        return layer !== this.sketchLayer && layer !== this.highlightLayer;
+      }
+      return false;
+    }) as any;
   }
 
   private _attachSceneView(sceneViewDiv: HTMLDivElement) {

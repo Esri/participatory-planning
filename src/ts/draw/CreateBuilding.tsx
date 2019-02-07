@@ -15,11 +15,10 @@ import { tsx } from "esri/widgets/support/widget";
 @subclass("app.draw.CreateBuilding")
 export default class CreateBuilding extends declared(DrawWidget) {
 
-  private stories: number = 3;
+  @property()
+  public layer = this.createGraphicsLayer();
 
-  constructor(params?: any) {
-    super(params);
-  }
+  private stories: number = 3;
 
   public render() {
     return (
@@ -37,6 +36,13 @@ export default class CreateBuilding extends declared(DrawWidget) {
         </div>
       </div>
     );
+  }
+
+  private _startDrawing(stories: number) {
+    this.stories = stories;
+    this.createPolygon(new Color("#d6bb7a")).then((polygons) => {
+      this._extrudeBuildings(polygons);
+    });
   }
 
   private _extrudeBuildings(polygons: Polygon[]) {
@@ -60,14 +66,7 @@ export default class CreateBuilding extends declared(DrawWidget) {
         },
       } as any);
 
-      this.scene.groundLayer.add(building);
-    });
-  }
-
-  private _startDrawing(stories: number) {
-    this.stories = stories;
-    this.createPolygon(new Color("#d6bb7a")).then((polygons) => {
-      this._extrudeBuildings(polygons);
+      this.layer.add(building);
     });
   }
 

@@ -4,9 +4,7 @@ import { create as createPromise } from "esri/core/promiseUtils";
 import Scene from "../../Scene";
 import "../support/extensions";
 
-export default class Operation<TargetType> {
-
-  public static activeOperation: Operation<any> | null;
+export default class Operation<TargetType = any> {
 
   public finished: IPromise<TargetType>;
 
@@ -20,16 +18,17 @@ export default class Operation<TargetType> {
       this.reject = reject;
     }) as any);
 
+    const lastOp = scene.currentOperation;
+    if (lastOp) {
+      lastOp.cancel();
+    }
+
+    scene.currentOperation = this;
     this.finished.always(() => {
-      if (Operation.activeOperation === this) {
-        Operation.activeOperation = null;
+      if (scene.currentOperation === this) {
+        scene.currentOperation = null;
       }
     });
-
-    if (Operation.activeOperation) {
-      Operation.activeOperation.cancel();
-    }
-    Operation.activeOperation = this;
   }
 
   public cancel() {

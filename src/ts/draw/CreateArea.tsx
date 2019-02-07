@@ -9,21 +9,14 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import { contains } from "esri/geometry/geometryEngine";
-import Polygon from "esri/geometry/Polygon";
 import Graphic from "esri/Graphic";
-import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import { tsx } from "esri/widgets/support/widget";
 
 @subclass("app.draw.CreateArea")
 export default class CreateArea extends declared(DrawWidget) {
 
   @property()
-  public scene: Scene;
-
-  constructor(params?: any) {
-    super(params);
-  }
+  public layer = this.createGraphicsLayer();
 
   public render() {
     return (
@@ -57,7 +50,7 @@ export default class CreateArea extends declared(DrawWidget) {
           },
         } as any);
 
-        this.scene.groundLayer.add(building);
+        this.layer.add(building);
       });
     });
   }
