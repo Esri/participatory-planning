@@ -4,7 +4,7 @@ This is a non-commercial, demo application made at the Esri R&D Center Zurich to
 in the Dumbo quarter of Brooklyn NY.
 
 
-![screenshot](./src/assets/images/dumbo.png)
+![screenshot](./screenshot.png)
 
 
 ## Instructions
