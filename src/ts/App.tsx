@@ -18,6 +18,8 @@ import SymbolGallery from "./draw/SymbolGallery";
 import Scene from "./Scene";
 import Timeline from "./Timeline";
 
+import UpdateOperation from "./draw/operation/UpdateOperation";
+
 @subclass("app.widgets.webmapview")
 export default class App extends declared(Widget) {
 
@@ -68,8 +70,7 @@ export default class App extends declared(Widget) {
               console.log("Removing", response.results[0].graphic);
               const layer = graphic.layer as GraphicsLayer;
               if (layer !== this.scene.highlightLayer || layer !== this.scene.sketchLayer) {
-                layer.remove(graphic);
-                this.scene.adjustSymbleHeights();
+                new UpdateOperation(graphic, this.scene);
               }
             }
           });

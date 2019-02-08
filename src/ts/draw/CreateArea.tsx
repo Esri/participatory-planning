@@ -29,6 +29,9 @@ export default class CreateArea extends declared(DrawWidget) {
             <button class="btn" onclick={ this._startDrawing.bind(this, "#bdce8a", "#93a06c") }>Create Lawn</button>
           </div>
           <div class="menu-item">
+            <button class="btn" onclick={ this._startDrawing.bind(this, "#d6bb7a", "#d6bb7a") }>Create Beach</button>
+          </div>
+          <div class="menu-item">
             <button class="btn" onclick={ this._startDrawing.bind(this, "#a0b4cf", "#8b9cb3") }>Create Water</button>
           </div>
         </div>

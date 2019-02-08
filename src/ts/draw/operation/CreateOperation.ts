@@ -41,15 +41,14 @@ export default class CreateOperation<ResultType extends Geometry> extends Operat
     });
 
     const action = this.draw.create(drawAction);
-    action.on([
-        "vertex-add",
-        "vertex-remove",
-        "cursor-update",
-        "redo",
-        "undo",
-      ] as any,
-      (event) => { this._updateDrawing(event); },
-    );
+
+    [
+      "vertex-add",
+      "vertex-remove",
+      "cursor-update",
+      "redo",
+      "undo",
+    ].forEach((eventName) => action.on(eventName, (event) => this._updateDrawing(event)));
     action.on(
       "draw-complete",
       (event) => { this._completeDrawing(event); });
