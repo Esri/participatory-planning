@@ -23,11 +23,17 @@ export default class UpdateOperation extends Operation<Graphic> {
 
     this.sketchViewModel.on("update", (event) => {
       if (event.state === "complete" || event.state === "cancel") {
-        this.resolve(graphic);
+        const result = this.clippedGeometries(graphic.geometry);
+        this.resolve(result);
       }
     });
 
     this.sketchViewModel.update(graphic);
+  }
+
+  protected castGeometry(geometry: Geometry): Graphic[] {
+    this.graphic.geometry = geometry;
+    return [this.graphic];
   }
 
 }

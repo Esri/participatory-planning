@@ -24,7 +24,7 @@ export interface CreatePolygonParams {
   scene: Scene;
 }
 
-export default class CreateOperation<ResultType extends Geometry> extends Operation<ResultType[]> {
+export default class CreateOperation<ResultType extends Geometry> extends Operation<ResultType> {
 
   protected polylineGraphic: Graphic = new Graphic();
 

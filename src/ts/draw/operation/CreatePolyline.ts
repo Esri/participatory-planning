@@ -17,30 +17,11 @@ export default class CreatePolyline extends CreateOperation<Polyline> {
   protected resultFromVertices(vertices: number[][]): Polyline[] {
     const polygon = this.createPolyline(vertices);
 
-    return polygon ? this._clippedPolygons(polygon) : [];
+    return polygon ? this.clippedGeometries(polygon) : [];
   }
 
-  private _distinctPolygon(geometry: Geometry): Polyline[] {
-    if (geometry instanceof Polyline) {
-      if (geometry.paths.length > 1) {
-        return geometry.paths.map((ring) => new Polyline({
-          paths: [ring],
-          spatialReference: geometry.spatialReference,
-        }));
-      } else {
-        return [geometry];
-      }
-    }
-    return [];
-   }
-
-  private _clippedPolygons(polygon: Geometry): Polyline[] {
-    const clips = ge.intersect(this.scene.maskPolygon, polygon);
-    if (clips instanceof Array) {
-      return clips.map((clip) => this._distinctPolygon(clip)).reduce((result, val) => result.concat(val));
-    } else {
-      return this._distinctPolygon(clips);
-    }
+  protected castGeometry(geometry: Geometry): Polyline[] {
+    return this.geometry2Polylines(geometry);
   }
 
 }

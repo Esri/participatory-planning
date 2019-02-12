@@ -13,7 +13,7 @@ import CreateArea from "./draw/CreateArea";
 import CreateBuilding from "./draw/CreateBuilding";
 import CreatePath from "./draw/CreatePath";
 import DrawWidget from "./draw/DrawWidget";
-import CreatePolygon from "./draw/operation/CreatePolygon";
+import GlTFWidget from "./draw/GlTFWidget";
 import SymbolGallery from "./draw/SymbolGallery";
 import Scene from "./Scene";
 import Timeline from "./Timeline";
@@ -50,6 +50,10 @@ export default class App extends declared(Widget) {
     scene: this.scene,
   });
 
+  private glTFWidget = new GlTFWidget({
+    scene: this.scene,
+  });
+
   private selectedWidget: DrawWidget | null = null;
 
   public postInitialize() {
@@ -66,8 +70,8 @@ export default class App extends declared(Widget) {
           // do something with the result graphic
           response.results.forEach((result) => {
             const graphic = result.graphic;
-            if (graphic) {
-              console.log("Removing", response.results[0].graphic);
+            if (graphic && graphic.geometry) {
+              console.log("Editing", response.results[0].graphic);
               const layer = graphic.layer as GraphicsLayer;
               if (layer !== this.scene.highlightLayer || layer !== this.scene.sketchLayer) {
                 new UpdateOperation(graphic, this.scene);
@@ -86,22 +90,22 @@ export default class App extends declared(Widget) {
     return (
       <div>
         <div id="scene" afterCreate={ this._attachScene.bind(this) } />
-        <div class="top">
-          <div class="timeline" afterCreate={ this._attachTimeline.bind(this) } />
-          <div class="perspective" />
-        </div>
-        <div class="bottom">
-          <div id="secondaryMenu" class="secondary-menu">
+
+        <div class="box">
+          <div class="top">
+            <div class="timeline" afterCreate={ this._attachTimeline.bind(this) } />
+          </div>
+          <div class="center">
             <div afterCreate={ this._attachMenu.bind(this, this.createArea) } />
             <div afterCreate={ this._attachMenu.bind(this, this.createPath) } />
             <div afterCreate={ this._attachMenu.bind(this, this.createBuilding) } />
             <div afterCreate={ this._attachMenu.bind(this, this.symbolGallery) } />
+            <div afterCreate={ this._attachMenu.bind(this, this.glTFWidget)} />
           </div>
-
-          <div class="primary-menu">
+          <div class="bottom">
             <div class="menu">
             {
-              ["feature-layer", "line-chart", "organization", "map-pin"]
+              ["feature-layer", "line-chart", "organization", "map-pin", "upload"]
               .map((item) => (
                 <div class="menu-item">
                   <button class="btn btn-large" onclick={ this._selectMenu.bind(this, item) }>
@@ -113,6 +117,7 @@ export default class App extends declared(Widget) {
             </div>
           </div>
         </div>
+
         <div class="intro">
           <div class="column-17">
             <div class="card card-wide">
@@ -168,6 +173,9 @@ export default class App extends declared(Widget) {
       case "map-pin":
         this.symbolGallery.selectedGroup = null;
         this._showWidget(this.symbolGallery);
+        break;
+      case "upload":
+        this._showWidget(this.glTFWidget);
         break;
     }
   }

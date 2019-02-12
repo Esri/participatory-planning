@@ -83,6 +83,11 @@ module.exports = {
     new CopyWebpackPlugin([{
       from: './src/assets/images',
       to: 'images/'
+    }]),
+
+    new CopyWebpackPlugin([{
+      from: './src/assets/js',
+      to: 'js/'
     }])
   ],
   resolve: {

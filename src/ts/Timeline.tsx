@@ -83,7 +83,10 @@ export default class Timeline extends declared(Widget) {
     });
 
     this.scene.view.when(() => {
-      this._goToSlide(this.introSlide);
+      // this._goToSlide(this.introSlide);
+
+      (document.getElementsByClassName("intro")[0] as any).style.visibility = "hidden";
+      this._showAfter();
     });
   }
 
@@ -143,6 +146,7 @@ export default class Timeline extends declared(Widget) {
     return view.goTo(slide.viewpoint).then(() => {
 
       view.environment = slide.environment;
+      view.set("environment.lighting.ambientOcclusionEnabled", true);
 
       // Toggle layer visibility
       this.scene.map.layers.forEach((layer) => {

@@ -78,7 +78,7 @@ export default class Scene extends declared(Widget) {
   public readonly highlightLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" }});
 
   @property()
-  public currentOperation: Operation | null;
+  public currentOperation: Operation<any> | null;
 
   public readonly maskPolygon = new Polygon({
     rings: [MASK_AREA],
@@ -122,7 +122,6 @@ export default class Scene extends declared(Widget) {
       this.sceneLayer.renderer = this.sceneLayerRenderer;
       this.showMaskedBuildings("white");
     });
-    this.view.set("environment.lighting.ambientOcclusionEnabled", true);
 
     this.watch("currentOperation", () => {
       this._dimmInactiveLayers();

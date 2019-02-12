@@ -43,7 +43,7 @@ export default class CreatePolygon extends CreateOperation<Polygon> {
 
   protected resultFromVertices(vertices: number[][]): Polygon[] {
     const graphic = this.polygonGraphic.geometry;
-    return graphic ? this._clippedPolygons(graphic) : [];
+    return graphic ? this.clippedGeometries(graphic) : [];
   }
 
   protected updateAndValidateDraft(vertices: number[][]) {
@@ -59,6 +59,10 @@ export default class CreatePolygon extends CreateOperation<Polygon> {
     this.polygonGraphic = redraw(this.polygonGraphic, "geometry", intersects ? null : geometry);
 
     this.polylineGraphic.symbol = intersects ? this.invalidPolylineSymbol : this.polylineSymbol;
+  }
+
+  protected castGeometry(geometry: Geometry): Polygon[] {
+    return this.geometry2Polygons(geometry);
   }
 
   private _isIntersectingPolyline(polyline: Polyline): boolean {
@@ -77,29 +81,6 @@ export default class CreatePolygon extends CreateOperation<Polygon> {
 
     // returns true if the line intersects itself, false otherwise
     return ge.crosses(lastSegment, line);
-  }
-
-  private _distinctPolygon(geometry: Geometry): Polygon[] {
-    if (geometry instanceof Polygon) {
-      if (geometry.rings.length > 1) {
-        return geometry.rings.map((ring) => new Polygon({
-          rings: [ring],
-          spatialReference: geometry.spatialReference,
-        }));
-      } else {
-        return [geometry];
-      }
-    }
-    return [];
-   }
-
-  private _clippedPolygons(polygon: Geometry): Polygon[] {
-    const clips = ge.intersect(this.scene.maskPolygon, polygon);
-    if (clips instanceof Array) {
-      return clips.map((clip) => this._distinctPolygon(clip)).reduce((result, val) => result.concat(val));
-    } else {
-      return this._distinctPolygon(clips);
-    }
   }
 
 }

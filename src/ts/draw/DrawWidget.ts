@@ -35,11 +35,11 @@ export default class DrawWidget extends declared(Widget) {
     return layer;
   }
 
-  protected createPolygon(color: Color): IPromise<Polygon[]> {
+  protected createPolygon(color: Color): IPromise<Polygon> {
     return new CreatePolygon(this.scene, color).finished;
   }
 
-  protected createPolyline(color: Color): IPromise<Polyline[]> {
+  protected createPolyline(color: Color): IPromise<Polyline> {
     return new CreatePolyline(this.scene, color).finished;
   }
 
