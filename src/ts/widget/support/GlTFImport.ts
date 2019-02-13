@@ -25,44 +25,28 @@ interface ZIPEntry {
 
 const ZIP_PROGRESS_FACTOR = 0.5;
 
-@subclass("app.draw.support.GlTFImporter")
-export default class GlTFImporter extends declared(Accessor) {
+@subclass("app.draw.support.GlTFImport")
+export default class GlTFImport extends declared(Accessor) {
 
   @property()
   public progress = 0;
+
+  @property()
+  public task: string;
+
+  public readonly blobUrl: IPromise<string>;
 
   private zip = (window as any).zip;
 
   constructor(public url: string) {
     super();
-  }
 
-  public import(): IPromise<string> {
-
-      this._reportProgress(0);
-
-      return this
-        ._downloadAndExtractZip(this.url)
-        .then((entries) => this._zipEntriesToBlob(entries))
-        .then((blobEntries) => this._combineToSingleBlob(blobEntries))
-        .then((gltfBlob) => gltfBlob.url);
-  }
-
-  private _reportDownloadProgress(event: any) {
-    const value = (event.loaded / event.total) * (1 - ZIP_PROGRESS_FACTOR);
-    this._reportProgress(value);
-  }
-
-  private _reportUnzipProgress(total: number, completed: number) {
-    const value = ZIP_PROGRESS_FACTOR + completed / total * ZIP_PROGRESS_FACTOR;
-    this._reportProgress(value);
-  }
-
-  private _reportProgress(value: number) {
-    value = Math.floor(100 * value);
-    if (value >= this.progress) {
-      this.progress = value;
-    }
+    this._reportProgress("start", 0);
+    this.blobUrl = this
+      ._downloadAndExtractZip(this.url)
+      .then((entries) => this._zipEntriesToBlob(entries))
+      .then((blobEntries) => this._combineToSingleBlob(blobEntries))
+      .then((gltfBlob) => gltfBlob.url);
   }
 
   private _downloadAndExtractZip(url: string): IPromise<ZIPEntry[]> {
@@ -167,6 +151,24 @@ export default class GlTFImporter extends declared(Accessor) {
       // Read initial blob
       reader.readAsText(rootEntry.blob);
     }) as any);
+  }
+
+  private _reportDownloadProgress(event: any) {
+    const value = (event.loaded / event.total) * (1 - ZIP_PROGRESS_FACTOR);
+    this._reportProgress("download", value);
+  }
+
+  private _reportUnzipProgress(total: number, completed: number) {
+    const value = ZIP_PROGRESS_FACTOR + completed / total * ZIP_PROGRESS_FACTOR;
+    this._reportProgress("unzip", value);
+  }
+
+  private _reportProgress(task: string, value: number) {
+    this.task = task;
+    value = Math.floor(100 * value);
+    if (value >= this.progress) {
+      this.progress = value;
+    }
   }
 
 }

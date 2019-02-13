@@ -36,21 +36,22 @@ body {
   height: 100%;
 }
 
-.box div {
-  border: 1px dotted grey;
-}
-
 .box .top {
   flex: 0 1 auto;
-  /* The above is shorthand for:
-  flex-grow: 0,
-  flex-shrink: 1,
-  flex-basis: auto
-  */
 }
 
-.box .center {
+.box .content {
   flex: 1 1 auto;
+}
+
+.box > .content > div {
+  height: 100%;
+  position: relative;
+}
+
+.box > .content > div > * {
+  position: absolute;
+  bottom: 0px;
 }
 
 .box .footer {
@@ -60,13 +61,27 @@ body {
 .box, .intro {
   width: 100%;
   position: absolute;
+}
+
+.box {
   pointer-events: none;
 }
 
-.intro {
+.menu-item, .sketchfab-widget > *, .gallery-grid {
+  pointer-events: auto;
+}
+
+#overlay {
   background-color: #000A;
   height: 100%;
   width: 100%;
+}
+
+.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .intro > div {
@@ -86,62 +101,22 @@ body {
   margin: 5px;
 }
 
-.menu-item, .card, .gallery-grid-item {
-  pointer-events: auto;
-}
-
 .primary-menu .menu-item {
   margin: 10px;
 }
 
-
-#topMenu,
-#bottomMenu,
-#sceneView,
-#sceneSlides {
+.sketchfab-widget {
+  display: block;
   position: absolute;
-}
-
-// Make bottom menu circled
-.shaded-menu {
-  background-color: $transparent-black;
-  color: white;
-  height: 100px;
-  width: 100px;
-  border-radius: 50%;
-  // text-align: center;
-  // vertical-align: middle;
-  position: relative;
-  box-shadow: inset -10px -10px 100px #000, 10px 10px 20px black, inset 0px 0px 10px #0005;
-  display: inline-block;
-  margin: 10px;
-}
-
-/*
-.primary-menu .menuItem::after {
-  background-color: rgba(255, 255, 255, 0.3);
-  content: '';
-  height: 45%;
-  width: 12%;
-  position: absolute;
-  top: 4%;
-  left: 15%;
-  border-radius: 50%;
-  transform: rotate(40deg);
-}
-*/
-
-.scene-slides .slide {
-  position: relative;
-  margin: 10px;
-  float: left;
-  div {
-    position: absolute;
-    bottom: 0px;
-    color: white;
-    left: 5px;
-    text-shadow: 1px 1px #000000;
-  }
+  height: auto;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-right: 80px;
+  margin-left: 80px;
 }
 
 [class^="icon-ui-"]:before, [class*=" icon-ui-"]:before {
@@ -157,41 +132,4 @@ body {
 .gallery-grid-item {
   padding: 6px;
   display: inline-block;
-}
-
-.menu-bar .gallery-grid-item {
-  width: 25%;
-  background-color: rgba(255, 255, 255, 0.85);
-  border: 1px solid #4c4c4c;
-}
-
-.menu-bar {
-  padding-top: 50px;
-  height: 100%;
-  background-color: #4c4c4c;
-  position: absolute;
-  z-index: 10;
-  left: auto;
-  right: 0px;
-}
-
-.menu-bar .btn-link {
-  margin: 10px;
-  color: white;
-}
-
-.menu-bar .btn {
-  width: 100%;
-  text-align: center;
-  color: white;
-  background-color: #00000000;
-  border-bottom-color: white;
-  border-top-color: white;
-//  border-left-width: 0px;
-//  border-right-width: 0px;
-}
-
-.menu-bar .is-active {
-  color: #4c4c4c;
-  background-color: white;
 }

@@ -19,7 +19,7 @@ import WebScene from "esri/WebScene";
 import { tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
-import Operation from "./draw/operation/Operation";
+import Operation from "./widget/operation/Operation";
 import { computeBoundingPolygon } from "./support/geometry";
 import { redraw } from "./support/graphics";
 

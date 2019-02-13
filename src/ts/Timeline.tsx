@@ -12,22 +12,20 @@ import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import Slide from "esri/webscene/Slide";
 import { tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
 
 // animejs
 import anime from "animejs";
 
-import Scene, {MASK_AREA} from "./Scene";
+import {MASK_AREA} from "./Scene";
 import { redraw } from "./support/graphics";
+import "./widget/support/extensions";
+import WidgetBase from "./widget/WidgetBase";
 
 export const AREA_ANIMATION_DURATION = 2000;
 export const MASK_ANIMATION_DURATION = 1000;
 
 @subclass("app.widgets.Timeline")
-export default class Timeline extends declared(Widget) {
-
-  @property()
-  public scene: Scene;
+export default class Timeline extends declared(WidgetBase) {
 
   private introSlide: Slide;
   private beforeSlide: Slide;
@@ -83,10 +81,7 @@ export default class Timeline extends declared(Widget) {
     });
 
     this.scene.view.when(() => {
-      // this._goToSlide(this.introSlide);
-
-      (document.getElementsByClassName("intro")[0] as any).style.visibility = "hidden";
-      this._showAfter();
+      this._goToSlide(this.introSlide);
     });
   }
 
@@ -115,8 +110,11 @@ export default class Timeline extends declared(Widget) {
   }
 
   public start() {
-    (document.getElementsByClassName("intro")[0] as any).style.visibility = "hidden";
     this._showIntro();
+  }
+
+  public startPlanning() {
+    this._showAfter();
   }
 
   private _showIntro(): IPromise {

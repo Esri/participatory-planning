@@ -9,21 +9,13 @@ import { whenOnce } from "esri/core/watchUtils";
 import Polygon from "esri/geometry/Polygon";
 import Polyline from "esri/geometry/Polyline";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
-import Widget from "esri/widgets/Widget";
 
-import Scene from "../Scene";
 import CreatePolygon from "./operation/CreatePolygon";
 import CreatePolyline from "./operation/CreatePolyline";
+import WidgetBase from "./WidgetBase";
 
 @subclass("app.draw.DrawWidget")
-export default class DrawWidget extends declared(Widget) {
-
-  @property()
-  public scene: Scene;
-
-  constructor(params?: any) {
-    super(params);
-  }
+export default class DrawWidget extends declared(WidgetBase) {
 
   protected createGraphicsLayer(drapped: boolean = true): GraphicsLayer {
     const layer = new GraphicsLayer({

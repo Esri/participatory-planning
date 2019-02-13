@@ -5,56 +5,50 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
+import { whenNotOnce } from "esri/core/watchUtils";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import { renderable, tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
 
-import CreateArea from "./draw/CreateArea";
-import CreateBuilding from "./draw/CreateBuilding";
-import CreatePath from "./draw/CreatePath";
-import DrawWidget from "./draw/DrawWidget";
-import GlTFWidget from "./draw/GlTFWidget";
-import SymbolGallery from "./draw/SymbolGallery";
 import Scene from "./Scene";
 import Timeline from "./Timeline";
+import CreateArea from "./widget/CreateArea";
+import CreateBuilding from "./widget/CreateBuilding";
+import CreatePath from "./widget/CreatePath";
+import DrawWidget from "./widget/DrawWidget";
+import GlTFWidget from "./widget/GlTFWidget";
+import SymbolGallery from "./widget/SymbolGallery";
+import WidgetBase from "./widget/WidgetBase";
 
-import UpdateOperation from "./draw/operation/UpdateOperation";
+import UpdateOperation from "./widget/operation/UpdateOperation";
+
+const scene = new Scene();
 
 @subclass("app.widgets.webmapview")
-export default class App extends declared(Widget) {
+export default class App extends declared(WidgetBase) {
 
   @aliasOf("scene.map.portalItem.title")
   @renderable()
   public title: string;
 
+  private timeline = new Timeline({ scene });
+
+  private createArea = new CreateArea({ scene });
+
+  private createPath = new CreatePath({ scene });
+
+  private createBuilding = new CreateBuilding({ scene });
+
+  private symbolGallery = new SymbolGallery({ scene });
+
+  private glTFWidget = new GlTFWidget({ scene });
+
   @property()
-  public scene = new Scene();
-
-  private timeline = new Timeline({
-    scene: this.scene,
-  });
-
-  private createArea = new CreateArea({
-    scene: this.scene,
-  });
-
-  private createPath = new CreatePath({
-    scene: this.scene,
-  });
-
-  private createBuilding = new CreateBuilding({
-    scene: this.scene,
-  });
-
-  private symbolGallery = new SymbolGallery({
-    scene: this.scene,
-  });
-
-  private glTFWidget = new GlTFWidget({
-    scene: this.scene,
-  });
-
   private selectedWidget: DrawWidget | null = null;
+
+  public constructor() {
+    super();
+    this.scene = scene;
+  }
 
   public postInitialize() {
     const view = this.scene.view;
@@ -95,7 +89,7 @@ export default class App extends declared(Widget) {
           <div class="top">
             <div class="timeline" afterCreate={ this._attachTimeline.bind(this) } />
           </div>
-          <div class="center">
+          <div class="content">
             <div afterCreate={ this._attachMenu.bind(this, this.createArea) } />
             <div afterCreate={ this._attachMenu.bind(this, this.createPath) } />
             <div afterCreate={ this._attachMenu.bind(this, this.createBuilding) } />
@@ -118,7 +112,12 @@ export default class App extends declared(Widget) {
           </div>
         </div>
 
-        <div class="intro">
+        <div id="overlay" class="center" />
+        <div id="loadingIndicator" class="center" afterCreate={ () => this.toggleLoadingIndicator(true) }>
+          <div class="loader-bars"></div>
+          <div class="loader-text text-white" id="loadingIndicatorText"></div>
+        </div>
+        <div id="intro" class="center">
           <div class="column-17">
             <div class="card card-wide">
               <figure class="card-wide-image-wrap">
@@ -134,13 +133,27 @@ export default class App extends declared(Widget) {
                   is too much content to display well in a standard card.</p>
                 <p class="font-size--1 trailer-half">Generally wide cards are meant to be displayed one-up,
                   not grouped.</p>
-                <button class="btn" onclick={ () => this.timeline.start() }>Start</button>
+                <button class="btn" onclick={ () => this._start() }>Start</button>
               </div>
             </div>
           </div>
         </div>
       </div>
     );
+  }
+
+  protected toggleIntro(show: boolean) {
+    this.toggleElement("intro", show);
+  }
+
+  private _start() {
+    this.toggleIntro(false);
+
+    whenNotOnce(this.scene.view, "updating").then(() => {
+      this.toggleOverlay(false);
+      this.toggleLoadingIndicator(false);
+      this.timeline.startPlanning();
+    });
   }
 
   private _attachScene(element: HTMLDivElement) {
@@ -175,6 +188,7 @@ export default class App extends declared(Widget) {
         this._showWidget(this.symbolGallery);
         break;
       case "upload":
+        this.glTFWidget.startImport();
         this._showWidget(this.glTFWidget);
         break;
     }
