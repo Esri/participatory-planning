@@ -76,8 +76,8 @@ export default class Timeline extends declared(WidgetBase) {
 
       this.maskPolygon.geometry = this.scene.maskPolygon;
 
-      this.scene.highlightLayer.add(this.maskPolyline);
-      this.scene.highlightLayer.add(this.maskPolygon);
+      this.scene.sketchLayer.add(this.maskPolyline);
+      this.scene.sketchLayer.add(this.maskPolygon);
     });
 
     this.scene.view.when(() => {

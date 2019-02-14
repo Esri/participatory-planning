@@ -125,11 +125,29 @@ body {
 
 .gallery-grid {
   overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
+  overflow-y: auto;
+  text-align: center;
+  padding-bottom: 20px;
 }
 
 .gallery-grid-item {
-  padding: 6px;
+  height: 70px;
+  width: 70px;
+  margin: 2px;
   display: inline-block;
+  cursor: pointer;
+  background-color: #AAAA;
+}
+
+.gallery-grid-item img {
+  height: 64px;
+  width: 64px;
+	-webkit-transform: scale(1);
+	transform: scale(1);
+	-webkit-transition: .1s ease-in-out;
+	transition: .1s ease-in-out;
+}
+.gallery-grid-item:hover img {
+	-webkit-transform: scale(1.1);
+	transform: scale(1.1);
 }

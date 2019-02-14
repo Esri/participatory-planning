@@ -67,7 +67,7 @@ export default class App extends declared(WidgetBase) {
             if (graphic && graphic.geometry) {
               console.log("Editing", response.results[0].graphic);
               const layer = graphic.layer as GraphicsLayer;
-              if (layer !== this.scene.highlightLayer || layer !== this.scene.sketchLayer) {
+              if (layer !== this.scene.sketchLayer) {
                 new UpdateOperation(graphic, this.scene);
               }
             }
@@ -184,7 +184,7 @@ export default class App extends declared(WidgetBase) {
         this._showWidget(this.createBuilding);
         break;
       case "map-pin":
-        this.symbolGallery.selectedGroup = null;
+        this.symbolGallery.reset();
         this._showWidget(this.symbolGallery);
         break;
       case "upload":

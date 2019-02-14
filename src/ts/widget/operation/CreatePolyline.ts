@@ -6,9 +6,9 @@ import Polyline from "esri/geometry/Polyline";
 
 import Scene from "../../Scene";
 import "../support/extensions";
-import CreateOperation from "./CreateOperation";
+import CreateMultipointOperation from "./CreateMultipointOperation";
 
-export default class CreatePolyline extends CreateOperation<Polyline> {
+export default class CreatePolyline extends CreateMultipointOperation<Polyline> {
 
   constructor(scene: Scene, color: Color) {
     super("polyline", scene, color);

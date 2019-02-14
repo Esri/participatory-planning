@@ -10,7 +10,7 @@ import "../support/extensions";
 
 export default class Operation<TargetType = Geometry> {
 
-  public finished: IPromise<TargetType>;
+  public finished: IPromise<TargetType[]>;
 
   protected resolve: (value: TargetType[]) => void;
 

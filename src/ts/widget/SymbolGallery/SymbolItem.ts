@@ -19,21 +19,23 @@ export default class SymbolItem extends declared(Accessor) {
   @property()
   public name: string;
 
+  public webSymbol: WebStyleSymbol;
+
   private fetchPromise: IPromise<EsriSymbol>;
 
   constructor(data: any, group: SymbolGroup) {
     super(data);
     this.group = group;
     this.thumbnailHref = data.thumbnail.href;
+    this.webSymbol = new WebStyleSymbol({
+      name: data.name,
+      styleName: group.category,
+    });
   }
 
   public fetchSymbol(): IPromise<EsriSymbol> {
     if (!this.fetchPromise) {
-      const webSymbol = new WebStyleSymbol({
-        name: this.name,
-        styleName: this.group.category,
-      });
-      this.fetchPromise = webSymbol.fetchSymbol().then((actualSymbol) => actualSymbol);
+      this.fetchPromise = this.webSymbol.fetchSymbol().then((actualSymbol) => actualSymbol);
     }
     return this.fetchPromise;
   }

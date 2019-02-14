@@ -19,9 +19,9 @@ import WebScene from "esri/WebScene";
 import { tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
-import Operation from "./widget/operation/Operation";
 import { computeBoundingPolygon } from "./support/geometry";
 import { redraw } from "./support/graphics";
+import Operation from "./widget/operation/Operation";
 
 // Hard coded constants
 
@@ -72,11 +72,6 @@ export default class Scene extends declared(Widget) {
   })
   public readonly sketchLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" }});
 
-  @property({
-    readOnly: true,
-  })
-  public readonly highlightLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" }});
-
   @property()
   public currentOperation: Operation<any> | null;
 
@@ -116,8 +111,8 @@ export default class Scene extends declared(Widget) {
   public postInitialize() {
     this.map.when(() => {
       this.map.add(this.sketchLayer);
-      this.map.add(this.highlightLayer);
-      this.highlightLayer.add(this.boundingPolygonGraphic);
+      this.map.add(this.sketchLayer);
+      this.sketchLayer.add(this.boundingPolygonGraphic);
       this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
       this.sceneLayer.renderer = this.sceneLayerRenderer;
       this.showMaskedBuildings("white");
@@ -129,6 +124,12 @@ export default class Scene extends declared(Widget) {
         this.currentOperation.finished.then(() => {
           this.adjustSymbleHeights();
         });
+      }
+    });
+
+    this.view.on("key-down", (event) => {
+      if (event.key === "Escape" && this.currentOperation) {
+        this.currentOperation.cancel();
       }
     });
   }
@@ -244,7 +245,7 @@ export default class Scene extends declared(Widget) {
   private _drawLayers(): Collection<GraphicsLayer> {
     return this.map.layers.filter((layer) => {
       if (layer instanceof GraphicsLayer) {
-        return layer !== this.sketchLayer && layer !== this.highlightLayer;
+        return layer !== this.sketchLayer;
       }
       return false;
     }) as any;

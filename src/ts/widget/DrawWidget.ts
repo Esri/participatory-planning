@@ -6,10 +6,13 @@ import {
   subclass,
 } from "esri/core/accessorSupport/decorators";
 import { whenOnce } from "esri/core/watchUtils";
+import Point from "esri/geometry/Point";
 import Polygon from "esri/geometry/Polygon";
 import Polyline from "esri/geometry/Polyline";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
+import EsriSymbol from "esri/symbols/Symbol";
 
+import CreatePoint from "./operation/CreatePoint";
 import CreatePolygon from "./operation/CreatePolygon";
 import CreatePolyline from "./operation/CreatePolyline";
 import WidgetBase from "./WidgetBase";
@@ -27,12 +30,16 @@ export default class DrawWidget extends declared(WidgetBase) {
     return layer;
   }
 
-  protected createPolygon(color: Color): IPromise<Polygon> {
+  protected createPolygon(color: Color): IPromise<Polygon[]> {
     return new CreatePolygon(this.scene, color).finished;
   }
 
-  protected createPolyline(color: Color): IPromise<Polyline> {
+  protected createPolyline(color: Color): IPromise<Polyline[]> {
     return new CreatePolyline(this.scene, color).finished;
+  }
+
+  protected createPoint(symbol: EsriSymbol): IPromise<Point[]> {
+    return new CreatePoint(this.scene, symbol).finished;
   }
 
 }

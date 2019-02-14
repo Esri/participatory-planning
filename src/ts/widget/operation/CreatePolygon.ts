@@ -11,9 +11,9 @@ import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
 import Scene from "../../Scene";
 import { redraw } from "../../support/graphics";
 import "../support/extensions";
-import CreateOperation from "./CreateOperation";
+import CreateMultipointOperation from "./CreateMultipointOperation";
 
-export default class CreatePolygon extends CreateOperation<Polygon> {
+export default class CreatePolygon extends CreateMultipointOperation<Polygon> {
 
   protected polygonGraphic: Graphic = new Graphic();
 
@@ -31,7 +31,7 @@ export default class CreatePolygon extends CreateOperation<Polygon> {
         width: "0.5px",
       },
     });
-    this.polylineSymbol = this.polylineGraphic.symbol as SimpleLineSymbol;
+    this.polylineSymbol = this.sketchGraphic.symbol as SimpleLineSymbol;
     this.invalidPolylineSymbol = this.polylineSymbol.clone();
     this.invalidPolylineSymbol.color = new Color("red");
 
@@ -58,7 +58,7 @@ export default class CreatePolygon extends CreateOperation<Polygon> {
 
     this.polygonGraphic = redraw(this.polygonGraphic, "geometry", intersects ? null : geometry);
 
-    this.polylineGraphic.symbol = intersects ? this.invalidPolylineSymbol : this.polylineSymbol;
+    this.sketchGraphic.symbol = intersects ? this.invalidPolylineSymbol : this.polylineSymbol;
   }
 
   protected castGeometry(geometry: Geometry): Polygon[] {

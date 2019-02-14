@@ -46,6 +46,10 @@ export default class SymbolGallery extends declared(DrawWidget) {
   @property()
   public selectedGroup: SymbolGroup | null;
 
+  @renderable()
+  @property()
+  public selectedSymbol: SymbolItem | null;
+
   @property({
     type: Collection.ofType(SymbolItem),
     readOnly: true,
@@ -81,14 +85,18 @@ export default class SymbolGallery extends declared(DrawWidget) {
     });
   }
 
-  public render() {
+  public reset() {
+    this.selectedGroup = null;
+    this.selectedSymbol = null;
+  }
 
+  public render() {
     const galleryItems = this.selectedGroup ? this.selectedGroup.items.toArray() : [];
     const showGroups = !galleryItems.length && this.groups.length;
     const showLoading = !(galleryItems.length || showGroups);
     return (
       <div>
-        <div class="gallery-grid" style={ galleryItems.length ? "" : "display:none;"}>
+        <div class="gallery-grid" style={ (galleryItems.length && !this.selectedSymbol) ? "" : "display:none;"}>
         {
           galleryItems.map((item) => this._renderSymbolItem(item))
         }
@@ -112,20 +120,19 @@ export default class SymbolGallery extends declared(DrawWidget) {
         </div>
       </div>
     );
+  }
 
-    // const sourceLoading = false;
-    // const rootClasses = {
-    //   [CSS.sourceLoading]: sourceLoading,
-    // };
+  private _renderSymbolItem(item: SymbolItem) {
+    const href = item.thumbnailHref;
+    const key = item.group.category + item.name;
 
-    // let renderedItems;
-    // if (this.items.length) {
-    //   renderedItems = this.items.toArray().map(this._renderSymbolItem, this);
-    //   // renderedItems = this._renderSymbolItem(this.items.toArray());
-    // } else {
-    //   renderedItems = "Loading...";
-    // }
-
+    return (
+      <div class="gallery-grid-item" key={key} bind={this} onclick={ this._selectSymbolItem }
+        afterCreate={this._addInteract} data-item={item}>
+        <img src={href} />
+      </div>
+    );
+    // draggable="true" bind={this} ondragstart={ this.startDrag }
   }
 
   private _selectGroup(group: SymbolGroup) {
@@ -135,16 +142,27 @@ export default class SymbolGallery extends declared(DrawWidget) {
     });
   }
 
-  private _renderSymbolItem(item: SymbolItem) {
-    const href = item.thumbnailHref;
-    const key = item.group.category + item.name;
+  private _selectSymbolItem(event: any) {
+    this.selectedSymbol = event.currentTarget["data-item"];
+    if (this.selectedSymbol) {
+      this._placeSymbol(this.selectedSymbol.webSymbol);
+    }
+  }
 
-    return (
-      <div class="gallery-grid-item" key={key} bind={this} afterCreate={this._addInteract} data-item={item}>
-        <img src={href} />
-      </div>
-    );
-    // draggable="true" bind={this} ondragstart={ this.startDrag }
+  private _placeSymbol(symbol: EsriSymbol) {
+    this.createPoint(symbol).then((points: Point[]) => {
+
+      points.forEach((point) => {
+        const graphic = new Graphic({
+          geometry: points[0],
+          symbol,
+        });
+        this.symbolLayer.add(graphic);
+      });
+
+      // Continue placing the same symbol
+      this._placeSymbol(symbol);
+    });
   }
 
   private _addInteract(element: HTMLDivElement) {
