@@ -14,7 +14,7 @@ export default class UpdateOperation extends Operation<Graphic> {
 
   private sketchViewModel: SketchViewModel;
 
-  constructor(public graphic: Graphic, widget: DrawWidget) {
+  constructor(widget: DrawWidget, public graphic: Graphic) {
     super(widget);
 
     this.sketchViewModel = new SketchViewModel({

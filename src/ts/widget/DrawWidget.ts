@@ -17,6 +17,9 @@ import CreatePoint from "./operation/CreatePoint";
 import CreatePolygon from "./operation/CreatePolygon";
 import CreatePolyline from "./operation/CreatePolyline";
 import WidgetBase from "./WidgetBase";
+import Graphic = require('esri/Graphic');
+import Operation from './operation/Operation';
+import UpdateOperation from './operation/UpdateOperation';
 
 @subclass("app.draw.DrawWidget")
 export default class DrawWidget extends declared(WidgetBase) {
@@ -33,6 +36,13 @@ export default class DrawWidget extends declared(WidgetBase) {
       },
     });
     whenOnce(this, "scene", () => this.scene.map.add(this.layer));
+  }
+
+  public updateGraphic(graphic: Graphic): Operation<Graphic> {
+    if (graphic.layer !== this.layer) {
+      throw new Error("Graphic must belong to this widget's layer");
+    }
+    return new UpdateOperation(this, graphic);
   }
 
   protected createPolygon(color: Color): IPromise<Polygon[]> {

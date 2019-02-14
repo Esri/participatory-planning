@@ -145,17 +145,20 @@ export default class SymbolGallery extends declared(DrawWidget) {
   private _selectSymbolItem(event: any) {
     this.selectedSymbol = event.currentTarget["data-item"];
     if (this.selectedSymbol) {
-      this._placeSymbol(this.selectedSymbol.webSymbol);
+      this._placeSymbol(this.selectedSymbol);
     }
   }
 
-  private _placeSymbol(symbol: EsriSymbol) {
-    this.createPoint(symbol).then((points: Point[]) => {
+  private _placeSymbol(symbol: SymbolItem) {
+    this.createPoint(symbol.webSymbol).then((points: Point[]) => {
 
       points.forEach((point) => {
         const graphic = new Graphic({
-          geometry: points[0],
-          symbol,
+          geometry: point,
+          symbol: symbol.webSymbol,
+        });
+        symbol.fetchSymbol().then((point3DSymbol) => {
+          graphic.symbol = point3DSymbol;
         });
         this.layer.add(graphic);
       });

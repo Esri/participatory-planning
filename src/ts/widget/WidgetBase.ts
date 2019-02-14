@@ -15,7 +15,7 @@ export default class WidgetBase extends declared(Widget) {
   @property()
   public scene: Scene;
 
-  constructor(params?: any) {
+  constructor(params: any = {}) {
     super(params);
   }
 

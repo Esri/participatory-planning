@@ -211,7 +211,7 @@ export default class App extends declared(WidgetBase) {
     if (layer) {
       this.drawWidgets.some((widget) => {
         if (widget.layer === layer) {
-          new UpdateOperation(graphic, widget);
+          widget.updateGraphic(graphic);
           return true;
         }
         return false;
