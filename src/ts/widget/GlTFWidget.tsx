@@ -28,9 +28,6 @@ enum GlTFWidgetState {
 export default class GlTFWidget extends declared(DrawWidget) {
 
   @property()
-  public layer = this.createGraphicsLayer();
-
-  @property()
   @renderable()
   public state: GlTFWidgetState = GlTFWidgetState.Idle;
 

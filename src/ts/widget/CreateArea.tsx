@@ -15,9 +15,6 @@ import { tsx } from "esri/widgets/support/widget";
 @subclass("app.draw.CreateArea")
 export default class CreateArea extends declared(DrawWidget) {
 
-  @property()
-  public layer = this.createGraphicsLayer();
-
   public render() {
     return (
       <div>

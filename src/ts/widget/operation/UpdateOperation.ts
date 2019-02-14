@@ -8,16 +8,17 @@ import Operation from "./Operation";
 
 import SketchViewModel = require('esri/widgets/Sketch/SketchViewModel');
 import Graphic = require('esri/Graphic');
+import DrawWidget from '../DrawWidget';
 
 export default class UpdateOperation extends Operation<Graphic> {
 
   private sketchViewModel: SketchViewModel;
 
-  constructor(public graphic: Graphic, scene: Scene) {
-    super(scene);
+  constructor(public graphic: Graphic, widget: DrawWidget) {
+    super(widget);
 
     this.sketchViewModel = new SketchViewModel({
-      view: scene.view,
+      view: this.scene.view,
       layer: graphic.layer,
     });
 

@@ -21,6 +21,7 @@ import Widget from "esri/widgets/Widget";
 
 import { computeBoundingPolygon } from "./support/geometry";
 import { redraw } from "./support/graphics";
+import DrawWidget from "./widget/DrawWidget";
 import Operation from "./widget/operation/Operation";
 
 // Hard coded constants
@@ -43,8 +44,6 @@ export const MASK_AREA = [
   [-8236138.632189713, 4968850.261903069],
   [-8235919.081131686, 4968836.806196137],
 ];
-
-export const GraphicsLayerCollection = Collection.ofType<GraphicsLayer>(GraphicsLayer);
 
 @subclass("app.widgets.webmapview")
 export default class Scene extends declared(Widget) {
@@ -119,7 +118,7 @@ export default class Scene extends declared(Widget) {
     });
 
     this.watch("currentOperation", () => {
-      this._dimmInactiveLayers();
+      this._dimmUpperLayers();
       if (this.currentOperation) {
         this.currentOperation.finished.then(() => {
           this.adjustSymbleHeights();
@@ -237,9 +236,15 @@ export default class Scene extends declared(Widget) {
     }, 0);
   }
 
-  private _dimmInactiveLayers() {
-    const hasOperation = !!this.currentOperation;
-    this._drawLayers().forEach((layer) => layer.opacity = hasOperation ? 0.2 : 1);
+  private _dimmUpperLayers() {
+    const activeLayer = this.currentOperation ? this.currentOperation.widget.layer : null;
+    let dimmFactor = 1;
+    this._drawLayers().forEach((layer) => {
+      layer.opacity = dimmFactor;
+      if (layer === activeLayer) {
+        dimmFactor = 0.2;
+      }
+    });
   }
 
   private _drawLayers(): Collection<GraphicsLayer> {

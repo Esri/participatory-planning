@@ -7,6 +7,5 @@ import App from "./ts/App";
 /**
  * Initialize application
  */
-export const app = new App({
-  container: "app",
-});
+export const app = new App();
+app.container = "app";

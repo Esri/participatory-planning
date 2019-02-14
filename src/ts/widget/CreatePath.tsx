@@ -15,28 +15,22 @@ import { tsx } from "esri/widgets/support/widget";
 @subclass("app.draw.CreatePath")
 export default class CreatePath extends declared(DrawWidget) {
 
-  @property()
-  public trailLayer = this.createGraphicsLayer();
-
-  @property()
-  public streetLayer = this.createGraphicsLayer();
-
   public render() {
     return (
       <div>
         <div class="menu">
           <div class="menu-item">
-            <button class="btn" onclick={ this._startDrawing.bind(this, this.streetLayer) }>Create Street</button>
+            <button class="btn" onclick={ this._startDrawing.bind(this) }>Create Street</button>
           </div>
           <div class="menu-item">
-            <button class="btn" onclick={ this._startDrawing.bind(this, this.trailLayer) }>Create Walking Path</button>
+            <button class="btn" onclick={ this._startDrawing.bind(this) }>Create Walking Path</button>
           </div>
         </div>
       </div>
     );
   }
 
-  private _startDrawing(layer: GraphicsLayer) {
+  private _startDrawing() {
     this.createPolyline(new Color("#b2b2b2")).then((polylines) => {
       polylines.forEach((geometry) => {
         const street = new Graphic({
@@ -48,7 +42,7 @@ export default class CreatePath extends declared(DrawWidget) {
           },
         } as any);
 
-        layer.add(street);
+        this.layer.add(street);
       });
     });
     // this.sketchModel.reset();

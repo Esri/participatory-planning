@@ -15,9 +15,6 @@ import { tsx } from "esri/widgets/support/widget";
 @subclass("app.draw.CreateBuilding")
 export default class CreateBuilding extends declared(DrawWidget) {
 
-  @property()
-  public layer = this.createGraphicsLayer();
-
   private stories: number = 3;
 
   public render() {

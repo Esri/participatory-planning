@@ -7,11 +7,12 @@ import Polyline from "esri/geometry/Polyline";
 import Scene from "../../Scene";
 import "../support/extensions";
 import CreateMultipointOperation from "./CreateMultipointOperation";
+import DrawWidget from '../DrawWidget';
 
 export default class CreatePolyline extends CreateMultipointOperation<Polyline> {
 
-  constructor(scene: Scene, color: Color) {
-    super("polyline", scene, color);
+  constructor(widget: DrawWidget, color: Color) {
+    super("polyline", widget, color);
   }
 
   protected resultFromVertices(vertices: number[][]): Polyline[] {

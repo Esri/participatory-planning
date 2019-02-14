@@ -13,6 +13,7 @@ import Scene from "../../Scene";
 import { redraw } from "../../support/graphics";
 import "../support/extensions";
 import CreateOperation from "./CreateOperation";
+import DrawWidget from '../DrawWidget';
 
 interface DrawActionEvent {
   coordinates: number[];
@@ -22,8 +23,8 @@ interface DrawActionEvent {
 
 export default class CreatePoint extends CreateOperation<Point> {
 
-  constructor(scene: Scene, public symbol: EsriSymbol) {
-    super(scene);
+  constructor(widget: DrawWidget, public symbol: EsriSymbol) {
+    super(widget);
 
     this.sketchGraphic.symbol = symbol;
 

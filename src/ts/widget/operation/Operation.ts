@@ -6,9 +6,12 @@ import Polygon from "esri/geometry/Polygon";
 import Polyline from "esri/geometry/Polyline";
 
 import Scene from "../../Scene";
+import DrawWidget from "../DrawWidget";
 import "../support/extensions";
 
 export default class Operation<TargetType = Geometry> {
+
+  public scene: Scene;
 
   public finished: IPromise<TargetType[]>;
 
@@ -16,21 +19,22 @@ export default class Operation<TargetType = Geometry> {
 
   protected reject: (error?: any) => void;
 
-  constructor(public scene: Scene) {
+  constructor(public widget: DrawWidget) {
+    this.scene = widget.scene;
     this.finished = createPromise(((resolve: (_: TargetType[]) => void, reject: (error?: any) => void) => {
       this.resolve = resolve;
       this.reject = reject;
     }) as any);
 
-    const lastOp = scene.currentOperation;
+    const lastOp = this.scene.currentOperation;
     if (lastOp) {
       lastOp.cancel();
     }
 
-    scene.currentOperation = this;
+    this.scene.currentOperation = this;
     this.finished.always(() => {
-      if (scene.currentOperation === this) {
-        scene.currentOperation = null;
+      if (this.scene.currentOperation === this) {
+        this.scene.currentOperation = null;
       }
     });
   }

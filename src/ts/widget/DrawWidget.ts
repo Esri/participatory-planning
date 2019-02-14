@@ -12,6 +12,7 @@ import Polyline from "esri/geometry/Polyline";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import EsriSymbol from "esri/symbols/Symbol";
 
+import Scene from "../Scene";
 import CreatePoint from "./operation/CreatePoint";
 import CreatePolygon from "./operation/CreatePolygon";
 import CreatePolyline from "./operation/CreatePolyline";
@@ -20,26 +21,30 @@ import WidgetBase from "./WidgetBase";
 @subclass("app.draw.DrawWidget")
 export default class DrawWidget extends declared(WidgetBase) {
 
-  protected createGraphicsLayer(drapped: boolean = true): GraphicsLayer {
-    const layer = new GraphicsLayer({
+  @property()
+  public layer: GraphicsLayer;
+
+  constructor(params?: any) {
+    super(params);
+
+    this.layer = new GraphicsLayer({
       elevationInfo: {
-        mode: drapped ? "on-the-ground" : "relative-to-ground",
+        mode: "on-the-ground",
       },
     });
-    whenOnce(this, "scene", () => this.scene.map.add(layer));
-    return layer;
+    whenOnce(this, "scene", () => this.scene.map.add(this.layer));
   }
 
   protected createPolygon(color: Color): IPromise<Polygon[]> {
-    return new CreatePolygon(this.scene, color).finished;
+    return new CreatePolygon(this, color).finished;
   }
 
   protected createPolyline(color: Color): IPromise<Polyline[]> {
-    return new CreatePolyline(this.scene, color).finished;
+    return new CreatePolyline(this, color).finished;
   }
 
   protected createPoint(symbol: EsriSymbol): IPromise<Point[]> {
-    return new CreatePoint(this.scene, symbol).finished;
+    return new CreatePoint(this, symbol).finished;
   }
 
 }

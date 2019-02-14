@@ -12,6 +12,7 @@ import Scene from "../../Scene";
 import { redraw } from "../../support/graphics";
 import "../support/extensions";
 import CreateMultipointOperation from "./CreateMultipointOperation";
+import DrawWidget from '../DrawWidget';
 
 export default class CreatePolygon extends CreateMultipointOperation<Polygon> {
 
@@ -20,8 +21,8 @@ export default class CreatePolygon extends CreateMultipointOperation<Polygon> {
   private polylineSymbol: SimpleLineSymbol;
   private invalidPolylineSymbol: SimpleLineSymbol;
 
-  constructor(scene: Scene, color: Color) {
-    super("polygon", scene, color);
+  constructor(widget: DrawWidget, color: Color) {
+    super("polygon", widget, color);
 
     this.polygonGraphic.symbol = new SimpleFillSymbol({
       color: color.withAlpha(0.3),

@@ -63,10 +63,6 @@ export default class Timeline extends declared(WidgetBase) {
     }],
   };
 
-  constructor(params?: any) {
-    super(params);
-  }
-
   public postInitialize() {
     this.scene.map.when(() => {
       const slides = this.scene.map.presentation.slides;

@@ -36,9 +36,6 @@ export default class SymbolGallery extends declared(DrawWidget) {
 
   @property() public scene: Scene;
 
-  @property()
-  public symbolLayer = this.createGraphicsLayer(false);
-
   @renderable()
   @property() public groups = new SymbolGroupCollection();
 
@@ -74,7 +71,9 @@ export default class SymbolGallery extends declared(DrawWidget) {
   private placeholderSymbol: EsriSymbol;
 
   public postInitialize() {
-    this._load();
+    this.layer.elevationInfo = {
+      mode: "relative-to-ground",
+    };
     const symbol = new WebStyleSymbol({
       name: "Pushpin 4",
       styleName: "EsriIconsStyle",
@@ -83,6 +82,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
     symbol.fetchSymbol().then((actualSymbol) => {
       this.placeholderSymbol = actualSymbol;
     });
+    this._load();
   }
 
   public reset() {
@@ -157,7 +157,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
           geometry: points[0],
           symbol,
         });
-        this.symbolLayer.add(graphic);
+        this.layer.add(graphic);
       });
 
       // Continue placing the same symbol
@@ -214,7 +214,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
 
   private _redrawDragGraphic(geometry?: any) {
     this.dragGraphic.symbol = this.dragSymbol;
-    this.dragGraphic = redraw(this.dragGraphic, "geometry", geometry, this.symbolLayer);
+    this.dragGraphic = redraw(this.dragGraphic, "geometry", geometry, this.layer);
   }
 
   private _mapPointForEvent(event: {clientX: number, clientY: number}): Point {

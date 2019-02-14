@@ -14,6 +14,7 @@ import Draw from "esri/views/draw/Draw";
 import Scene from "../../Scene";
 import "../support/extensions";
 import Operation from "./Operation";
+import DrawWidget from '../DrawWidget';
 
 export default class CreateOperation<TargetType = Geometry> extends Operation<TargetType> {
 
@@ -21,8 +22,8 @@ export default class CreateOperation<TargetType = Geometry> extends Operation<Ta
 
   protected sketchGraphic: Graphic = new Graphic();
 
-  constructor(scene: Scene) {
-    super(scene);
+  constructor(widget: DrawWidget) {
+    super(widget);
     this.draw = new Draw({ view: this.scene.view });
 
     this.scene.view.focus();

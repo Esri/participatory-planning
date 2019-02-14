@@ -20,6 +20,7 @@ import SymbolGallery from "./widget/SymbolGallery";
 import WidgetBase from "./widget/WidgetBase";
 
 import UpdateOperation from "./widget/operation/UpdateOperation";
+import Graphic = require('esri/Graphic');
 
 const scene = new Scene();
 
@@ -30,20 +31,22 @@ export default class App extends declared(WidgetBase) {
   @renderable()
   public title: string;
 
-  private timeline = new Timeline({ scene });
+  private timeline = new Timeline({scene});
 
-  private createArea = new CreateArea({ scene });
+  private createArea = new CreateArea({scene});
 
-  private createPath = new CreatePath({ scene });
+  private createPath = new CreatePath({scene});
 
-  private createBuilding = new CreateBuilding({ scene });
+  private createBuilding = new CreateBuilding({scene});
 
-  private symbolGallery = new SymbolGallery({ scene });
+  private symbolGallery = new SymbolGallery({scene});
 
-  private glTFWidget = new GlTFWidget({ scene });
+  private glTFWidget = new GlTFWidget({scene});
 
   @property()
   private selectedWidget: DrawWidget | null = null;
+
+  private drawWidgets = [this.createArea, this.createPath, this.createBuilding, this.symbolGallery, this.glTFWidget];
 
   public constructor() {
     super();
@@ -65,11 +68,7 @@ export default class App extends declared(WidgetBase) {
           response.results.forEach((result) => {
             const graphic = result.graphic;
             if (graphic && graphic.geometry) {
-              console.log("Editing", response.results[0].graphic);
-              const layer = graphic.layer as GraphicsLayer;
-              if (layer !== this.scene.sketchLayer) {
-                new UpdateOperation(graphic, this.scene);
-              }
+              this._updateGraphic(graphic);
             }
           });
         });
@@ -204,6 +203,20 @@ export default class App extends declared(WidgetBase) {
     }
     this.selectedWidget = widget;
     (this.selectedWidget.container as HTMLElement).style.display = "";
+  }
+
+  private _updateGraphic(graphic: Graphic) {
+    console.log("Editing", graphic);
+    const layer = graphic.layer as GraphicsLayer;
+    if (layer) {
+      this.drawWidgets.some((widget) => {
+        if (widget.layer === layer) {
+          new UpdateOperation(graphic, widget);
+          return true;
+        }
+        return false;
+      });
+    }
   }
 
 }

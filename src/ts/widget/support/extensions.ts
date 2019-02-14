@@ -1,7 +1,7 @@
 
 import Color from "esri/Color";
 
-declare namespace asdf {
+declare namespace __esri {
   interface Color {
     withAlpha: (a: number) => Color;
   }

@@ -12,6 +12,7 @@ import Scene from "../../Scene";
 import { redraw } from "../../support/graphics";
 import "../support/extensions";
 import CreateOperation from "./CreateOperation";
+import DrawWidget from '../DrawWidget';
 
 interface DrawActionEvent {
   vertices: number[][];
@@ -26,8 +27,8 @@ export interface CreatePolygonParams {
 
 export default class CreateMultipointOperation<ResultType extends Geometry> extends CreateOperation<ResultType> {
 
-  constructor(drawAction: string, scene: Scene, color: Color) {
-    super(scene);
+  constructor(drawAction: string, drawWidget: DrawWidget, color: Color) {
+    super(drawWidget);
 
     this.sketchGraphic.symbol = new SimpleLineSymbol({
       color,
