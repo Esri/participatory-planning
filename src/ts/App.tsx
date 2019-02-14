@@ -151,7 +151,7 @@ export default class App extends declared(WidgetBase) {
     whenNotOnce(this.scene.view, "updating").then(() => {
       this.toggleOverlay(false);
       this.toggleLoadingIndicator(false);
-      this.timeline.startPlanning();
+      this.timeline.start();
     });
   }
 
