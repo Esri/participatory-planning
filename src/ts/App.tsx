@@ -200,6 +200,10 @@ export default class App extends declared(WidgetBase) {
   private _showWidget(widget: DrawWidget) {
     if (this.selectedWidget) {
       this._hideWidget(this.selectedWidget);
+      if (this.selectedWidget === widget) {
+        this.selectedWidget = null;
+        return;
+      }
     }
     this.selectedWidget = widget;
     (this.selectedWidget.container as HTMLElement).style.display = "";
