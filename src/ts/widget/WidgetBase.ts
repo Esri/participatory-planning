@@ -35,7 +35,11 @@ export default class WidgetBase extends declared(Widget) {
   protected toggleElement(id: string, show: boolean) {
     const element = document.getElementById(id);
     if (element) {
-      element.style.visibility = show ? "" : "hidden";
+      if (show) {
+        element.classList.remove("hide");
+      } else {
+        element.classList.add("hide");
+      }
     }
   }
 

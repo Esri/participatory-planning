@@ -44,14 +44,18 @@ export default class GlTFWidget extends declared(DrawWidget) {
   }
 
   public render() {
-    const displayMap = Object.keys(GlTFWidgetState).reduce((map, key) => {
-      map[key] = this.state === key ? "" : "display: none;";
+    const classList = Object.keys(GlTFWidgetState).reduce((map, key) => {
+      if (this.state === key) {
+        map[key] = ["sketchfab-widget"];
+      } else {
+        map[key] = ["sketchfab-widget", "hide"];
+      }
       return map;
     }, {});
 
     return (
       <div>
-        <div class="sketchfab-widget" style={ displayMap[GlTFWidgetState.Import] }
+        <div classList={ classList[GlTFWidgetState.Import] }
           afterCreate={ this._attachImportWidget.bind(this) } />
       </div>
     );

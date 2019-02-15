@@ -18,6 +18,7 @@ import anime from "animejs";
 
 import {MASK_AREA} from "./Scene";
 import { redraw } from "./support/graphics";
+import { dojoPromise } from "./support/promises";
 import "./widget/support/extensions";
 import WidgetBase from "./widget/WidgetBase";
 
@@ -30,6 +31,7 @@ export default class Timeline extends declared(WidgetBase) {
   private introSlide: Slide;
   private beforeSlide: Slide;
   private afterSlide: Slide;
+  private screenshotSlide: Slide;
 
   private maskColor = new Color([226, 119, 40]);
 
@@ -69,6 +71,7 @@ export default class Timeline extends declared(WidgetBase) {
       this.introSlide = slides.getItemAt(0);
       this.beforeSlide = slides.getItemAt(1);
       this.afterSlide = slides.getItemAt(2);
+      this.screenshotSlide = slides.getItemAt(3);
 
       this.maskPolygon.geometry = this.scene.maskPolygon;
 
@@ -79,6 +82,8 @@ export default class Timeline extends declared(WidgetBase) {
     this.scene.view.when(() => {
       this._goToSlide(this.introSlide);
     });
+
+    this.toggleElement("screenshot", false);
   }
 
   public render() {
@@ -100,27 +105,39 @@ export default class Timeline extends declared(WidgetBase) {
                 After
               </button>
             </div>
+            <div class="menu-item">
+              <button class="btn btn-large" onclick={ this._takeScreenshot.bind(this) }>
+                Screenshot
+              </button>
+            </div>
         </div>
       </div>
     );
   }
 
-  public start() {
-    this._showIntro();
+  public startIntro(): IPromise {
+    this.toggleElement("intro", false);
+    return this
+      ._goToSlide(this.introSlide)
+      .then(() => {
+        this.toggleOverlay(false);
+        this.toggleLoadingIndicator(false);
+      })
+      .then(() => this._showIntro());
   }
 
-  public startPlanning() {
+  public continueEditing() {
+    this.toggleOverlay(false);
+    this.toggleElement("screenshot", false);
     this._showAfter();
   }
 
   private _showIntro(): IPromise {
-    return this._showBefore()
-    .then(() => {
-      this
-        ._animateArea()
-        .then(() => this._animateMask())
-        .then(() => this._showAfter());
-    });
+    return this
+      ._showBefore()
+      .then(() => this._animateArea())
+      .then(() => this._animateMask())
+      .then(() => this._showAfter());
   }
 
   private _showBefore(): IPromise {
@@ -133,6 +150,25 @@ export default class Timeline extends declared(WidgetBase) {
     return this
       ._goToSlide(this.afterSlide)
       .then(() => this.scene.showMaskedBuildings());
+  }
+
+  private _takeScreenshot(): IPromise {
+    this.toggleLoadingIndicator(true);
+    return this
+      ._goToSlide(this.screenshotSlide)
+      .then(() => this.scene.view.takeScreenshot({
+        format: "png",
+        width: this.scene.view.width / 2,
+      }))
+      .then((screenshot) => this._showScreenshot(screenshot));
+  }
+
+  private _showScreenshot(screenshot: __esri.Screenshot) {
+    const element = document.getElementById("screenshotImage") as HTMLImageElement;
+    element.src = screenshot.dataUrl;
+    this.toggleLoadingIndicator(false);
+    this.toggleOverlay(true);
+    this.toggleElement("screenshot", true);
   }
 
   private _goToSlide(slide: Slide): IPromise {
@@ -165,7 +201,7 @@ export default class Timeline extends declared(WidgetBase) {
     });
   }
 
-  private _animateArea(): Promise<void> {
+  private _animateArea(): IPromise<void> {
 
     const start = MASK_AREA[0];
     const waypoints = MASK_AREA.slice(1);
@@ -216,10 +252,10 @@ export default class Timeline extends declared(WidgetBase) {
         },
       });
     });
-    return timeline.finished;
+    return dojoPromise(timeline.finished);
   }
 
-  private _animateMask(): Promise<void> {
+  private _animateMask(): IPromise<void> {
     const color = new Color({
       r: 226,
       g: 119,
@@ -233,7 +269,7 @@ export default class Timeline extends declared(WidgetBase) {
       b: 256,
     });
 
-    return anime.timeline({
+    const timeline = anime.timeline({
       update: () => {
         this.maskPolygon = redraw(this.maskPolygon, "symbol.color", color);
         this.scene.showMaskedBuildings(buildingColor);
@@ -256,7 +292,8 @@ export default class Timeline extends declared(WidgetBase) {
       changeComplete: () => {
         this.maskPolyline.set("symbol", this.flatSymbolLine);
       },
-    }).finished;
+    });
+    return dojoPromise(timeline.finished);
   }
 
 }

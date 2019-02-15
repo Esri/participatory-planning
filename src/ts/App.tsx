@@ -112,10 +112,12 @@ export default class App extends declared(WidgetBase) {
         </div>
 
         <div id="overlay" class="center" />
-        <div id="loadingIndicator" class="center" afterCreate={ () => this.toggleLoadingIndicator(true) }>
+        <div id="loadingIndicator" class="center hide"
+          afterCreate={ () => this.toggleLoadingIndicator(true) }>
           <div class="loader-bars"></div>
           <div class="loader-text text-white" id="loadingIndicatorText"></div>
         </div>
+
         <div id="intro" class="center">
           <div class="column-17">
             <div class="card card-wide">
@@ -132,27 +134,27 @@ export default class App extends declared(WidgetBase) {
                   is too much content to display well in a standard card.</p>
                 <p class="font-size--1 trailer-half">Generally wide cards are meant to be displayed one-up,
                   not grouped.</p>
-                <button class="btn" onclick={ () => this._start() }>Start</button>
+                <button class="btn" onclick={ () => this.timeline.startIntro() }>Start</button>
               </div>
             </div>
           </div>
         </div>
+
+        <div id="screenshot" class="center hide">
+          <div>
+            <img id="screenshotImage" />
+          </div>
+          <div class="menu">
+          <div class="menu-item">
+            <button class="btn" onclick={ () => this.timeline.continueEditing() }>
+              Back
+            </button>
+          </div>
+          </div>
+
+        </div>
       </div>
     );
-  }
-
-  protected toggleIntro(show: boolean) {
-    this.toggleElement("intro", show);
-  }
-
-  private _start() {
-    this.toggleIntro(false);
-
-    whenNotOnce(this.scene.view, "updating").then(() => {
-      this.toggleOverlay(false);
-      this.toggleLoadingIndicator(false);
-      this.timeline.start();
-    });
   }
 
   private _attachScene(element: HTMLDivElement) {

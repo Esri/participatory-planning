@@ -25,6 +25,19 @@ body {
                                   supported by Chrome and Opera */
 }
 
+// General
+
+.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.hide {
+  display: none;
+}
+
 #app,
 #scene {
   position: relative;
@@ -75,13 +88,6 @@ body {
   background-color: #000A;
   height: 100%;
   width: 100%;
-}
-
-.center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
 }
 
 .intro > div {
