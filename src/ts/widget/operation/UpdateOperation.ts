@@ -8,7 +8,7 @@ import Graphic from "esri/Graphic";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import DrawWidget from "../DrawWidget";
 
-export default class UpdateOperation extends Operation<Graphic> {
+export default class UpdateOperation extends Operation {
 
   private sketchViewModel: SketchViewModel;
 
@@ -22,8 +22,7 @@ export default class UpdateOperation extends Operation<Graphic> {
 
     this.sketchViewModel.on("update", (event) => {
       if (event.state === "complete" || event.state === "cancel") {
-        const result = this.clippedGeometries(graphic.geometry);
-        this.resolve(result);
+        this.complete(graphic);
       }
     });
 

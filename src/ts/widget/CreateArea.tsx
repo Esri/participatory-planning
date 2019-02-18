@@ -37,21 +37,15 @@ export default class CreateArea extends declared(DrawWidget) {
   }
 
   private _startDrawing(color: string, sketchColor: string = color) {
-    this.createPolygon(new Color(sketchColor)).then((polygons) => {
-      polygons.forEach((geometry) => {
-        const building = new Graphic({
-          geometry,
-          symbol: {
-            type: "simple-fill",
-            color,
-            outline: {
-              width: 0,
-            },
-          },
-        } as any);
-
-        this.layer.add(building);
-      });
+    this.createPolygon(new Color(sketchColor)).then((newArea) => {
+      newArea.symbol = {
+        type: "simple-fill",
+        color,
+        outline: {
+          width: 0,
+        },
+      } as any;
+      this.layer.add(newArea);
     });
   }
 

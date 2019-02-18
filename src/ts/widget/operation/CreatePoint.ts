@@ -13,19 +13,23 @@ interface DrawActionEvent {
   defaultPrevented: boolean;
 }
 
-export default class CreatePoint extends CreateOperation<Point> {
+export default class CreatePoint extends CreateOperation<DrawActionEvent> {
 
   constructor(widget: DrawWidget, public symbol: EsriSymbol) {
-    super(widget);
-
+    super("point", widget);
     this.sketchGraphic.symbol = symbol;
+  }
 
-    const action = this.draw.create("point");
-
-    action.on("cursor-update", (event) => this._updateDrawing(event));
-    action.on(
-      "draw-complete",
-      (event) => { this._completeDrawing(event); });
+  protected updateSketch(event: DrawActionEvent) {
+    this.snapVertices([event.coordinates]);
+    const spatialReference = this.scene.view.spatialReference;
+    const geometry = new Point({
+      x: event.coordinates[0],
+      y: event.coordinates[1],
+      z: 2,
+      spatialReference,
+    });
+    this.sketchGraphic = redraw(this.sketchGraphic, "geometry", geometry);
   }
 
   private _updateDrawing(event: DrawActionEvent) {
@@ -38,11 +42,6 @@ export default class CreatePoint extends CreateOperation<Point> {
       spatialReference,
     });
     this.sketchGraphic = redraw(this.sketchGraphic, "geometry", geometry);
-  }
-
-  private _completeDrawing(event: DrawActionEvent) {
-    this._updateDrawing(event);
-    this.resolve([this.sketchGraphic.geometry as Point]);
   }
 
 }

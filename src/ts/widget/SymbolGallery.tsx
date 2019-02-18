@@ -123,7 +123,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
     );
   }
 
-  public updateGraphic(graphic: Graphic): Operation<Graphic> {
+  public updateGraphic(graphic: Graphic): Operation {
     (graphic.geometry as Point).hasZ = false;
     return new UpdateOperation(this, graphic);
   }
@@ -156,18 +156,8 @@ export default class SymbolGallery extends declared(DrawWidget) {
   }
 
   private _placeSymbol(symbol: SymbolItem) {
-    this.createPoint(symbol.webSymbol).then((points: Point[]) => {
-
-      points.forEach((point) => {
-        const graphic = new Graphic({
-          geometry: point,
-          symbol: symbol.webSymbol,
-        });
-        symbol.fetchSymbol().then((point3DSymbol) => {
-          graphic.symbol = point3DSymbol;
-        });
-        this.layer.add(graphic);
-      });
+    this.createPoint(symbol.webSymbol).then((newSymbol) => {
+      this.layer.add(newSymbol);
 
       // Continue placing the same symbol
       this._placeSymbol(symbol);

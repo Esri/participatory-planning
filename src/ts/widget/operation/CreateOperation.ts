@@ -1,8 +1,6 @@
 
-import Geometry from "esri/geometry/Geometry";
 import ge from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
-
 import Graphic from "esri/Graphic";
 import Draw from "esri/views/draw/Draw";
 
@@ -10,24 +8,45 @@ import DrawWidget from "../DrawWidget";
 import "../support/extensions";
 import Operation from "./Operation";
 
-export default class CreateOperation<TargetType = Geometry> extends Operation<TargetType> {
+export default class CreateOperation<DrawActionEventType> extends Operation {
 
-  protected draw: Draw;
+  protected readonly draw: Draw;
 
   protected sketchGraphic: Graphic = new Graphic();
 
-  constructor(widget: DrawWidget) {
+  constructor(drawAction: string, widget: DrawWidget) {
     super(widget);
+
     this.draw = new Draw({ view: this.scene.view });
 
     this.scene.view.focus();
     this.scene.view.container.style.cursor = "crosshair";
     this.scene.sketchLayer.add(this.sketchGraphic);
+
     this.finished.always(() => {
       this.scene.sketchLayer.remove(this.sketchGraphic);
       this.scene.view.container.style.cursor = "";
       this.draw.reset();
     });
+
+    const action = this.draw.create(drawAction);
+
+    action.on(
+      [
+        "cursor-update",
+        "vertex-add",
+        "vertex-remove",
+        "redo",
+        "undo",
+      ],
+      (event) => this._updateSketch(event) );
+    action.on(
+      "draw-complete",
+      (event) => this._completeSketch(event) );
+  }
+
+  protected updateSketch(_: DrawActionEventType) {
+    throw new Error("Implement in subclass");
   }
 
   protected snapVertices(vertices: number[][]) {
@@ -44,6 +63,15 @@ export default class CreateOperation<TargetType = Geometry> extends Operation<Ta
         point[1] = nearestPoint.coordinate.y;
       }
     });
+  }
+
+  private _updateSketch(event: DrawActionEventType) {
+    this.updateSketch(event);
+  }
+
+  private _completeSketch(event: DrawActionEventType) {
+    this._updateSketch(event);
+    this.complete(this.sketchGraphic);
   }
 
 }

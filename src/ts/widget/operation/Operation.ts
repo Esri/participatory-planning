@@ -2,26 +2,25 @@
 import { create as createPromise } from "esri/core/promiseUtils";
 import Geometry from "esri/geometry/Geometry";
 import ge from "esri/geometry/geometryEngine";
-import Polygon from "esri/geometry/Polygon";
-import Polyline from "esri/geometry/Polyline";
+import Graphic from "esri/Graphic";
 
 import Scene from "../../Scene";
 import DrawWidget from "../DrawWidget";
 import "../support/extensions";
 
-export default class Operation<TargetType = Geometry> {
+export default class Operation {
 
   public scene: Scene;
 
-  public finished: IPromise<TargetType[]>;
+  public finished: IPromise<Graphic>;
 
-  protected resolve: (value: TargetType[]) => void;
+  protected resolve: (value: Graphic) => void;
 
   protected reject: (error?: any) => void;
 
   constructor(public widget: DrawWidget) {
     this.scene = widget.scene;
-    this.finished = createPromise(((resolve: (_: TargetType[]) => void, reject: (error?: any) => void) => {
+    this.finished = createPromise(((resolve: (_: Graphic) => void, reject: (error?: any) => void) => {
       this.resolve = resolve;
       this.reject = reject;
     }) as any);
@@ -43,44 +42,24 @@ export default class Operation<TargetType = Geometry> {
     this.reject("canceled");
   }
 
-  protected castGeometry(_: Geometry): TargetType[] {
-    throw new Error("Implement in subclasses");
-  }
-
-  protected geometry2Polygons(geometry: Geometry): Polygon[] {
-    if (geometry instanceof Polygon) {
-      if (geometry.rings.length > 1) {
-        return geometry.rings.map((ring) => new Polygon({
-          rings: [ring],
-          spatialReference: geometry.spatialReference,
-        }));
-      } else {
-        return [geometry];
-      }
-    }
-    return [];
-  }
-
-  protected geometry2Polylines(geometry: Geometry): Polyline[] {
-    if (geometry instanceof Polyline) {
-      if (geometry.paths.length > 1) {
-        return geometry.paths.map((ring) => new Polyline({
-          paths: [ring],
-          spatialReference: geometry.spatialReference,
-        }));
-      } else {
-        return [geometry];
-      }
-    }
-    return [];
-  }
-
-  protected clippedGeometries(polygon: Geometry): TargetType[] {
-    const clips = ge.intersect(this.scene.maskPolygon, polygon);
-    if (clips instanceof Array) {
-      return clips.map((clip) => this.castGeometry(clip)).reduce((result, val) => result.concat(val));
+  protected complete(graphic: Graphic) {
+    const clippedGeometry = this.clippedGeometry(graphic.geometry);
+    if (clippedGeometry) {
+      this.resolve(new Graphic({
+        symbol: graphic.symbol,
+        geometry: clippedGeometry,
+      }));
     } else {
-      return this.castGeometry(clips);
+      this.reject("Sketch graphic outside of mask area");
+    }
+  }
+
+  protected clippedGeometry(geometry: Geometry): Geometry | null {
+    const clips = ge.intersect(this.scene.maskPolygon, geometry);
+    if (clips instanceof Array) {
+      return clips.length ? clips[0] : null;
+    } else {
+      return clips;
     }
   }
 

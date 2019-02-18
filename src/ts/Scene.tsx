@@ -71,7 +71,7 @@ export default class Scene extends declared(Widget) {
   public readonly sketchLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" }});
 
   @property()
-  public currentOperation: Operation<any> | null;
+  public currentOperation: Operation | null;
 
   public readonly maskPolygon = new Polygon({
     rings: [MASK_AREA],

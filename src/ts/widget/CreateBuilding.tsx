@@ -8,7 +8,6 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import Polygon from "esri/geometry/Polygon";
 import Graphic from "esri/Graphic";
 import { tsx } from "esri/widgets/support/widget";
 
@@ -37,33 +36,23 @@ export default class CreateBuilding extends declared(DrawWidget) {
 
   private _startDrawing(stories: number) {
     this.stories = stories;
-    this.createPolygon(new Color("#d6bb7a")).then((polygons) => {
-      this._extrudeBuildings(polygons);
-    });
-  }
-
-  private _extrudeBuildings(polygons: Polygon[]) {
-    polygons.forEach((geometry) => {
-      const building = new Graphic({
-        geometry,
-        symbol: {
-          type: "polygon-3d", // autocasts as new PolygonSymbol3D()
-          symbolLayers: [{
-            type: "extrude", // autocasts as new ExtrudeSymbol3DLayer()
-            material: {
-              color: "#FFF",
-            },
-            edges: {
-              type: "sketch",
-              color: [100, 100, 100],
-              extensionLength: 5,
-            },
-            size: this.stories * 3,
-          }],
-        },
-      } as any);
-
-      this.layer.add(building);
+    this.createPolygon(new Color("#d6bb7a")).then((newBuilding) => {
+      newBuilding.symbol = {
+        type: "polygon-3d", // autocasts as new PolygonSymbol3D()
+        symbolLayers: [{
+          type: "extrude", // autocasts as new ExtrudeSymbol3DLayer()
+          material: {
+            color: "#FFF",
+          },
+          edges: {
+            type: "sketch",
+            color: [100, 100, 100],
+            extensionLength: 5,
+          },
+          size: this.stories * 3,
+        }],
+      } as any;
+      this.layer.add(newBuilding);
     });
   }
 

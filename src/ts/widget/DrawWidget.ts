@@ -37,22 +37,22 @@ export default class DrawWidget extends declared(WidgetBase) {
     whenOnce(this, "scene", () => this.scene.map.add(this.layer));
   }
 
-  public updateGraphic(graphic: Graphic): Operation<Graphic> {
+  public updateGraphic(graphic: Graphic): Operation {
     if (graphic.layer !== this.layer) {
       throw new Error("Graphic must belong to this widget's layer");
     }
     return new UpdateOperation(this, graphic);
   }
 
-  protected createPolygon(color: Color): IPromise<Polygon[]> {
+  protected createPolygon(color: Color): IPromise<Graphic> {
     return new CreatePolygon(this, color).finished;
   }
 
-  protected createPolyline(color: Color): IPromise<Polyline[]> {
+  protected createPolyline(color: Color): IPromise<Graphic> {
     return new CreatePolyline(this, color).finished;
   }
 
-  protected createPoint(symbol: EsriSymbol): IPromise<Point[]> {
+  protected createPoint(symbol: EsriSymbol): IPromise<Graphic> {
     return new CreatePoint(this, symbol).finished;
   }
 
