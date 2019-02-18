@@ -57,7 +57,7 @@ export default class App extends declared(WidgetBase) {
     const view = this.scene.view;
     view.on("click", (event: any) => {
       if (event.mapPoint) {
-        console.log("[" + event.mapPoint.x + ", " + event.mapPoint.y + "]");
+        console.log("[" + event.mapPoint.x + ", " + event.mapPoint.y + "]", event);
       }
 
       if (!this.scene.currentOperation) {
@@ -65,11 +65,14 @@ export default class App extends declared(WidgetBase) {
         .then((response) => {
           // check if a feature is returned from the hurricanesLayer
           // do something with the result graphic
-          response.results.forEach((result) => {
+          console.log("hitTest", response.results);
+          response.results.some((result) => {
             const graphic = result.graphic;
             if (graphic && graphic.geometry) {
               this._updateGraphic(graphic);
+              return true;
             }
+            return false;
           });
         });
       }
