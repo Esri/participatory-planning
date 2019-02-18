@@ -5,7 +5,7 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import { whenNotOnce } from "esri/core/watchUtils";
+import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
@@ -18,9 +18,6 @@ import DrawWidget from "./widget/DrawWidget";
 import GlTFWidget from "./widget/GlTFWidget";
 import SymbolGallery from "./widget/SymbolGallery";
 import WidgetBase from "./widget/WidgetBase";
-
-import UpdateOperation from "./widget/operation/UpdateOperation";
-import Graphic = require('esri/Graphic');
 
 const scene = new Scene();
 

@@ -6,9 +6,9 @@ import { redraw } from "../../support/graphics";
 import "../support/extensions";
 import Operation from "./Operation";
 
-import SketchViewModel = require('esri/widgets/Sketch/SketchViewModel');
-import Graphic = require('esri/Graphic');
-import DrawWidget from '../DrawWidget';
+import Graphic from "esri/Graphic";
+import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
+import DrawWidget from "../DrawWidget";
 
 export default class UpdateOperation extends Operation<Graphic> {
 

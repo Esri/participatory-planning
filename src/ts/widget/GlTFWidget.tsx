@@ -5,17 +5,17 @@ import GlTFImport from "./support/GlTFImport";
 // esri
 import Color from "esri/Color";
 import {
+  aliasOf,
   declared,
   property,
   subclass,
-  aliasOf,
 } from "esri/core/accessorSupport/decorators";
+import Point from "esri/geometry/Point";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
+import ObjectSymbol3DLayer from "esri/symbols/ObjectSymbol3DLayer";
+import PointSymbol3D from "esri/symbols/PointSymbol3D";
 import { renderable, tsx } from "esri/widgets/support/widget";
-import PointSymbol3D = require('esri/symbols/PointSymbol3D');
-import ObjectSymbol3DLayer = require('esri/symbols/ObjectSymbol3DLayer');
-import Point = require('esri/geometry/Point');
 
 enum GlTFWidgetState {
   Import = "Import",

@@ -10,9 +10,9 @@ import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
 
 import Scene from "../../Scene";
 import { redraw } from "../../support/graphics";
+import DrawWidget from "../DrawWidget";
 import "../support/extensions";
 import CreateMultipointOperation from "./CreateMultipointOperation";
-import DrawWidget from '../DrawWidget';
 
 export default class CreatePolygon extends CreateMultipointOperation<Polygon> {
 

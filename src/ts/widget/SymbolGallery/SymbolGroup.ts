@@ -1,10 +1,10 @@
-import Accessor = require("esri/core/Accessor");
+import Accessor from "esri/core/Accessor";
 import {
   declared,
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import Collection = require("esri/core/Collection");
+import Collection from "esri/core/Collection";
 import PortalItem from "esri/portal/PortalItem";
 import SymbolItem from "./SymbolItem";
 

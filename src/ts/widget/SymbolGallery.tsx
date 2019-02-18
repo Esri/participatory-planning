@@ -9,7 +9,8 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import Collection = require("esri/core/Collection");
+import Collection from "esri/core/Collection";
+import { nearestCoordinate } from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
 import Graphic from "esri/Graphic";
 import Portal from "esri/portal/Portal";
@@ -24,10 +25,10 @@ import { renderable, tsx } from "esri/widgets/support/widget";
 import interact, { InteractEvent } from "interactjs";
 
 import { redraw } from "../support/graphics";
+import Operation from "./operation/Operation";
+import UpdateOperation from "./operation/UpdateOperation";
 import SymbolGroup from "./SymbolGallery/SymbolGroup";
 import SymbolItem from "./SymbolGallery/SymbolItem";
-
-import { nearestCoordinate } from "esri/geometry/geometryEngine";
 
 const SymbolGroupCollection = Collection.ofType<SymbolGroup>(SymbolGroup);
 
@@ -122,6 +123,11 @@ export default class SymbolGallery extends declared(DrawWidget) {
     );
   }
 
+  public updateGraphic(graphic: Graphic): Operation<Graphic> {
+    (graphic.geometry as Point).hasZ = false;
+    return new UpdateOperation(this, graphic);
+  }
+
   private _renderSymbolItem(item: SymbolItem) {
     const href = item.thumbnailHref;
     const key = item.group.category + item.name;
@@ -193,11 +199,6 @@ export default class SymbolGallery extends declared(DrawWidget) {
   }
 
   private _onDrag(event: InteractEvent) {
-    const target = event.target;
-       // keep the dragged position in the data-x/data-y attributes
-    const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
-    const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
-
     // translate the element
     // target.style.webkitTransform =
     // target.style.transform =
@@ -236,7 +237,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
     // return result;
   }
 
-  private _onDragEnd(event: InteractEvent) {
+  private _onDragEnd(_: InteractEvent) {
     this.dragGraphic = new Graphic();
   }
 

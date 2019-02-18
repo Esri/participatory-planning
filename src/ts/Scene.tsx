@@ -21,7 +21,6 @@ import Widget from "esri/widgets/Widget";
 
 import { computeBoundingPolygon } from "./support/geometry";
 import { redraw } from "./support/graphics";
-import DrawWidget from "./widget/DrawWidget";
 import Operation from "./widget/operation/Operation";
 
 // Hard coded constants

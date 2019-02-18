@@ -43,7 +43,7 @@ export default class Operation<TargetType = Geometry> {
     this.reject("canceled");
   }
 
-  protected castGeometry(geometry: Geometry): TargetType[] {
+  protected castGeometry(_: Geometry): TargetType[] {
     throw new Error("Implement in subclasses");
   }
 

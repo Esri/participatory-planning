@@ -12,14 +12,13 @@ import Polyline from "esri/geometry/Polyline";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import EsriSymbol from "esri/symbols/Symbol";
 
-import Scene from "../Scene";
+import Graphic from "esri/Graphic";
 import CreatePoint from "./operation/CreatePoint";
 import CreatePolygon from "./operation/CreatePolygon";
 import CreatePolyline from "./operation/CreatePolyline";
+import Operation from "./operation/Operation";
+import UpdateOperation from "./operation/UpdateOperation";
 import WidgetBase from "./WidgetBase";
-import Graphic = require('esri/Graphic');
-import Operation from './operation/Operation';
-import UpdateOperation from './operation/UpdateOperation';
 
 @subclass("app.draw.DrawWidget")
 export default class DrawWidget extends declared(WidgetBase) {

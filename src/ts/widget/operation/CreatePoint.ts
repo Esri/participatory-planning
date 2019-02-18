@@ -11,9 +11,9 @@ import Draw from "esri/views/draw/Draw";
 
 import Scene from "../../Scene";
 import { redraw } from "../../support/graphics";
+import DrawWidget from "../DrawWidget";
 import "../support/extensions";
 import CreateOperation from "./CreateOperation";
-import DrawWidget from '../DrawWidget';
 
 interface DrawActionEvent {
   coordinates: number[];

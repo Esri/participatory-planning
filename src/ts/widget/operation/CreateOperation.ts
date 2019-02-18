@@ -12,9 +12,9 @@ import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
 import Draw from "esri/views/draw/Draw";
 
 import Scene from "../../Scene";
+import DrawWidget from "../DrawWidget";
 import "../support/extensions";
 import Operation from "./Operation";
-import DrawWidget from '../DrawWidget';
 
 export default class CreateOperation<TargetType = Geometry> extends Operation<TargetType> {
 
