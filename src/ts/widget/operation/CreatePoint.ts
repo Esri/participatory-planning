@@ -1,15 +1,7 @@
 
-import Color from "esri/Color";
-import Geometry from "esri/geometry/Geometry";
-import ge from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
-import Polygon from "esri/geometry/Polygon";
-import Polyline from "esri/geometry/Polyline";
-import Graphic from "esri/Graphic";
 import EsriSymbol from "esri/symbols/Symbol";
-import Draw from "esri/views/draw/Draw";
 
-import Scene from "../../Scene";
 import { redraw } from "../../support/graphics";
 import DrawWidget from "../DrawWidget";
 import "../support/extensions";

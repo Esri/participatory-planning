@@ -1,12 +1,8 @@
 
 import Color from "esri/Color";
 import Geometry from "esri/geometry/Geometry";
-import ge from "esri/geometry/geometryEngine";
-import Point from "esri/geometry/Point";
 import Polyline from "esri/geometry/Polyline";
-import Graphic from "esri/Graphic";
 import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
-import Draw from "esri/views/draw/Draw";
 
 import Scene from "../../Scene";
 import { redraw } from "../../support/graphics";
@@ -37,13 +33,15 @@ export default class CreateMultipointOperation<ResultType extends Geometry> exte
 
     const action = this.draw.create(drawAction);
 
-    [
-      "vertex-add",
-      "vertex-remove",
-      "cursor-update",
-      "redo",
-      "undo",
-    ].forEach((eventName) => action.on(eventName, (event) => this._updateDrawing(event)));
+    action.on(
+      [
+        "vertex-add",
+        "vertex-remove",
+        "cursor-update",
+        "redo",
+        "undo",
+      ],
+      (event) => this._updateDrawing(event));
     action.on(
       "draw-complete",
       (event) => { this._completeDrawing(event); });

@@ -1,14 +1,11 @@
 
 import Color from "esri/Color";
 import Geometry from "esri/geometry/Geometry";
-import ge from "esri/geometry/geometryEngine";
 import Polygon from "esri/geometry/Polygon";
-import Polyline from "esri/geometry/Polyline";
 import Graphic from "esri/Graphic";
 import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
 
-import Scene from "../../Scene";
 import { redraw } from "../../support/graphics";
 import DrawWidget from "../DrawWidget";
 import "../support/extensions";
@@ -42,7 +39,7 @@ export default class CreatePolygon extends CreateMultipointOperation<Polygon> {
     });
   }
 
-  protected resultFromVertices(vertices: number[][]): Polygon[] {
+  protected resultFromVertices(_: number[][]): Polygon[] {
     const graphic = this.polygonGraphic.geometry;
     return graphic ? this.clippedGeometries(graphic) : [];
   }
@@ -64,24 +61,6 @@ export default class CreatePolygon extends CreateMultipointOperation<Polygon> {
 
   protected castGeometry(geometry: Geometry): Polygon[] {
     return this.geometry2Polygons(geometry);
-  }
-
-  private _isIntersectingPolyline(polyline: Polyline): boolean {
-    const length = polyline.paths.length ? polyline.paths[0].length : 0;
-    if (length < 3) {
-      return false;
-    }
-    const line = polyline.clone();
-
-    const spatialReference = this.scene.view.spatialReference;
-    const lastSegment = new Polyline({
-      paths: [line.paths[0].slice(length - 2)],
-      spatialReference,
-    });
-    line.removePoint(0, length - 1);
-
-    // returns true if the line intersects itself, false otherwise
-    return ge.crosses(lastSegment, line);
   }
 
 }

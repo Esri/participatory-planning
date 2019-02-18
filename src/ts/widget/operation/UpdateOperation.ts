@@ -1,8 +1,6 @@
 
 import Geometry from "esri/geometry/Geometry";
 
-import Scene from "../../Scene";
-import { redraw } from "../../support/graphics";
 import "../support/extensions";
 import Operation from "./Operation";
 

@@ -1,10 +1,8 @@
 
 import Color from "esri/Color";
 import Geometry from "esri/geometry/Geometry";
-import ge from "esri/geometry/geometryEngine";
 import Polyline from "esri/geometry/Polyline";
 
-import Scene from "../../Scene";
 import DrawWidget from "../DrawWidget";
 import "../support/extensions";
 import CreateMultipointOperation from "./CreateMultipointOperation";
