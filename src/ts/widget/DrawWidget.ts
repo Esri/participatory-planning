@@ -52,8 +52,8 @@ export default class DrawWidget extends declared(WidgetBase) {
     return new CreatePolyline(this, color).finished;
   }
 
-  protected createPoint(symbol: EsriSymbol): IPromise<Graphic> {
-    return new CreatePoint(this, symbol).finished;
+  protected createPoint(symbol: EsriSymbol, layer = this.scene.sketchLayer): IPromise<Graphic> {
+    return new CreatePoint(this, symbol, layer).finished;
   }
 
 }

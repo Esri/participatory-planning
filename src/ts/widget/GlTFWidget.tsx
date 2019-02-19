@@ -1,5 +1,6 @@
 
 import DrawWidget from "./DrawWidget";
+import UpdateOperation from "./operation/UpdateOperation";
 import GlTFImport from "./support/GlTFImport";
 
 // esri
@@ -40,6 +41,9 @@ export default class GlTFWidget extends declared(DrawWidget) {
   public progress: number;
 
   public postInitialize() {
+    this.layer.elevationInfo = {
+      mode: "relative-to-ground",
+    };
     this.watch("progress", (value) => this.toggleLoadingIndicator(true, value));
   }
 
@@ -55,7 +59,7 @@ export default class GlTFWidget extends declared(DrawWidget) {
 
     return (
       <div>
-        <div classList={ classList[GlTFWidgetState.Import] }
+        <div class={ classList[GlTFWidgetState.Import].join(" ") }
           afterCreate={ this._attachImportWidget.bind(this) } />
       </div>
     );
@@ -73,11 +77,8 @@ export default class GlTFWidget extends declared(DrawWidget) {
 
       this.toggleLoadingIndicator(false);
 
-      const point = new Point({
-        x: -8235607.175360308,
-        y: 4968884.173592559,
-        spatialReference: this.scene.view.spatialReference,
-      });
+      const point = this.scene.maskPolygon.centroid;
+      point.z = 0;
 
       const graphic = new Graphic({
         geometry: point,

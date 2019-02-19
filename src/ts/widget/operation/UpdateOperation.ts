@@ -7,6 +7,7 @@ import Operation from "./Operation";
 import Graphic from "esri/Graphic";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import DrawWidget from "../DrawWidget";
+import Point = require('esri/geometry/Point');
 
 export default class UpdateOperation extends Operation {
 
@@ -20,18 +21,37 @@ export default class UpdateOperation extends Operation {
       layer: graphic.layer,
     });
 
+    if (graphic.geometry.hasZ) {
+      const watchHandle = graphic.watch("geometry", () => {
+        this.scene.adjustHeight(graphic);
+      });
+      this.finished.always(() => watchHandle.remove());
+    }
+
     this.sketchViewModel.on("update", (event) => {
       if (event.state === "complete" || event.state === "cancel") {
         this.complete(graphic);
       }
     });
 
-    this.sketchViewModel.update(graphic);
-  }
+    this.finished.always(() => {
+      if (this.sketchViewModel.activeTool) {
+        this.sketchViewModel.cancel();
+      }
+    });
 
-  protected castGeometry(geometry: Geometry): Graphic[] {
-    this.graphic.geometry = geometry;
-    return [this.graphic];
+    // Workaround for `SketchViewModel` not supporting flying graphics
+    const hasZ = graphic.geometry.hasZ;
+    if (hasZ) {
+      graphic.geometry.hasZ = false;
+    }
+
+    this.sketchViewModel.update(graphic);
+
+    if (hasZ) {
+      graphic.geometry.hasZ = true;
+    }
+
   }
 
 }

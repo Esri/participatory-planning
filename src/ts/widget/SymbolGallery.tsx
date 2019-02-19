@@ -29,6 +29,7 @@ import Operation from "./operation/Operation";
 import UpdateOperation from "./operation/UpdateOperation";
 import SymbolGroup from "./SymbolGallery/SymbolGroup";
 import SymbolItem from "./SymbolGallery/SymbolItem";
+import { PointSymbol3D, ObjectSymbol3DLayer } from 'esri/symbols';
 
 const SymbolGroupCollection = Collection.ofType<SymbolGroup>(SymbolGroup);
 
@@ -123,11 +124,6 @@ export default class SymbolGallery extends declared(DrawWidget) {
     );
   }
 
-  public updateGraphic(graphic: Graphic): Operation {
-    (graphic.geometry as Point).hasZ = false;
-    return new UpdateOperation(this, graphic);
-  }
-
   private _renderSymbolItem(item: SymbolItem) {
     const href = item.thumbnailHref;
     const key = item.group.category + item.name;
@@ -151,16 +147,18 @@ export default class SymbolGallery extends declared(DrawWidget) {
   private _selectSymbolItem(event: any) {
     this.selectedSymbol = event.currentTarget["data-item"];
     if (this.selectedSymbol) {
-      this._placeSymbol(this.selectedSymbol);
+      this.selectedSymbol.fetchSymbol().then((symbol) => {
+        this._placeSymbol(symbol);
+      });
     }
   }
 
-  private _placeSymbol(symbol: SymbolItem) {
-    this.createPoint(symbol.webSymbol).then((newSymbol) => {
-      this.layer.add(newSymbol);
+  private _placeSymbol(symbol: EsriSymbol) {
+    this.createPoint(symbol, this.layer).then((graphic) => {
+      this.layer.add(graphic);
 
       // Continue placing the same symbol
-      this._placeSymbol(symbol);
+      this._placeSymbol(graphic.symbol);
     });
   }
 

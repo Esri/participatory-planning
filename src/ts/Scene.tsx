@@ -119,8 +119,8 @@ export default class Scene extends declared(Widget) {
     this.watch("currentOperation", () => {
       this._dimmUpperLayers();
       if (this.currentOperation) {
-        this.currentOperation.finished.then(() => {
-          this.adjustSymbleHeights();
+        this.currentOperation.finished.always(() => {
+          this.adjustSymbolHeights();
         });
       }
     });
@@ -208,18 +208,24 @@ export default class Scene extends declared(Widget) {
     this.sceneLayer.renderer = this.sceneLayerRenderer.clone();
   }
 
-  public adjustSymbleHeights() {
+  public adjustSymbolHeights() {
     this._drawLayers().forEach((layer) => {
       layer.graphics.toArray().forEach((graphic) => {
-        const point = graphic.geometry as Point;
-        if (point && point.hasZ) {
-          const height = this.heightAtPoint(point);
-          if (height !== point.z) {
-            redraw(graphic, "geometry.z", height);
-          }
-        }
+        this.adjustHeight(graphic);
       });
     });
+  }
+
+  public adjustHeight(graphic: Graphic) {
+    const point = graphic.geometry as Point;
+    if (point && point.hasZ) {
+      const height = this.heightAtPoint(point);
+      if (height !== point.z) {
+        const newPoint = point.clone();
+        newPoint.z = height;
+        graphic.geometry = newPoint;
+      }
+    }
   }
 
   public heightAtPoint(mapPoint: Point): number {
