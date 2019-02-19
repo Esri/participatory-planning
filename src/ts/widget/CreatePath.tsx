@@ -37,10 +37,7 @@ export default class CreatePath extends declared(DrawWidget) {
         color: new Color("#cbcbcb"),
         width: 20,
       } as any;
-      this.layer.add(newPath);
     });
-    // this.sketchModel.reset();
-    // this.sketchModel.create("polyline");
   }
 
 }

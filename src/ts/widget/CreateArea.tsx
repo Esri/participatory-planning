@@ -9,7 +9,6 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import Graphic from "esri/Graphic";
 import { tsx } from "esri/widgets/support/widget";
 
 @subclass("app.draw.CreateArea")
@@ -45,7 +44,6 @@ export default class CreateArea extends declared(DrawWidget) {
           width: 0,
         },
       } as any;
-      this.layer.add(newArea);
     });
   }
 

@@ -12,8 +12,6 @@ import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import Slide from "esri/webscene/Slide";
 import { tsx } from "esri/widgets/support/widget";
-import Polyline from "esri/geometry/Polyline";
-import Point from "esri/geometry/Point";
 
 // animejs
 import anime from "animejs";
@@ -22,7 +20,6 @@ import {MASK_AREA} from "./Scene";
 import { dojoPromise } from "./support/promises";
 import "./widget/support/extensions";
 import WidgetBase from "./widget/WidgetBase";
-import SimpleFillSymbol = require('esri/symbols/SimpleFillSymbol');
 
 export const AREA_ANIMATION_DURATION = 2000;
 export const MASK_ANIMATION_DURATION = 1000;

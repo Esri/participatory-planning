@@ -61,24 +61,10 @@ export default class SymbolGallery extends declared(DrawWidget) {
 
   private loadingPromise: IPromise;
 
-  private dragGraphic: Graphic = new Graphic();
-
-  private dragSymbol: EsriSymbol;
-
-  private placeholderSymbol: EsriSymbol;
-
   public postInitialize() {
     this.layer.elevationInfo = {
       mode: "relative-to-ground",
     };
-    const symbol = new WebStyleSymbol({
-      name: "Pushpin 4",
-      styleName: "EsriIconsStyle",
-    });
-    this.placeholderSymbol = symbol;
-    symbol.fetchSymbol().then((actualSymbol) => {
-      this.placeholderSymbol = actualSymbol;
-    });
     this._load();
   }
 
@@ -148,9 +134,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
   }
 
   private _placeSymbol(symbol: EsriSymbol) {
-    this.createPoint(symbol, this.layer).then((graphic) => {
-      this.layer.add(graphic);
-
+    this.createPoint(symbol).then((graphic) => {
       // Continue placing the same symbol
       this._placeSymbol(graphic.symbol);
     });

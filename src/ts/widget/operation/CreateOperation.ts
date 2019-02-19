@@ -2,6 +2,7 @@
 import ge from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
 import Graphic from "esri/Graphic";
+import GraphicsLayer from "esri/layers/GraphicsLayer";
 import Draw from "esri/views/draw/Draw";
 
 import DrawWidget from "../DrawWidget";
@@ -14,16 +15,21 @@ export default class CreateOperation<DrawActionEventType> extends Operation {
 
   protected sketchGraphic = new Graphic();
 
-  constructor(drawAction: string, widget: DrawWidget, private layer = widget.scene.sketchLayer) {
+  private layer: GraphicsLayer;
+
+  constructor(drawAction: string, widget: DrawWidget) {
     super(widget);
 
+    this.layer = widget.layer;
     this.draw = new Draw({ view: this.scene.view });
 
     this.scene.view.focus();
     this.scene.view.container.style.cursor = "crosshair";
 
-    this.finished.always(() => {
+    this.finished.catch(() => {
       this.layer.remove(this.sketchGraphic);
+    });
+    this.finished.always(() => {
       this.scene.view.container.style.cursor = "";
       this.draw.reset();
     });

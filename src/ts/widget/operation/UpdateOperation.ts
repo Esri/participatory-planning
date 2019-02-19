@@ -4,10 +4,10 @@ import Geometry from "esri/geometry/Geometry";
 import "../support/extensions";
 import Operation from "./Operation";
 
+import Point = require("esri/geometry/Point");
 import Graphic from "esri/Graphic";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import DrawWidget from "../DrawWidget";
-import Point = require('esri/geometry/Point');
 
 export default class UpdateOperation extends Operation {
 

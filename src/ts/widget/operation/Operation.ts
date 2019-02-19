@@ -45,10 +45,8 @@ export default class Operation {
   protected complete(graphic: Graphic) {
     const clippedGeometry = this.clippedGeometry(graphic.geometry);
     if (clippedGeometry) {
-      this.resolve(new Graphic({
-        symbol: graphic.symbol,
-        geometry: clippedGeometry,
-      }));
+      graphic.geometry = clippedGeometry;
+      this.resolve(graphic);
     } else {
       this.reject("Sketch graphic outside of mask area");
     }

@@ -38,9 +38,9 @@ export default class CreateBuilding extends declared(DrawWidget) {
     this.stories = stories;
     this.createPolygon(new Color("#d6bb7a")).then((newBuilding) => {
       newBuilding.symbol = {
-        type: "polygon-3d", // autocasts as new PolygonSymbol3D()
+        type: "polygon-3d",
         symbolLayers: [{
-          type: "extrude", // autocasts as new ExtrudeSymbol3DLayer()
+          type: "extrude",
           material: {
             color: "#FFF",
           },
@@ -52,7 +52,6 @@ export default class CreateBuilding extends declared(DrawWidget) {
           size: this.stories * 3,
         }],
       } as any;
-      this.layer.add(newBuilding);
     });
   }
 

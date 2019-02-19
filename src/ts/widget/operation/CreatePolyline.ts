@@ -1,5 +1,6 @@
 
 import Color from "esri/Color";
+import GraphicsLayer from "esri/layers/GraphicsLayer";
 import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
 
 import DrawWidget from "../DrawWidget";
