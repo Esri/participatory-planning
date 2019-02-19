@@ -1,15 +1,16 @@
 
-import DrawWidget from "./DrawWidget";
-
 // esri
 import Color from "esri/Color";
 import {
   declared,
-  property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
+import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
 import { tsx } from "esri/widgets/support/widget";
+
+import DrawWidget from "./DrawWidget";
+import "./support/extensions";
 
 @subclass("app.draw.CreateBuilding")
 export default class CreateBuilding extends declared(DrawWidget) {
@@ -34,25 +35,42 @@ export default class CreateBuilding extends declared(DrawWidget) {
     );
   }
 
+  public updateGraphic(buildingGraphic: Graphic) {
+    buildingGraphic.symbol = new SimpleFillSymbol({
+      color: new Color("#d6bb7a").withAlpha(0.3),
+      style: "diagonal-cross",
+      outline: {  // autocasts as new SimpleLineSymbol()
+        color: new Color("#d6bb7a").withAlpha(0.2),
+        width: "0.5px",
+      },
+    });
+    this.update(buildingGraphic).then((updatedBuilding) => {
+      this._applyBuildingSymbol(updatedBuilding);
+    });
+  }
+
+  private _applyBuildingSymbol(buildingGraphic: Graphic) {
+    buildingGraphic.symbol = {
+      type: "polygon-3d",
+      symbolLayers: [{
+        type: "extrude",
+        material: {
+          color: "#FFF",
+        },
+        edges: {
+          type: "sketch",
+          color: [100, 100, 100],
+          extensionLength: 5,
+        },
+        size: this.stories * 3,
+      }],
+    } as any;
+  }
+
   private _startDrawing(stories: number) {
     this.stories = stories;
-    this.createPolygon(new Color("#d6bb7a")).then((newBuilding) => {
-      newBuilding.symbol = {
-        type: "polygon-3d",
-        symbolLayers: [{
-          type: "extrude",
-          material: {
-            color: "#FFF",
-          },
-          edges: {
-            type: "sketch",
-            color: [100, 100, 100],
-            extensionLength: 5,
-          },
-          size: this.stories * 3,
-        }],
-      } as any;
-    });
+    this.createPolygon(new Color("#d6bb7a"))
+      .then((newBuilding) => this._applyBuildingSymbol(newBuilding));
   }
 
 }
