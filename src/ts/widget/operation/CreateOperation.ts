@@ -12,21 +12,18 @@ export default class CreateOperation<DrawActionEventType> extends Operation {
 
   protected readonly draw: Draw;
 
-  protected sketchGraphic: Graphic = new Graphic({
-    geometry: new Point({x: 0, y: 0}),
-  });
+  protected sketchGraphic = new Graphic();
 
-  constructor(drawAction: string, widget: DrawWidget, layer = widget.scene.sketchLayer) {
+  constructor(drawAction: string, widget: DrawWidget, private layer = widget.scene.sketchLayer) {
     super(widget);
 
     this.draw = new Draw({ view: this.scene.view });
 
     this.scene.view.focus();
     this.scene.view.container.style.cursor = "crosshair";
-    layer.add(this.sketchGraphic);
 
     this.finished.always(() => {
-      layer.remove(this.sketchGraphic);
+      this.layer.remove(this.sketchGraphic);
       this.scene.view.container.style.cursor = "";
       this.draw.reset();
     });
@@ -68,6 +65,9 @@ export default class CreateOperation<DrawActionEventType> extends Operation {
   }
 
   private _updateSketch(event: DrawActionEventType) {
+    if (!this.sketchGraphic.layer) {
+      this.layer.add(this.sketchGraphic);
+    }
     this.updateSketch(event);
   }
 

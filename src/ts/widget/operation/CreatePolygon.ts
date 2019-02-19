@@ -5,14 +5,15 @@ import Graphic from "esri/Graphic";
 import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
 import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
 
-import { redraw } from "../../support/graphics";
 import DrawWidget from "../DrawWidget";
 import "../support/extensions";
 import CreateMultipointOperation, { DrawActionEvent } from "./CreateMultipointOperation";
 
+const EMPTY_RING = [[0, 0], [1, 1], [0, 0]];
+
 export default class CreatePolygon extends CreateMultipointOperation {
 
-  protected polygonGraphic: Graphic = new Graphic();
+  protected polylineGraphic = new Graphic();
 
   private polylineSymbol: SimpleLineSymbol;
   private invalidPolylineSymbol: SimpleLineSymbol;
@@ -20,6 +21,7 @@ export default class CreatePolygon extends CreateMultipointOperation {
   constructor(widget: DrawWidget, color: Color) {
     super("polygon", widget);
 
+    this.sketchGraphic.geometry = this.createPolygon([]);
     this.sketchGraphic.symbol = new SimpleFillSymbol({
       color: color.withAlpha(0.3),
       style: "diagonal-cross",
@@ -28,22 +30,28 @@ export default class CreatePolygon extends CreateMultipointOperation {
         width: "0.5px",
       },
     });
-    this.polylineSymbol = this.sketchGraphic.symbol = new SimpleLineSymbol({
+
+    this.polylineSymbol = new SimpleLineSymbol({
       color,
       width: 3,
     });
     this.invalidPolylineSymbol = this.polylineSymbol.clone();
     this.invalidPolylineSymbol.color = new Color("red");
 
-    this.scene.sketchLayer.add(this.polygonGraphic);
+    this.polylineGraphic.symbol = this.polylineSymbol;
+    this.polylineGraphic.geometry = this.createPolyline([]);
+
     this.finished.always(() => {
-      this.scene.sketchLayer.remove(this.polygonGraphic);
+      this.scene.sketchLayer.remove(this.polylineGraphic);
     });
   }
 
   protected createPolygon(vertices: number[][]): Polygon {
+    const ring = 2 < vertices.length ?
+      vertices.concat([vertices[0]]) :
+      EMPTY_RING;
     return new Polygon({
-      rings: 2 < vertices.length ? [vertices.concat([vertices[0]])] : [],
+      rings: [ring],
       spatialReference: this.scene.view.spatialReference,
     });
   }
@@ -55,10 +63,13 @@ export default class CreatePolygon extends CreateMultipointOperation {
 
     const intersects = polygon.isSelfIntersecting;
 
-    this.sketchGraphic = redraw(this.sketchGraphic, "geometry", intersects ? null : polygon);
+    this.sketchGraphic.geometry = polygon; // intersects ? null : polygon;
 
-    this.polygonGraphic = redraw(this.polygonGraphic, "geometry", polyline);
-    this.polygonGraphic.symbol = intersects ? this.invalidPolylineSymbol : this.polylineSymbol;
+    if (!this.polylineGraphic.layer) {
+      this.scene.sketchLayer.add(this.polylineGraphic);
+    }
+    this.polylineGraphic.geometry = polyline;
+    this.polylineGraphic.symbol = intersects ? this.invalidPolylineSymbol : this.polylineSymbol;
   }
 
 }

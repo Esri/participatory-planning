@@ -16,6 +16,7 @@ export default class CreatePoint extends CreateOperation<DrawActionEvent> {
 
   constructor(widget: DrawWidget, public symbol: EsriSymbol, layer = widget.scene.sketchLayer) {
     super("point", widget, layer);
+    this.sketchGraphic.geometry = new Point();
     this.sketchGraphic.symbol = symbol;
   }
 

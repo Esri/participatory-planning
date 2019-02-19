@@ -20,7 +20,6 @@ import { tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
 
 import { computeBoundingPolygon } from "./support/geometry";
-import { redraw } from "./support/graphics";
 import Operation from "./widget/operation/Operation";
 
 // Hard coded constants

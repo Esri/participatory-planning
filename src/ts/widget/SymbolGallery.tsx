@@ -21,15 +21,10 @@ import EsriSymbol from "esri/symbols/Symbol";
 import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
-// interactjs
-import interact, { InteractEvent } from "interactjs";
-
-import { redraw } from "../support/graphics";
 import Operation from "./operation/Operation";
 import UpdateOperation from "./operation/UpdateOperation";
 import SymbolGroup from "./SymbolGallery/SymbolGroup";
 import SymbolItem from "./SymbolGallery/SymbolItem";
-import { PointSymbol3D, ObjectSymbol3DLayer } from 'esri/symbols';
 
 const SymbolGroupCollection = Collection.ofType<SymbolGroup>(SymbolGroup);
 
@@ -129,8 +124,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
     const key = item.group.category + item.name;
 
     return (
-      <div class="gallery-grid-item" key={key} bind={this} onclick={ this._selectSymbolItem }
-        afterCreate={this._addInteract} data-item={item}>
+      <div class="gallery-grid-item" key={key} bind={this} onclick={ this._selectSymbolItem } data-item={item}>
         <img src={href} />
       </div>
     );
@@ -160,73 +154,6 @@ export default class SymbolGallery extends declared(DrawWidget) {
       // Continue placing the same symbol
       this._placeSymbol(graphic.symbol);
     });
-  }
-
-  private _addInteract(element: HTMLDivElement) {
-    interact(element)
-      .draggable({
-        inertia: true,
-        onmove: (event) => this._onDrag(event),
-      })
-      .on("dragstart", (event) => this._onDragStart(event))
-      .on("dragend",  (event) => this._onDragEnd(event));
-  }
-
-  private _onDragStart(event: InteractEvent) {
-    const item = event.target["data-item"] as SymbolItem;
-    if (item != null) {
-      this.dragSymbol = this.placeholderSymbol;
-      item.fetchSymbol().then((actualSymbol) => {
-        this.dragSymbol = actualSymbol;
-        // this.dragGraphic.symbol = item;
-        this._redrawDragGraphic();
-      });
-      // this.scene.drawLayer.add(this.dragGraphic);
-      this._onDrag(event);
-    }
-  }
-
-  private _onDrag(event: InteractEvent) {
-    // translate the element
-    // target.style.webkitTransform =
-    // target.style.transform =
-    //  'translate(' + x + 'px, ' + y + 'px)';
-
-    // update the posiion attributes
-    // target.setAttribute('data-x', x);
-    // target.setAttribute('data-y', y);
-
-    const mapPoint = this._mapPointForEvent(event); // this.scene.view.toMap(screenPoint);
-    // this.dragGraphic.geometry = mapPoint;
-
-    mapPoint.z = this.scene.heightAtPoint(mapPoint);
-
-    this._redrawDragGraphic(mapPoint);
-  }
-
-  private _redrawDragGraphic(geometry?: any) {
-    this.dragGraphic.symbol = this.dragSymbol;
-    this.dragGraphic = redraw(this.dragGraphic, "geometry", geometry, this.layer);
-  }
-
-  private _mapPointForEvent(event: {clientX: number, clientY: number}): Point {
-    const a = {x: event.clientX, y: event.clientY};
-    const b = {x: event.clientX, y: event.clientY - 50};
-    const aMap = this.scene.view.toMap(a);
-    const bMap = this.scene.view.toMap(b);
-
-    const result = new Point({
-      x: aMap.x + 2 * (bMap.x - aMap.x),
-      y: aMap.y + 2 * (bMap.y - aMap.y),
-      spatialReference: aMap.spatialReference,
-    });
-
-    return nearestCoordinate(this.scene.maskPolygon, result).coordinate;
-    // return result;
-  }
-
-  private _onDragEnd(_: InteractEvent) {
-    this.dragGraphic = new Graphic();
   }
 
   private _load(): IPromise {

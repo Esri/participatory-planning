@@ -12,18 +12,30 @@ import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import Slide from "esri/webscene/Slide";
 import { tsx } from "esri/widgets/support/widget";
+import Polyline from "esri/geometry/Polyline";
+import Point from "esri/geometry/Point";
 
 // animejs
 import anime from "animejs";
 
 import {MASK_AREA} from "./Scene";
-import { redraw } from "./support/graphics";
 import { dojoPromise } from "./support/promises";
 import "./widget/support/extensions";
 import WidgetBase from "./widget/WidgetBase";
+import SimpleFillSymbol = require('esri/symbols/SimpleFillSymbol');
 
 export const AREA_ANIMATION_DURATION = 2000;
 export const MASK_ANIMATION_DURATION = 1000;
+
+const maskPolygonSymbol = (color: Color): any => {
+  return {
+    type: "simple-fill",
+    color,
+    outline: {
+      width: 0,
+    },
+  };
+};
 
 @subclass("app.widgets.Timeline")
 export default class Timeline extends declared(WidgetBase) {
@@ -35,35 +47,32 @@ export default class Timeline extends declared(WidgetBase) {
 
   private maskColor = new Color([226, 119, 40]);
 
-  private maskPolyline = new Graphic();
+  private maskPolyline = new Graphic({
+    geometry: {
+      type: "polyline",
+      paths: [[0, 0], [1, 1]],
+      spatialReference: SpatialReference.WebMercator,
+    },
+    symbol: {
+      type: "line-3d",
+      symbolLayers: [{
+        type: "line",
+        size: 6,
+        material: { color: this.maskColor },
+      }],
+    },
+    // symbol: {
+    //   type: "line-3d",
+    //   symbolLayers: [{
+    //     type: "path",
+    //     size: 6,
+    //     material: { color: this.maskColor },
+    //   }],
+    } as any);
 
   private maskPolygon = new Graphic({
-    symbol: {
-      type: "simple-fill", // autocasts as new SimpleFillSymbol()
-      color: this.maskColor.withAlpha(0),
-      outline: { // autocasts as new SimpleLineSymbol()
-        width: 0,
-      },
-    },
+    symbol: maskPolygonSymbol(this.maskColor.withAlpha(0)),
   } as any);
-
-  private volumetricSymbolLine = {
-    type: "line-3d",
-    symbolLayers: [{
-      type: "path",
-      size: 6,
-      material: { color: this.maskColor },
-    }],
-  };
-
-  private flatSymbolLine = {
-    type: "line-3d",
-    symbolLayers: [{
-      type: "line",
-      size: 6,
-      material: { color: this.maskColor },
-    }],
-  };
 
   public postInitialize() {
     this.scene.map.when(() => {
@@ -232,15 +241,15 @@ export default class Timeline extends declared(WidgetBase) {
       y: start[1],
     };
 
-    this.maskPolyline.set("symbol", this.volumetricSymbolLine);
-
     let timeline = anime.timeline({
       update: () => {
-        this.maskPolyline = redraw(this.maskPolyline, "geometry", {
-          type: "polyline",
-          paths: [paths.concat([[movingPoint.x, movingPoint.y]])],
-          spatialReference: SpatialReference.WebMercator,
-        });
+        if (paths.length) {
+          this.maskPolyline.geometry = {
+            type: "polyline",
+            paths: [paths.concat([[movingPoint.x, movingPoint.y]])],
+            spatialReference: SpatialReference.WebMercator,
+          } as any;
+        }
       },
     });
     waypoints.forEach((point, index) => {
@@ -274,7 +283,7 @@ export default class Timeline extends declared(WidgetBase) {
 
     const timeline = anime.timeline({
       update: () => {
-        this.maskPolygon = redraw(this.maskPolygon, "symbol.color", color);
+        this.maskPolygon.symbol = maskPolygonSymbol(color);
         this.scene.showMaskedBuildings(buildingColor);
       },
     }).add({
@@ -292,9 +301,6 @@ export default class Timeline extends declared(WidgetBase) {
       duration: MASK_ANIMATION_DURATION / 2,
       endDelay: 1500,
       easing: "easeInOutCubic",
-      changeComplete: () => {
-        this.maskPolyline.set("symbol", this.flatSymbolLine);
-      },
     });
     return dojoPromise(timeline.finished);
   }
