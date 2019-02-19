@@ -134,7 +134,10 @@ export default class App extends declared(WidgetBase) {
                   is too much content to display well in a standard card.</p>
                 <p class="font-size--1 trailer-half">Generally wide cards are meant to be displayed one-up,
                   not grouped.</p>
-                <button class="btn" onclick={ () => this.timeline.startIntro() }>Start</button>
+                <nav>
+                  <button class="btn btn-grouped" onclick={ () => this.timeline.startIntro() }>Show Intro</button>
+                  <button class="btn btn-grouped" onclick={ () => this.timeline.continueEditing() }>Start</button>
+                </nav>
               </div>
             </div>
           </div>

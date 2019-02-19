@@ -128,6 +128,8 @@ export default class Timeline extends declared(WidgetBase) {
 
   public continueEditing() {
     this.toggleOverlay(false);
+    this.toggleLoadingIndicator(false);
+    this.toggleElement("intro", false);
     this.toggleElement("screenshot", false);
     this._showAfter();
   }
@@ -173,6 +175,7 @@ export default class Timeline extends declared(WidgetBase) {
 
   private _goToSlide(slide: Slide): IPromise {
     const view = this.scene.view;
+    this.scene.map.basemap = slide.basemap;
     return view.goTo(slide.viewpoint).then(() => {
 
       view.environment = slide.environment;
