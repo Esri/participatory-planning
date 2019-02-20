@@ -112,6 +112,7 @@ export default class Scene extends declared(Widget) {
       this.sketchLayer.add(this.boundingPolygonGraphic);
       this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
       this.sceneLayer.renderer = this.sceneLayerRenderer;
+      this.sceneLayer.popupEnabled = false;
       this.showMaskedBuildings("white");
     });
 
