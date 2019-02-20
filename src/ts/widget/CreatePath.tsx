@@ -5,11 +5,8 @@ import DrawWidget from "./DrawWidget";
 import Color from "esri/Color";
 import {
   declared,
-  property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import Graphic from "esri/Graphic";
-import GraphicsLayer from "esri/layers/GraphicsLayer";
 import { tsx } from "esri/widgets/support/widget";
 
 @subclass("app.draw.CreatePath")
@@ -20,22 +17,23 @@ export default class CreatePath extends declared(DrawWidget) {
       <div>
         <div class="menu">
           <div class="menu-item">
-            <button class="btn" onclick={ this._startDrawing.bind(this) }>Create Street</button>
+            <button class="btn" onclick={ this._startDrawing.bind(this, true) }>Create Street</button>
           </div>
           <div class="menu-item">
-            <button class="btn" onclick={ this._startDrawing.bind(this) }>Create Walking Path</button>
+            <button class="btn" onclick={ this._startDrawing.bind(this, false) }>Create Walking Path</button>
           </div>
         </div>
       </div>
     );
   }
 
-  private _startDrawing() {
-    this.createPolyline(new Color("#b2b2b2")).then((newPath) => {
+  private _startDrawing(street: boolean) {
+    const color = street ? new Color("#cbcbcb") : new Color("#b2b2b2");
+    this.createPolyline(color).then((newPath) => {
       newPath.symbol = {
         type: "simple-line",
-        color: new Color("#cbcbcb"),
-        width: 20,
+        color,
+        width: street ? 20 : 3,
       } as any;
     });
   }
