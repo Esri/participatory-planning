@@ -133,7 +133,10 @@ export default class Timeline extends declared(WidgetBase) {
         this.toggleOverlay(false);
         this.toggleLoadingIndicator(false);
       })
-      .then(() => this._showIntro());
+      .then(() => this._showBefore())
+      .then(() => this._animateArea())
+      .then(() => this._animateMask())
+      .then(() => this._showAfter());
   }
 
   public continueEditing() {
@@ -145,11 +148,9 @@ export default class Timeline extends declared(WidgetBase) {
   }
 
   private _showIntro(): IPromise {
-    return this
-      ._showBefore()
-      .then(() => this._animateArea())
-      .then(() => this._animateMask())
-      .then(() => this._showAfter());
+    this.toggleLoadingIndicator(true);
+    return this._goToSlide(this.introSlide)
+      .then(() => this.toggleElement("intro", true));
   }
 
   private _showBefore(): IPromise {

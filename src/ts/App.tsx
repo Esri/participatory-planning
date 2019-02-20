@@ -176,11 +176,12 @@ export default class App extends declared(WidgetBase) {
               </figure>
               <div class="card-content">
                 <h4 class="trailer-half"><a href="#">{ this.title }</a></h4>
-                <p class="font-size--1 trailer-half">Wide cards are just like standard cards except that
-                  they are displayed in landscape orientation. This is useful in situations where there
-                  is too much content to display well in a standard card.</p>
-                <p class="font-size--1 trailer-half">Generally wide cards are meant to be displayed one-up,
-                  not grouped.</p>
+                <p class="font-size--1 trailer-half">
+                  <ul>
+                    <li>When creating shapes, either double click or press <code>C</code> to complete.</li>
+                    <li>Press <code>Del</code> or <code>Backspace</code> to remove a selected object.</li>
+                  </ul>
+                </p>
                 <div menu>
                   <button class="menu-item btn btn-grouped"
                     onclick={ () => this.timeline.startIntro() }>Show Intro</button>
