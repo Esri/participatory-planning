@@ -94,28 +94,32 @@ export default class Timeline extends declared(WidgetBase) {
 
   public render() {
     return (
-      <div>
-        <div class="menu">
-            <div class="menu-item">
-              <button class="btn btn-large" onclick={ this._showIntro.bind(this) }>
-                Intro
-              </button>
-            </div>
-            <div class="menu-item">
-              <button class="btn btn-large" onclick={ this._showBefore.bind(this) }>
-                Before
-              </button>
-            </div>
-            <div class="menu-item">
-              <button class="btn btn-large" onclick={ this._showAfter.bind(this) }>
-                After
-              </button>
-            </div>
-            <div class="menu-item">
-              <button class="btn btn-large" onclick={ this._takeScreenshot.bind(this) }>
-                Screenshot
-              </button>
-            </div>
+      <div class="timeline">
+        <div class="menu menu-left phone-hide">
+          <div class="menu-item">
+            <button class="btn btn-large" onclick={ this._showIntro.bind(this) }>
+              Show Intro
+            </button>
+          </div>
+        </div>
+        <div class="menu phone-hide">
+          <div class="menu-item">
+            <button class="btn btn-large" onclick={ this._showBefore.bind(this) }>
+              Before
+            </button>
+          </div>
+          <div class="menu-item">
+            <button class="btn btn-large" onclick={ this._showAfter.bind(this) }>
+              After
+            </button>
+          </div>
+        </div>
+        <div class="menu menu-right">
+          <div class="menu-item">
+            <button class="btn btn-large" onclick={ this._takeScreenshot.bind(this) }>
+              Share
+            </button>
+          </div>
         </div>
       </div>
     );

@@ -22,17 +22,18 @@ export default class CreateOperation<DrawActionEventType> extends Operation {
     this.draw = new Draw({ view: this.scene.view });
 
     this.scene.view.focus();
-    this.scene.view.container.style.cursor = "crosshair";
+
+    const action = this.draw.create(drawAction);
 
     this.finished.catch(() => {
       this.layer.remove(this.sketchGraphic);
     });
+    const defaultCursor = (this.scene.view as any).cursor;
+    (this.scene.view as any).cursor = "crosshair";
     this.finished.always(() => {
-      this.scene.view.container.style.cursor = "";
+      (this.scene.view as any).cursor = defaultCursor;
       this.draw.reset();
     });
-
-    const action = this.draw.create(drawAction);
 
     action.on(
       [
@@ -46,6 +47,7 @@ export default class CreateOperation<DrawActionEventType> extends Operation {
     action.on(
       "draw-complete",
       (event) => this._completeSketch(event) );
+
   }
 
   protected updateSketch(_: DrawActionEventType) {

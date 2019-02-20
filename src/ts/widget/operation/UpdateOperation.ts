@@ -42,6 +42,7 @@ export default class UpdateOperation extends Operation {
 
     // Workaround for `SketchViewModel` not supporting flying graphics
     const hasZ = graphic.geometry.hasZ;
+    const lastGeometry = graphic.geometry.clone();
     if (hasZ) {
       graphic.geometry.hasZ = false;
     }
@@ -49,7 +50,7 @@ export default class UpdateOperation extends Operation {
     this.sketchViewModel.update(graphic);
 
     if (hasZ) {
-      graphic.geometry.hasZ = true;
+      graphic.geometry = lastGeometry;
     }
 
   }

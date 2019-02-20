@@ -80,8 +80,17 @@ body {
   pointer-events: none;
 }
 
+.timeline .menu-left, .timeline .menu-right {
+  position: absolute;
+  top: 0px;
+}
+
 .menu-item, .sketchfab-widget > *, .gallery-grid {
   pointer-events: auto;
+}
+
+.bottom .btn {
+  width: 100px;
 }
 
 #overlay {
@@ -100,6 +109,14 @@ body {
 .menu {
   width: 100%;
   text-align: center;
+}
+
+.menu-left {
+  text-align: left;
+}
+
+.menu-right {
+  text-align: right;
 }
 
 .menu-item {

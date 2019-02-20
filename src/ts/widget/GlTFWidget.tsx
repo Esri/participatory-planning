@@ -78,7 +78,8 @@ export default class GlTFWidget extends declared(DrawWidget) {
       this.toggleLoadingIndicator(false);
 
       const point = this.scene.maskPolygon.centroid;
-      point.z = 0;
+      point.hasZ = true;
+      point.z = this.scene.heightAtPoint(point);
 
       const graphic = new Graphic({
         geometry: point,
@@ -100,6 +101,7 @@ export default class GlTFWidget extends declared(DrawWidget) {
 
       // this.layer.removeAll();
       this.layer.add(graphic);
+      this.updateGraphic(graphic);
 
       this.state = GlTFWidgetState.Idle;
 

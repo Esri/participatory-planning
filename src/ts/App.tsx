@@ -16,10 +16,16 @@ import CreateBuilding from "./widget/CreateBuilding";
 import CreatePath from "./widget/CreatePath";
 import DrawWidget from "./widget/DrawWidget";
 import GlTFWidget from "./widget/GlTFWidget";
-import SymbolGallery from "./widget/SymbolGallery";
+import SymbolGallery, { SymbolGroupId } from "./widget/SymbolGallery";
 import WidgetBase from "./widget/WidgetBase";
 
 const scene = new Scene();
+
+interface MainMenu {
+  label: string;
+  iconName: string;
+  onClick: () => void;
+}
 
 @subclass("app.widgets.webmapview")
 export default class App extends declared(WidgetBase) {
@@ -44,6 +50,8 @@ export default class App extends declared(WidgetBase) {
   private selectedWidget: DrawWidget | null = null;
 
   private drawWidgets = [this.createArea, this.createPath, this.createBuilding, this.symbolGallery, this.glTFWidget];
+
+  private mainMenuEntries: MainMenu[] = [];
 
   public constructor() {
     super();
@@ -75,6 +83,45 @@ export default class App extends declared(WidgetBase) {
       }
     });
 
+    this.mainMenuEntries.push({
+      label: "Ground",
+      iconName: "feature-layer",
+      onClick: this._showWidget.bind(this, this.createArea),
+    });
+    this.mainMenuEntries.push({
+      label: "Paths",
+      iconName: "line-chart",
+      onClick: this._showWidget.bind(this, this.createPath),
+    });
+    this.mainMenuEntries.push({
+      label: "Buildings",
+      iconName: "organization",
+      onClick: this._showWidget.bind(this, this.createBuilding),
+    });
+    this.mainMenuEntries.push({
+      label: "Icons",
+      iconName: "map-pin",
+      onClick: this._showSymbolGallery.bind(this, SymbolGroupId.Icons),
+    });
+    this.mainMenuEntries.push({
+      label: "Trees",
+      iconName: "map-pin",
+      onClick: this._showSymbolGallery.bind(this, SymbolGroupId.Trees),
+    });
+    this.mainMenuEntries.push({
+      label: "Vehicles",
+      iconName: "map-pin",
+      onClick: this._showSymbolGallery.bind(this, SymbolGroupId.Vehicles),
+    });
+    this.mainMenuEntries.push({
+      label: "glTF",
+      iconName: "upload",
+      onClick: () => {
+        this.glTFWidget.startImport();
+        this._showWidget(this.glTFWidget);
+      },
+    });
+
     // Leave a reference of the view on the window for debugging
     (window as any).app = this;
   }
@@ -86,7 +133,7 @@ export default class App extends declared(WidgetBase) {
 
         <div class="box">
           <div class="top">
-            <div class="timeline" afterCreate={ this._attachTimeline.bind(this) } />
+            <div afterCreate={ this._attachTimeline.bind(this) } />
           </div>
           <div class="content">
             <div afterCreate={ this._attachMenu.bind(this, this.createArea) } />
@@ -98,11 +145,11 @@ export default class App extends declared(WidgetBase) {
           <div class="bottom">
             <div class="menu">
             {
-              ["feature-layer", "line-chart", "organization", "map-pin", "upload"]
-              .map((item) => (
+              this.mainMenuEntries.map((entry) => (
                 <div class="menu-item">
-                  <button class="btn btn-large" onclick={ this._selectMenu.bind(this, item) }>
-                    <span class={ "font-size-6 icon-ui-" + item } />
+                  <button class="btn" onclick={ entry.onClick }>
+                    <span class={ "font-size-3 icon-ui-" + entry.iconName } /><br />
+                    { entry.label }
                   </button>
                 </div>
               ))
@@ -134,10 +181,12 @@ export default class App extends declared(WidgetBase) {
                   is too much content to display well in a standard card.</p>
                 <p class="font-size--1 trailer-half">Generally wide cards are meant to be displayed one-up,
                   not grouped.</p>
-                <nav>
-                  <button class="btn btn-grouped" onclick={ () => this.timeline.startIntro() }>Show Intro</button>
-                  <button class="btn btn-grouped" onclick={ () => this.timeline.continueEditing() }>Start</button>
-                </nav>
+                <div menu>
+                  <button class="menu-item btn btn-grouped"
+                    onclick={ () => this.timeline.startIntro() }>Show Intro</button>
+                  <button class="menu-item btn btn-grouped"
+                    onclick={ () => this.timeline.continueEditing() }>Start</button>
+                </div>
               </div>
             </div>
           </div>
@@ -173,31 +222,6 @@ export default class App extends declared(WidgetBase) {
     this._hideWidget(menu);
   }
 
-  private _selectMenu(item: string) {
-    if (this.selectedWidget) {
-      (this.selectedWidget.container as HTMLElement).style.display = "";
-    }
-    switch (item) {
-      case "feature-layer":
-        this._showWidget(this.createArea);
-        break;
-      case "line-chart":
-        this._showWidget(this.createPath);
-        break;
-      case "organization":
-        this._showWidget(this.createBuilding);
-        break;
-      case "map-pin":
-        this.symbolGallery.reset();
-        this._showWidget(this.symbolGallery);
-        break;
-      case "upload":
-        this.glTFWidget.startImport();
-        this._showWidget(this.glTFWidget);
-        break;
-    }
-  }
-
   private _hideWidget(widget: DrawWidget) {
     (widget.container as HTMLElement).style.display = "none";
   }
@@ -212,6 +236,16 @@ export default class App extends declared(WidgetBase) {
     }
     this.selectedWidget = widget;
     (this.selectedWidget.container as HTMLElement).style.display = "";
+  }
+
+  private _showSymbolGallery(groupId: SymbolGroupId) {
+    if (this.symbolGallery.selectedGroupId !== groupId) {
+      this.symbolGallery.selectedGroupId = groupId;
+      if (this.selectedWidget === this.symbolGallery) {
+        return;
+      }
+    }
+    this._showWidget(this.symbolGallery);
   }
 
   private _updateGraphic(graphic: Graphic) {
