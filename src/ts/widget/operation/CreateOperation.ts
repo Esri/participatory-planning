@@ -13,12 +13,10 @@ export default class CreateOperation<DrawActionEventType> extends Operation {
 
   protected readonly draw: Draw;
 
-  protected sketchGraphic = new Graphic();
-
   private layer: GraphicsLayer;
 
   constructor(drawAction: string, widget: DrawWidget) {
-    super(widget);
+    super(widget, new Graphic({}));
 
     this.layer = widget.layer;
     this.draw = new Draw({ view: this.scene.view });

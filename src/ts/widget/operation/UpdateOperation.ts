@@ -13,8 +13,8 @@ export default class UpdateOperation extends Operation {
 
   private sketchViewModel: SketchViewModel;
 
-  constructor(widget: DrawWidget, public graphic: Graphic) {
-    super(widget);
+  constructor(widget: DrawWidget, graphic: Graphic) {
+    super(widget, graphic);
 
     this.sketchViewModel = new SketchViewModel({
       view: this.scene.view,

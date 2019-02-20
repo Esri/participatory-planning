@@ -3,6 +3,7 @@ import { create as createPromise } from "esri/core/promiseUtils";
 import Geometry from "esri/geometry/Geometry";
 import ge from "esri/geometry/geometryEngine";
 import Graphic from "esri/Graphic";
+import GraphicsLayer from "esri/layers/GraphicsLayer";
 
 import Scene from "../../Scene";
 import DrawWidget from "../DrawWidget";
@@ -18,7 +19,7 @@ export default class Operation {
 
   protected reject: (error?: any) => void;
 
-  constructor(public widget: DrawWidget) {
+  constructor(public widget: DrawWidget, protected sketchGraphic: Graphic) {
     this.scene = widget.scene;
     this.finished = createPromise(((resolve: (_: Graphic) => void, reject: (error?: any) => void) => {
       this.resolve = resolve;
@@ -38,8 +39,15 @@ export default class Operation {
     });
   }
 
-  public cancel() {
+  public cancel(removeGraphic = false) {
     this.reject("canceled");
+
+    this.finished.catch(() => {
+      const layer = this.sketchGraphic.layer as GraphicsLayer;
+      if (removeGraphic && layer) {
+        layer.remove(this.sketchGraphic);
+      }
+    });
   }
 
   protected complete(graphic: Graphic) {

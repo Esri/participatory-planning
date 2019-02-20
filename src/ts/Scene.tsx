@@ -125,8 +125,12 @@ export default class Scene extends declared(Widget) {
     });
 
     this.view.on("key-down", (event) => {
-      if (event.key === "Escape" && this.currentOperation) {
-        this.currentOperation.cancel();
+      if (this.currentOperation) {
+        if (event.key === "Escape") {
+          this.currentOperation.cancel();
+        } else if (event.key === "Delete" || event.key === "Backspace") {
+          this.currentOperation.cancel(true);
+        }
       }
     });
   }
