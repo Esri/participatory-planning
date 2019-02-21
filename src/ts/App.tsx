@@ -180,6 +180,7 @@ export default class App extends declared(WidgetBase) {
                   <ul>
                     <li>When creating shapes, either double click or press <code>C</code> to complete.</li>
                     <li>Press <code>Del</code> or <code>Backspace</code> to remove a selected object.</li>
+                    <li>Press <code>Escape</code> to revert a current editing.</li>
                   </ul>
                 </p>
                 <div menu>
