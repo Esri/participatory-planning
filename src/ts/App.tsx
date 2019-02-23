@@ -175,7 +175,7 @@ export default class App extends declared(WidgetBase) {
                 </div>
               </figure>
               <div class="card-content">
-                <h4 class="trailer-half"><a href="#">{ this.title }</a></h4>
+                <h4 class="trailer-half">{ this.title }</h4>
                 <p class="font-size--1 trailer-half">
                   <ul>
                     <li>When creating shapes, either double click or press <code>C</code> to complete.</li>
@@ -185,9 +185,9 @@ export default class App extends declared(WidgetBase) {
                 </p>
                 <div menu>
                   <button class="menu-item btn btn-grouped"
-                    onclick={ () => this.timeline.startIntro() }>Show Intro</button>
-                  <button class="menu-item btn btn-grouped"
-                    onclick={ () => this.timeline.continueEditing() }>Start</button>
+                    onclick={ () => this.timeline.startIntro() }>Start Planning</button>
+                  <button class="menu-item btn btn-transparent btn-grouped"
+                    onclick={ () => this.timeline.continueEditing() }>Skip Animation</button>
                 </div>
               </div>
             </div>
