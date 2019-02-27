@@ -55,7 +55,7 @@ export default class CreateBuilding extends declared(DrawWidget) {
   private _getStories(buildingGraphic: Graphic): number {
     const polygonSymbol = buildingGraphic.symbol as PolygonSymbol3D;
     if (polygonSymbol && polygonSymbol.symbolLayers.length) {
-      const symbolLayer = polygonSymbol.symbolLayers[0] as ExtrudeSymbol3DLayer;
+      const symbolLayer = polygonSymbol.symbolLayers.getItemAt(0) as ExtrudeSymbol3DLayer;
       if (symbolLayer) {
         return symbolLayer.size;
       }
