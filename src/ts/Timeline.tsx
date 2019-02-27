@@ -26,6 +26,7 @@ import {MASK_AREA} from "./Scene";
 import { dojoPromise } from "./support/promises";
 import "./widget/support/extensions";
 import WidgetBase from "./widget/WidgetBase";
+import Polyline = require('esri/geometry/Polyline');
 
 export const AREA_ANIMATION_DURATION = 2000;
 export const MASK_ANIMATION_DURATION = 1000;
@@ -40,10 +41,15 @@ const maskPolygonSymbol = (color: Color): any => {
   };
 };
 
+const EMPTY_POLYLINE = new Polyline({
+  paths: [[[0, 0], [1, 1]]],
+  spatialReference: SpatialReference.WebMercator,
+});
+
 @subclass("app.widgets.Timeline")
 export default class Timeline extends declared(WidgetBase) {
 
-  private vectorTileLayer: Layer | null = null;
+  private vectorTileLayer: Layer;
 
   @renderable()
   @aliasOf("scene.map.presentation.slides")
@@ -54,11 +60,7 @@ export default class Timeline extends declared(WidgetBase) {
   private maskColor = new Color([226, 119, 40]);
 
   private maskPolyline = new Graphic({
-    geometry: {
-      type: "polyline",
-      paths: [[0, 0], [1, 1]],
-      spatialReference: SpatialReference.WebMercator,
-    },
+    geometry: EMPTY_POLYLINE,
     symbol: {
       type: "line-3d",
       symbolLayers: [{
@@ -69,11 +71,14 @@ export default class Timeline extends declared(WidgetBase) {
     },
     } as any);
 
-  private maskPolygon = new Graphic({
-    symbol: maskPolygonSymbol(this.maskColor.withAlpha(0)),
-  } as any);
+  private maskPolygon: Graphic;
+
+  private showIntroDialog = true;
 
   public postInitialize() {
+
+    const queryParams = document.location.search.substr(1);
+    this.showIntroDialog = queryParams !== "skipTutorial";
 
     this.scene.map.when(() => {
       this.scene.map.layers.some((layer) => {
@@ -83,7 +88,10 @@ export default class Timeline extends declared(WidgetBase) {
         }
       });
 
-      this.maskPolygon.geometry = this.scene.maskPolygon;
+      this.maskPolygon = new Graphic({
+        symbol: maskPolygonSymbol(this.maskColor.withAlpha(0)),
+        geometry: this.scene.maskPolygon,
+      } as any);
 
       this.scene.sketchLayer.add(this.maskPolyline);
       this.scene.sketchLayer.add(this.maskPolygon);
@@ -98,15 +106,14 @@ export default class Timeline extends declared(WidgetBase) {
 
   public render() {
 
-    const slides = this.slides.slice(1).toArray();
-
-    console.log("Slides", slides);
+    const slides = this.slides.slice(2).toArray();
 
     return (
       <div class="timeline">
         <div class="menu menu-left phone-hide">
           <div class="menu-item">
-            <button class="btn btn-large" onclick={ this._showIntro.bind(this) }>
+            <button class="btn btn-large" onclick={ this.showIntroDialog ?
+                this._showIntro.bind(this) : this.playIntroAnimation.bind(this) }>
               Intro
             </button>
           </div>
@@ -129,21 +136,22 @@ export default class Timeline extends declared(WidgetBase) {
     );
   }
 
-  public startIntro(): IPromise {
+  public playIntroAnimation(): IPromise {
     this.toggleElement("intro", false);
     return this
-      ._goToSlide(this.slides.getItemAt(0))
+      ._waitForSceneToUpdate()
       .then(() => {
         this.toggleOverlay(false);
         this.toggleLoadingIndicator(false);
       })
-      .then(() => this._showFirstEditSlide())
+      .then(() => this._goToSlide(this.slides.getItemAt(1), 1500))
       .then(() => this._animateArea())
       .then(() => this._animateMask())
+      .then(() => this._goToSlide(this.slides.getItemAt(2)))
       .then(() => this._toggleBasemap(false));
   }
 
-  public continueEditing() {
+  public startPlanning() {
     this.toggleOverlay(false);
     this.toggleLoadingIndicator(false);
     this.toggleElement("intro", false);
@@ -154,16 +162,22 @@ export default class Timeline extends declared(WidgetBase) {
 
   private _showIntro(): IPromise {
     this.toggleLoadingIndicator(true);
+    this.scene.showMaskedBuildings("white");
     return this._goToSlide(this.slides.getItemAt(0))
       .then(() => {
         this._toggleBasemap(true);
-        this.toggleElement("intro", true);
+        if (this.showIntroDialog) {
+          this.toggleElement("intro", true);
+        } else {
+          this.toggleElement("intro", false);
+          this.toggleLoadingIndicator(false);
+        }
       });
   }
 
   private _showFirstEditSlide(): IPromise {
     return this
-      ._goToSlide(this.slides.getItemAt(1))
+      ._goToSlide(this.slides.getItemAt(2))
       .then(() => this.scene.showMaskedBuildings());
   }
 
@@ -186,17 +200,24 @@ export default class Timeline extends declared(WidgetBase) {
     this.toggleElement("screenshot", true);
   }
 
-  private _goToSlide(slide: Slide): IPromise {
+  private _waitForSceneToUpdate(): IPromise {
+    return eachAlways(this.scene.view.allLayerViews.map((layerView) => {
+      return whenNotOnce(layerView, "updating");
+    }));
+  }
+
+  private _goToSlide(slide: Slide, duration = 800): IPromise {
     const view = this.scene.view;
-    return view.goTo(slide.viewpoint, { duration: 5000 }).then(() => {
+    return view.goTo(slide.viewpoint, { duration }).then(() => {
 
       view.set("environment.lighting.ambientOcclusionEnabled", true);
+      view.set("environment.lighting.date", "Thu Jun 20 2019 11:40:00 GMT-0500");
 
       // Wait for all layers to update after applying a new slide
-      return eachAlways(view.allLayerViews.map((layerView) => {
-        return whenNotOnce(layerView, "updating");
-      }));
-    });
+      return this._waitForSceneToUpdate();
+
+      // Catching any exceptions in case animation gets canceled
+    }).catch(console.error);
   }
 
   private _animateArea(): IPromise<void> {
@@ -287,13 +308,17 @@ export default class Timeline extends declared(WidgetBase) {
       duration: MASK_ANIMATION_DURATION / 2,
       endDelay: 1500,
       easing: "easeInOutCubic",
+      complete: () => {
+        this.maskPolyline.geometry = EMPTY_POLYLINE;
+      },
     });
     return dojoPromise(timeline.finished);
   }
 
-  private _toggleBasemap(show: boolean) {
+  private _toggleBasemap(show: boolean): IPromise {
     this.scene.map.basemap = (show ? "satellite" : null) as any;
     this.vectorTileLayer.visible = !show;
+    return this._waitForSceneToUpdate();
   }
 
 }

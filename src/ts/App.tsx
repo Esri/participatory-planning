@@ -185,9 +185,9 @@ export default class App extends declared(WidgetBase) {
                 </p>
                 <div menu>
                   <button class="menu-item btn btn-grouped"
-                    onclick={ () => this.timeline.startIntro() }>Start Planning</button>
+                    onclick={ () => this.timeline.playIntroAnimation() }>Start Planning</button>
                   <button class="menu-item btn btn-transparent btn-grouped"
-                    onclick={ () => this.timeline.continueEditing() }>Skip Animation</button>
+                    onclick={ () => this.timeline.startPlanning() }>Skip Animation</button>
                 </div>
               </div>
             </div>
@@ -200,7 +200,7 @@ export default class App extends declared(WidgetBase) {
           </div>
           <div class="menu">
           <div class="menu-item">
-            <button class="btn" onclick={ () => this.timeline.continueEditing() }>
+            <button class="btn" onclick={ () => this.timeline.startPlanning() }>
               Back
             </button>
           </div>

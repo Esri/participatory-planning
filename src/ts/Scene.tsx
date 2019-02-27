@@ -106,6 +106,7 @@ export default class Scene extends declared(Widget) {
   });
 
   public postInitialize() {
+
     this.map.when(() => {
       this.map.add(this.sketchLayer);
       this.map.add(this.sketchLayer);

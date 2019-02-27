@@ -49,11 +49,11 @@ export default class DrawWidget extends declared(WidgetBase) {
   }
 
   protected createPolygon(color: Color): IPromise<Graphic> {
-    return new CreatePolygon(this, color).finished;
+    return new CreatePolygon(this, new Color("#00FFFF")).finished;
   }
 
   protected createPolyline(color: Color): IPromise<Graphic> {
-    return new CreatePolyline(this, color).finished;
+    return new CreatePolyline(this, new Color("#00FFFF")).finished;
   }
 
   protected createPoint(symbol: EsriSymbol): IPromise<Graphic> {
