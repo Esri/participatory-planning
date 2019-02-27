@@ -200,8 +200,8 @@ export default class App extends declared(WidgetBase) {
           </div>
           <div class="menu">
           <div class="menu-item">
-            <button class="btn" onclick={ () => this.timeline.startPlanning() }>
-              Back
+            <button class="btn btn-clear-white" onclick={ () => this.timeline.startPlanning() }>
+              Continue Planning
             </button>
           </div>
           </div>

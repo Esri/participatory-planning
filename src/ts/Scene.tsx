@@ -153,6 +153,10 @@ export default class Scene extends declared(Widget) {
     );
   }
 
+  public clear() {
+    this._drawLayers().forEach((layer) => layer.removeAll());
+  }
+
   public showMaskedBuildings(color?: any) {
 
     const uniqueValueInfos = [];
@@ -227,6 +231,13 @@ export default class Scene extends declared(Widget) {
     this.texturedBuildings.visible = true;
     this._drawLayers().forEach((layer) => layer.visible = false);
     this.sceneLayer.visible = false;
+    this.boundingPolygonGraphic.symbol = {
+        type: "simple-fill",
+        color: [0, 0, 0, 0],
+        outline: {
+          width: 0,
+        },
+      } as any;
   }
 
   public adjustSymbolHeights() {

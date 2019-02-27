@@ -110,10 +110,15 @@ export default class Timeline extends declared(WidgetBase) {
       <div class="timeline">
         <div class="menu menu-left phone-hide">
           <div class="menu-item">
-            <button class="btn btn-large" onclick={ this.showIntroDialog ?
-                this._showIntro.bind(this) : this.playIntroAnimation.bind(this) }>
+          { this.showIntroDialog ? (
+            <button class="btn btn-large" onclick={ this._showIntro.bind(this) }>
+              New
+            </button>
+          ) : (
+            <button class="btn btn-large" onclick={ this.playIntroAnimation.bind(this) }>
               Intro
             </button>
+          )}
           </div>
         </div>
         <div class="menu phone-hide">
@@ -126,7 +131,7 @@ export default class Timeline extends declared(WidgetBase) {
         <div class="menu menu-right">
           <div class="menu-item">
             <button class="btn btn-large" onclick={ this._takeScreenshot.bind(this) }>
-              Share
+              Compare
             </button>
           </div>
         </div>
@@ -161,6 +166,7 @@ export default class Timeline extends declared(WidgetBase) {
   private _showIntro(): IPromise {
     this.toggleLoadingIndicator(true);
     this.scene.showMaskedBuildings("white");
+    this.scene.clear();
     return this._goToSlide(this.slides.getItemAt(0))
       .then(() => {
         this._toggleBasemap(true);
@@ -211,6 +217,11 @@ export default class Timeline extends declared(WidgetBase) {
     canvas.width = before.data.width + after.data.width;
     context.putImageData(before.data, 0, 0);
     context.putImageData(after.data, before.data.width, 0);
+
+    context.font = "30px Arial";
+    context.fillStyle = "white";
+    context.fillText("Before", 15, before.data.height - 20);
+    context.fillText("After", before.data.width + 15, before.data.height - 20);
 
     this.toggleLoadingIndicator(false);
     this.toggleOverlay(true);
