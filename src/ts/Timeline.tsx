@@ -188,8 +188,8 @@ export default class Timeline extends declared(WidgetBase) {
   private _takeScreenshot() {
     const view = this.scene.view;
     const width = Math.min(this.scene.view.width, this.scene.view.height);
-    const options = { format: "png", width: width * 0.9 };
-    this.toggleLoadingIndicator(true);
+    const options = { format: "png", width: width * 0.8 };
+    this.toggleLoadingIndicator(true, "Capturing Scene");
 
     setTimeout(() => {
       this._waitForSceneToUpdate()
@@ -226,7 +226,7 @@ export default class Timeline extends declared(WidgetBase) {
     context.fillText("My Plan", 15, height - 22);
 
     this.toggleLoadingIndicator(false);
-    this.toggleOverlay(true);
+    this.toggleOverlay(true, 0.9);
     this.toggleElement("screenshot", true);
   }
 

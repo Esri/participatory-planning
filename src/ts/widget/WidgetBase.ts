@@ -19,16 +19,12 @@ export default class WidgetBase extends declared(Widget) {
     super(params);
   }
 
-  protected toggleLoadingIndicator(show: boolean, percentage: number = 0) {
+  protected toggleLoadingIndicator(show: boolean, message = "Loading...") {
     this.toggleElement("loadingIndicator", show);
     this.toggleOverlay(show);
     const text = document.getElementById("loadingIndicatorText");
     if (text) {
-      if (0 < percentage && percentage <= 100) {
-        text.innerText = "Loading " + percentage + "%...";
-      } else {
-        text.innerText = "Loading...";
-      }
+      text.innerText = message;
     }
   }
 
@@ -43,8 +39,12 @@ export default class WidgetBase extends declared(Widget) {
     }
   }
 
-  protected toggleOverlay(show: boolean) {
+  protected toggleOverlay(show: boolean, opacity = 0.6) {
     this.toggleElement("overlay", show);
+    const overlay = document.getElementById("overlay");
+    if (overlay) {
+      overlay.style.opacity = opacity.toString();
+    }
   }
 
 }
