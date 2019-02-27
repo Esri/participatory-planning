@@ -196,7 +196,7 @@ export default class App extends declared(WidgetBase) {
 
         <div id="screenshot" class="center hide">
           <div>
-            <img id="screenshotImage" />
+            <canvas id="screenshotCanvas" />
           </div>
           <div class="menu">
           <div class="menu-item">

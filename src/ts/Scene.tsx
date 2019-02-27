@@ -21,6 +21,7 @@ import Widget from "esri/widgets/Widget";
 
 import { computeBoundingPolygon } from "./support/geometry";
 import Operation from "./widget/operation/Operation";
+import IntegratedMeshLayer = require('esri/layers/IntegratedMeshLayer');
 
 // Hard coded constants
 
@@ -105,11 +106,18 @@ export default class Scene extends declared(Widget) {
     geometry: this.boundingPolygon,
   });
 
+  private texturedBuildings = new IntegratedMeshLayer({
+    portalItem: {
+      id: "0406ec9f82824f368d8710ec42b8e5f6",
+    },
+    visible: false,
+  });
+
   public postInitialize() {
 
     this.map.when(() => {
       this.map.add(this.sketchLayer);
-      this.map.add(this.sketchLayer);
+      this.map.add(this.texturedBuildings);
       this.sketchLayer.add(this.boundingPolygonGraphic);
       this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
       this.sceneLayer.renderer = this.sceneLayerRenderer;
@@ -211,6 +219,14 @@ export default class Scene extends declared(Widget) {
     }
     this.sceneLayerRenderer.uniqueValueInfos = uniqueValueInfos;
     this.sceneLayer.renderer = this.sceneLayerRenderer.clone();
+    this.texturedBuildings.visible = false;
+    this.sceneLayer.visible = true;
+  }
+
+  public showTexturedBuildings() {
+    this.texturedBuildings.visible = true;
+    this._drawLayers().forEach((layer) => layer.visible = false);
+    this.sceneLayer.visible = false;
   }
 
   public adjustSymbolHeights() {

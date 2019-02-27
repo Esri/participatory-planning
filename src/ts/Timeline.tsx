@@ -55,8 +55,6 @@ export default class Timeline extends declared(WidgetBase) {
   @aliasOf("scene.map.presentation.slides")
   private slides: Collection<Slide>;
 
-  private screenshotSlide: Slide;
-
   private maskColor = new Color([226, 119, 40]);
 
   private maskPolyline = new Graphic({
@@ -181,20 +179,39 @@ export default class Timeline extends declared(WidgetBase) {
       .then(() => this.scene.showMaskedBuildings());
   }
 
-  private _takeScreenshot(): IPromise {
+  private _takeScreenshot() {
+    const view = this.scene.view;
+    const options = { format: "png", width: this.scene.view.width / 2 };
     this.toggleLoadingIndicator(true);
-    return this
-      ._goToSlide(this.screenshotSlide)
-      .then(() => this.scene.view.takeScreenshot({
-        format: "png",
-        width: this.scene.view.width / 2,
-      }))
-      .then((screenshot) => this._showScreenshot(screenshot));
+
+    setTimeout(() => {
+      this._waitForSceneToUpdate()
+        .then(() => view.takeScreenshot(options))
+        .then((after) => {
+          this.scene.showTexturedBuildings();
+          this._toggleBasemap(true);
+          setTimeout(() => {
+            this._waitForSceneToUpdate()
+              .then(() => view.takeScreenshot(options))
+              .then((before) => {
+                this._showScreenshot(before, after);
+
+                this.scene.showMaskedBuildings();
+                this._toggleBasemap(false);
+              });
+          }, 100);
+        });
+    }, 100);
   }
 
-  private _showScreenshot(screenshot: __esri.Screenshot) {
-    const element = document.getElementById("screenshotImage") as HTMLImageElement;
-    element.src = screenshot.dataUrl;
+  private _showScreenshot(before: __esri.Screenshot, after: __esri.Screenshot) {
+    const canvas = document.getElementById("screenshotCanvas") as HTMLCanvasElement;
+    const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+    canvas.height = before.data.height;
+    canvas.width = before.data.width + after.data.width;
+    context.putImageData(before.data, 0, 0);
+    context.putImageData(after.data, before.data.width, 0);
+
     this.toggleLoadingIndicator(false);
     this.toggleOverlay(true);
     this.toggleElement("screenshot", true);
