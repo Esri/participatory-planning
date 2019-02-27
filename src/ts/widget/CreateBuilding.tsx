@@ -6,6 +6,8 @@ import {
   subclass,
 } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
+import ExtrudeSymbol3DLayer from "esri/symbols/ExtrudeSymbol3DLayer";
+import PolygonSymbol3D from "esri/symbols/PolygonSymbol3D";
 import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
 import { tsx } from "esri/widgets/support/widget";
 
@@ -15,7 +17,7 @@ import "./support/extensions";
 @subclass("app.draw.CreateBuilding")
 export default class CreateBuilding extends declared(DrawWidget) {
 
-  private stories: number = 3;
+  private stories = 3;
 
   public render() {
     return (
@@ -36,6 +38,7 @@ export default class CreateBuilding extends declared(DrawWidget) {
   }
 
   public updateGraphic(buildingGraphic: Graphic) {
+    this.stories = this._getStories(buildingGraphic);
     buildingGraphic.symbol = new SimpleFillSymbol({
       color: new Color("#d6bb7a").withAlpha(0.3),
       style: "diagonal-cross",
@@ -47,6 +50,17 @@ export default class CreateBuilding extends declared(DrawWidget) {
     this.update(buildingGraphic).then((updatedBuilding) => {
       this._applyBuildingSymbol(updatedBuilding);
     });
+  }
+
+  private _getStories(buildingGraphic: Graphic): number {
+    const polygonSymbol = buildingGraphic.symbol as PolygonSymbol3D;
+    if (polygonSymbol && polygonSymbol.symbolLayers.length) {
+      const symbolLayer = polygonSymbol.symbolLayers[0] as ExtrudeSymbol3DLayer;
+      if (symbolLayer) {
+        return symbolLayer.size;
+      }
+    }
+    return 3;
   }
 
   private _applyBuildingSymbol(buildingGraphic: Graphic) {
