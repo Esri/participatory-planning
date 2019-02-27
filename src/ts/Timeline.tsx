@@ -10,6 +10,7 @@ import {
 import Collection from "esri/core/Collection";
 import { eachAlways } from "esri/core/promiseUtils";
 import { whenNotOnce } from "esri/core/watchUtils";
+import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import Layer from "esri/layers/Layer";
@@ -26,7 +27,6 @@ import {MASK_AREA} from "./Scene";
 import { dojoPromise } from "./support/promises";
 import "./widget/support/extensions";
 import WidgetBase from "./widget/WidgetBase";
-import Polyline = require('esri/geometry/Polyline');
 
 export const AREA_ANIMATION_DURATION = 2000;
 export const MASK_ANIMATION_DURATION = 1000;
@@ -187,7 +187,8 @@ export default class Timeline extends declared(WidgetBase) {
 
   private _takeScreenshot() {
     const view = this.scene.view;
-    const options = { format: "png", width: this.scene.view.width / 2 };
+    const width = Math.min(this.scene.view.width, this.scene.view.height);
+    const options = { format: "png", width: width * 0.9 };
     this.toggleLoadingIndicator(true);
 
     setTimeout(() => {
@@ -213,15 +214,16 @@ export default class Timeline extends declared(WidgetBase) {
   private _showScreenshot(before: __esri.Screenshot, after: __esri.Screenshot) {
     const canvas = document.getElementById("screenshotCanvas") as HTMLCanvasElement;
     const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-    canvas.height = before.data.height;
-    canvas.width = before.data.width + after.data.width;
-    context.putImageData(before.data, 0, 0);
-    context.putImageData(after.data, before.data.width, 0);
+    const height = canvas.width = canvas.height = Math.min(before.data.width, 2 * before.data.height);
+    const x = -(before.data.width - height) / 2;
+    const dirtyY = (before.data.height - height / 2) / 2;
+    context.putImageData(before.data, x, -dirtyY, 0, dirtyY, before.data.width, height / 2);
+    context.putImageData(after.data, x, height / 2 - dirtyY, 0, dirtyY, after.data.width, height / 2);
 
-    context.font = "30px Arial";
+    context.font = "50px Avenir";
     context.fillStyle = "white";
-    context.fillText("Before", 15, before.data.height - 20);
-    context.fillText("After", before.data.width + 15, before.data.height - 20);
+    context.fillText("Now", 15, height / 2 - 22);
+    context.fillText("My Plan", 15, height - 22);
 
     this.toggleLoadingIndicator(false);
     this.toggleOverlay(true);
