@@ -39,14 +39,20 @@ export default class CreateBuilding extends declared(DrawWidget) {
 
   public updateGraphic(buildingGraphic: Graphic) {
     this.stories = this._getStories(buildingGraphic);
-    buildingGraphic.symbol = new SimpleFillSymbol({
-      color: new Color("#d6bb7a").withAlpha(0.3),
-      style: "diagonal-cross",
-      outline: {  // autocasts as new SimpleLineSymbol()
-        color: new Color("#d6bb7a").withAlpha(0.2),
-        width: "0.5px",
-      },
-    });
+    buildingGraphic.symbol = {
+      type: "polygon-3d",
+      symbolLayers: [{
+        type: "extrude",
+        material: {
+          color: [255, 255, 255, 0.5],
+        },
+        edges: {
+          type: "solid",
+          color: [100, 100, 100],
+        },
+        size: this.stories * 3,
+      }],
+    } as any;
     this.update(buildingGraphic).then((updatedBuilding) => {
       this._applyBuildingSymbol(updatedBuilding);
     });
