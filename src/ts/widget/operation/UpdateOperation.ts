@@ -35,9 +35,8 @@ export default class UpdateOperation extends Operation {
     });
 
     this.finished.always(() => {
-      if (this.sketchViewModel.activeTool) {
-        this.sketchViewModel.cancel();
-      }
+      this.sketchViewModel.cancel();
+      this.sketchViewModel.destroy();
     });
 
     // Workaround for `SketchViewModel` not supporting flying graphics

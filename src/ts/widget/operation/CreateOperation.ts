@@ -33,6 +33,7 @@ export default class CreateOperation<DrawActionEventType> extends Operation {
     this.finished.always(() => {
       (this.scene.view as any).cursor = defaultCursor;
       this.draw.reset();
+      this.draw.destroy();
     });
 
     action.on(

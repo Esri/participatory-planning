@@ -44,6 +44,7 @@ export default class Operation {
 
     this.finished.catch(() => {
       const layer = this.sketchGraphic.layer as GraphicsLayer;
+      const graphic = this.sketchGraphic;
       if (removeGraphic && layer) {
         layer.remove(this.sketchGraphic);
       }

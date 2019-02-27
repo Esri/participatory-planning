@@ -215,7 +215,7 @@ export default class Scene extends declared(Widget) {
       this._drawLayers().forEach((layer) => layer.visible = true);
       this.boundingPolygonGraphic.symbol = {
           type: "simple-fill",
-          color: [0, 0, 0, 0.3],
+          color: [0, 0, 0, 0.15],
           outline: {
             width: 0,
           },
@@ -242,15 +242,17 @@ export default class Scene extends declared(Widget) {
 
   public adjustSymbolHeights() {
     this._drawLayers().forEach((layer) => {
-      layer.graphics.toArray().forEach((graphic) => {
-        this.adjustHeight(graphic);
-      });
+      if (layer.get("elevationInfo.mode") === "relative-to-ground") {
+        layer.graphics.toArray().forEach((graphic) => {
+          this.adjustHeight(graphic);
+        });
+      }
     });
   }
 
   public adjustHeight(graphic: Graphic) {
     const point = graphic.geometry as Point;
-    if (point && point.hasZ) {
+    if (point.type === "point" && point.hasZ) {
       const height = this.heightAtPoint(point);
       if (height !== point.z) {
         const newPoint = point.clone();

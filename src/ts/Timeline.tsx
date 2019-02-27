@@ -245,7 +245,7 @@ export default class Timeline extends declared(WidgetBase) {
       return this._waitForSceneToUpdate();
 
       // Catching any exceptions in case animation gets canceled
-    }).catch(console.error);
+    }).catch(console.log);
   }
 
   private _animateArea(): IPromise<void> {

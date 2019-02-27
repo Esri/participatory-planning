@@ -74,8 +74,7 @@ export default class App extends declared(WidgetBase) {
           response.results.some((result) => {
             const graphic = result.graphic;
             if (graphic && graphic.geometry) {
-              this._updateGraphic(graphic);
-              return true;
+              return this._updateGraphic(graphic);
             }
             return false;
           });
@@ -250,18 +249,19 @@ export default class App extends declared(WidgetBase) {
     this._showWidget(this.symbolGallery);
   }
 
-  private _updateGraphic(graphic: Graphic) {
-    console.log("Editing", graphic);
+  private _updateGraphic(graphic: Graphic): boolean {
     const layer = graphic.layer as GraphicsLayer;
     if (layer) {
-      this.drawWidgets.some((widget) => {
+      return this.drawWidgets.some((widget) => {
         if (widget.layer === layer) {
+          console.log("Editing", graphic);
           widget.updateGraphic(graphic);
           return true;
         }
         return false;
       });
     }
+    return false;
   }
 
 }
