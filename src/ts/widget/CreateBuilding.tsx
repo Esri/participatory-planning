@@ -57,7 +57,7 @@ export default class CreateBuilding extends declared(DrawWidget) {
     if (polygonSymbol && polygonSymbol.symbolLayers.length) {
       const symbolLayer = polygonSymbol.symbolLayers.getItemAt(0) as ExtrudeSymbol3DLayer;
       if (symbolLayer) {
-        return symbolLayer.size;
+        return symbolLayer.size / 3;
       }
     }
     return 3;
