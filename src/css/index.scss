@@ -270,6 +270,8 @@ body {
 	transform: scale(1.1);
 }
 
+// Screenshot
+
 #screenshot {
   width: 100%;
   height: 100%;
@@ -290,4 +292,14 @@ body {
 #screenshot .btn {
   width: 75px;
   height: 75px;
+}
+
+// Intro
+
+.card {
+  border-radius: 10px;
+}
+
+.card-wide-image-wrap {
+  border-radius: 10px 0px 0px 10px;
 }
