@@ -120,6 +120,13 @@ body {
   @extend .font-size-1;
 }
 
+.btn-white {
+  background-color: #FFF0;
+  border: 2px white solid;
+  color: white;
+  font-size: 12px;
+}
+
 .menu .btn {
   border: none;
   background-color: #FFF0;
@@ -261,4 +268,26 @@ body {
 .gallery-grid-item:hover img {
 	-webkit-transform: scale(1.1);
 	transform: scale(1.1);
+}
+
+#screenshot {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+#screenshot > div {
+  height: 90%;
+  width: 60%;
+  position: relative;
+  display: inline-block;
+}
+
+#screenshot > div:first-child, #screenshot > div:last-child {
+  width: 20%;
+}
+
+#screenshot .btn {
+  width: 75px;
+  height: 75px;
 }

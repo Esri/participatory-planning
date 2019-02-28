@@ -203,16 +203,26 @@ export default class App extends declared(WidgetBase) {
 
         <div id="screenshot" class="center hide">
           <div>
-            <canvas id="screenshotCanvas" />
+            <div class="center">
+              <button class="btn btn-large btn-white" onclick={ () => this.timeline.startPlanning() }>
+                <span class="font-size-3 fas fa-arrow-left" /><br />
+                Back
+              </button>
+            </div>
           </div>
-          <div class="menu">
-          <div class="menu-item">
-            <button class="btn btn-clear-white" onclick={ () => this.timeline.startPlanning() }>
-              Continue Planning
-            </button>
+          <div>
+            <div class="center">
+              <canvas id="screenshotCanvas" />
+            </div>
           </div>
+          <div>
+            <div class="center">
+              <button class="btn btn-large btn-white">
+                <span class="font-size-3 fas fa-share-square" /><br />
+                Share
+              </button>
+            </div>
           </div>
-
         </div>
       </div>
     );
