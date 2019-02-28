@@ -25,6 +25,14 @@ body {
                                   supported by Chrome and Opera */
 }
 
+// Disable focus glow
+*:focus {
+  outline: none;
+  border-color: inherit;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
 // General
 
 .center {
@@ -65,6 +73,13 @@ body {
 .box > .content > div > * {
   position: absolute;
   bottom: 0px;
+  transform: translate(-50%, 0);
+  display: inline-block;
+}
+
+.box > * {
+  text-align: center;
+  width: 100%;
 }
 
 .box .footer {
@@ -80,17 +95,64 @@ body {
   pointer-events: none;
 }
 
-.timeline .menu-left, .timeline .menu-right {
+.btn, .menu-item, .sketchfab-widget > *, .gallery-grid {
+  pointer-events: auto;
+}
+
+.timeline {
+  width: 100%;
+}
+
+.timeline .menu-left {
   position: absolute;
   top: 0px;
 }
 
-.menu-item, .sketchfab-widget > *, .gallery-grid {
-  pointer-events: auto;
+.timeline .menu-left {
+  left: 0px;
 }
 
-.bottom .btn {
-  width: 100px;
+.btn {
+  border-radius: 8px;
+  border: none;
+}
+
+.btn-large {
+  @extend .font-size-1;
+}
+
+.menu .btn {
+  border: none;
+  background-color: #FFF0;
+  color: $off-black;
+}
+
+.menu .btn:hover {
+  background-color: $white;
+}
+
+.menu .btn:active, .menu .btn.active {
+  background-color: $white;
+  color: $dark-blue;
+}
+
+.bottom .btn:not(.btn-large) {
+  width: 80px;
+  font-size: 12px;
+}
+
+.bottom .btn.btn-large {
+  top: 4px;
+}
+
+.bottom .btn-large:first-child {
+    margin-right: 35px;
+    margin-left: 13px;
+}
+
+.bottom .btn-large:last-child {
+    margin-right: 13px;
+    margin-left: 35px;
 }
 
 #overlay {
@@ -107,8 +169,19 @@ body {
 }
 
 .menu {
-  width: 100%;
+  margin: 10px;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
   text-align: center;
+  background-color: #FFF9;
+  display: inline-block;
+  border-radius: 10px;
+}
+
+.bottom .menu {
+  border-radius: 20px;
+  background-color: #FFFD;
 }
 
 .menu-left {
@@ -129,17 +202,14 @@ body {
 }
 
 .sketchfab-widget {
+  width: 90%;
   display: block;
   position: absolute;
   height: auto;
   bottom: 0;
   top: 0;
-  left: 0;
-  right: 0;
   margin-top: 20px;
   margin-bottom: 20px;
-  margin-right: 80px;
-  margin-left: 80px;
 }
 
 [class^="icon-ui-"]:before, [class*=" icon-ui-"]:before {
@@ -147,6 +217,7 @@ body {
 }
 
 .gallery-grid {
+  width: 90%;
   overflow-x: auto;
   overflow-y: auto;
   text-align: center;
@@ -159,7 +230,12 @@ body {
   margin: 2px;
   display: inline-block;
   cursor: pointer;
-  background-color: #AAAA;
+  background-color: #FFF8;
+  border-radius: 10px;
+}
+
+.gallery-grid-item:hover {
+  background-color: $white;
 }
 
 .gallery-grid-item img {

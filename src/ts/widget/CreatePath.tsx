@@ -5,36 +5,64 @@ import DrawWidget from "./DrawWidget";
 import Color from "esri/Color";
 import {
   declared,
+  property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import { tsx } from "esri/widgets/support/widget";
+import { renderable, tsx } from "esri/widgets/support/widget";
+
+interface PathMenu {
+  label: string;
+  color: string;
+  width: number;
+}
 
 @subclass("app.draw.CreatePath")
 export default class CreatePath extends declared(DrawWidget) {
 
+  @renderable()
+  @property()
+  private activeMenu: PathMenu | null = null;
+
+  private menus: PathMenu[] = [
+    {
+      label: "Street",
+      color: "#cbcbcb",
+      width: 20,
+    },
+    {
+      label: "Walking Path",
+      color: "#b2b2b2",
+      width: 3,
+    },
+  ];
+
   public render() {
+    const inactive = "btn btn-large";
+    const active = inactive + " active";
     return (
       <div>
         <div class="menu">
-          <div class="menu-item">
-            <button class="btn" onclick={ this._startDrawing.bind(this, true) }>Create Street</button>
-          </div>
-          <div class="menu-item">
-            <button class="btn" onclick={ this._startDrawing.bind(this, false) }>Create Walking Path</button>
-          </div>
+          { this.menus.map((menu) => (
+            <div class="menu-item">
+              <button
+                class={menu === this.activeMenu ? active : inactive}
+                onclick={ this._startDrawing.bind(this, menu) }>Create {menu.label}</button>
+            </div>
+          )) }
         </div>
       </div>
     );
   }
 
-  private _startDrawing(street: boolean) {
-    const color = street ? new Color("#cbcbcb") : new Color("#b2b2b2");
-    this.createPolyline(color).then((newPath) => {
+  private _startDrawing(menu: PathMenu) {
+    this.activeMenu = menu;
+    this.createPolyline(new Color(menu.color)).then((newPath) => {
       newPath.symbol = {
         type: "simple-line",
-        color,
-        width: street ? 20 : 3,
+        color: menu.color,
+        width: menu.width,
       } as any;
+      this.activeMenu = null;
     });
   }
 

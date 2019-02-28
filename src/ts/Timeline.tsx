@@ -96,7 +96,7 @@ export default class Timeline extends declared(WidgetBase) {
 
       this.scene.map.ground.surfaceColor = new Color("#f0f0f0");
 
-      this._showIntro();
+      this.showIntro();
     });
 
     this.toggleElement("screenshot", false);
@@ -108,19 +108,15 @@ export default class Timeline extends declared(WidgetBase) {
 
     return (
       <div class="timeline">
-        <div class="menu menu-left phone-hide">
-          <div class="menu-item">
-          { this.showIntroDialog ? (
-            <button class="btn btn-large" onclick={ this._showIntro.bind(this) }>
-              New
-            </button>
-          ) : (
-            <button class="btn btn-large" onclick={ this.playIntroAnimation.bind(this) }>
-              Intro
-            </button>
-          )}
+        { this.showIntroDialog ? ( <div/ > ) : (
+          <div class="menu menu-left phone-hide">
+            <div class="menu-item">
+              <button class="btn btn-large" onclick={ this.playIntroAnimation.bind(this) }>
+                Intro
+              </button>
+            </div>
           </div>
-        </div>
+        )}
         <div class="menu phone-hide">
           { slides.map((slide) => (<div class="menu-item" key={ slide.id }>
               <button class="btn btn-large" onclick={ () => this._goToSlide(slide) }>
@@ -128,15 +124,24 @@ export default class Timeline extends declared(WidgetBase) {
               </button>
             </div>)) }
         </div>
-        <div class="menu menu-right">
-          <div class="menu-item">
-            <button class="btn btn-large" onclick={ this._takeScreenshot.bind(this) }>
-              Compare
-            </button>
-          </div>
-        </div>
       </div>
     );
+  }
+
+  public showIntro(): IPromise {
+    this.toggleLoadingIndicator(true);
+    this.scene.showMaskedBuildings("white");
+    this.scene.clear();
+    return this._goToSlide(this.slides.getItemAt(0))
+      .then(() => {
+        this._toggleBasemap(true);
+        if (this.showIntroDialog) {
+          this.toggleElement("intro", true);
+        } else {
+          this.toggleElement("intro", false);
+          this.toggleLoadingIndicator(false);
+        }
+      });
   }
 
   public playIntroAnimation(): IPromise {
@@ -163,29 +168,7 @@ export default class Timeline extends declared(WidgetBase) {
     this._toggleBasemap(false);
   }
 
-  private _showIntro(): IPromise {
-    this.toggleLoadingIndicator(true);
-    this.scene.showMaskedBuildings("white");
-    this.scene.clear();
-    return this._goToSlide(this.slides.getItemAt(0))
-      .then(() => {
-        this._toggleBasemap(true);
-        if (this.showIntroDialog) {
-          this.toggleElement("intro", true);
-        } else {
-          this.toggleElement("intro", false);
-          this.toggleLoadingIndicator(false);
-        }
-      });
-  }
-
-  private _showFirstEditSlide(): IPromise {
-    return this
-      ._goToSlide(this.slides.getItemAt(2))
-      .then(() => this.scene.showMaskedBuildings());
-  }
-
-  private _takeScreenshot() {
+  public takeScreenshot() {
     const view = this.scene.view;
     const width = Math.min(this.scene.view.width, this.scene.view.height);
     const options = { format: "png", width: width * 0.8 };
@@ -211,6 +194,12 @@ export default class Timeline extends declared(WidgetBase) {
     }, 100);
   }
 
+  private _showFirstEditSlide(): IPromise {
+    return this
+      ._goToSlide(this.slides.getItemAt(2))
+      .then(() => this.scene.showMaskedBuildings());
+  }
+
   private _showScreenshot(before: __esri.Screenshot, after: __esri.Screenshot) {
     const canvas = document.getElementById("screenshotCanvas") as HTMLCanvasElement;
     const context = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -220,7 +209,7 @@ export default class Timeline extends declared(WidgetBase) {
     context.putImageData(before.data, x, -dirtyY, 0, dirtyY, before.data.width, height / 2);
     context.putImageData(after.data, x, height / 2 - dirtyY, 0, dirtyY, after.data.width, height / 2);
 
-    context.font = "50px Avenir";
+    context.font = "bold 50px Avenir";
     context.fillStyle = "white";
     context.fillText("Now", 15, height / 2 - 22);
     context.fillText("My Plan", 15, height - 22);

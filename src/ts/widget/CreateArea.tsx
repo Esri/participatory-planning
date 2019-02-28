@@ -1,5 +1,4 @@
 
-import Scene from "../Scene";
 import DrawWidget from "./DrawWidget";
 
 // esri
@@ -9,41 +8,68 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
-import { tsx } from "esri/widgets/support/widget";
+import { renderable, tsx } from "esri/widgets/support/widget";
+
+interface ColorMenu {
+  label: string;
+  color: string;
+}
 
 @subclass("app.draw.CreateArea")
 export default class CreateArea extends declared(DrawWidget) {
 
+  @renderable()
+  @property()
+  private activeColor: string | null = null;
+
+  private colorMenus: ColorMenu[] = [
+    {
+      label: "Ground",
+      color: "#f0f0f0",
+    },
+    {
+      label: "Lawn",
+      color: "#bdce8a",
+    },
+    {
+      label: "Beach",
+      color: "#dfca8f",
+    },
+    {
+      label: "Water",
+      color: "#a0b4cf",
+    },
+  ];
+
   public render() {
+    const inactive = "btn btn-large";
+    const active = inactive + " active";
     return (
       <div>
         <div class="menu">
-        <div class="menu-item">
-          <button class="btn" onclick={ this._startDrawing.bind(this, "#f0f0f0", "#b2b2b2") }>Create Ground</button>
-        </div>
-          <div class="menu-item">
-            <button class="btn" onclick={ this._startDrawing.bind(this, "#bdce8a", "#93a06c") }>Create Lawn</button>
-          </div>
-          <div class="menu-item">
-            <button class="btn" onclick={ this._startDrawing.bind(this, "#dfca8f", "#dfca8f") }>Create Beach</button>
-          </div>
-          <div class="menu-item">
-            <button class="btn" onclick={ this._startDrawing.bind(this, "#a0b4cf", "#8b9cb3") }>Create Water</button>
-          </div>
+          { this.colorMenus.map((menu) => (
+            <div class="menu-item">
+              <button
+                class={menu.color === this.activeColor ? active : inactive}
+                onclick={ this._startDrawing.bind(this, menu.color) }>Create {menu.label}</button>
+            </div>
+          )) }
         </div>
       </div>
     );
   }
 
   private _startDrawing(color: string, sketchColor: string = color) {
+    this.activeColor = color;
     this.createPolygon(new Color(sketchColor)).then((newArea) => {
       newArea.symbol = {
         type: "simple-fill",
-        color,
+        color: this.activeColor,
         outline: {
           width: 0,
         },
       } as any;
+      this.activeColor = null;
     });
   }
 

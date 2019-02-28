@@ -24,7 +24,7 @@ const scene = new Scene();
 interface MainMenu {
   label: string;
   iconName: string;
-  onClick: () => void;
+  onClick: (element: HTMLElement) => void;
 }
 
 @subclass("app.widgets.webmapview")
@@ -52,6 +52,8 @@ export default class App extends declared(WidgetBase) {
   private drawWidgets = [this.createArea, this.createPath, this.createBuilding, this.symbolGallery, this.glTFWidget];
 
   private mainMenuEntries: MainMenu[] = [];
+
+  private menuButtons: HTMLElement[] = [];
 
   public constructor() {
     super();
@@ -84,40 +86,40 @@ export default class App extends declared(WidgetBase) {
 
     this.mainMenuEntries.push({
       label: "Ground",
-      iconName: "feature-layer",
+      iconName: "fas fa-layer-group",
       onClick: this._showWidget.bind(this, this.createArea),
     });
     this.mainMenuEntries.push({
       label: "Paths",
-      iconName: "line-chart",
+      iconName: "fas fa-road",
       onClick: this._showWidget.bind(this, this.createPath),
     });
     this.mainMenuEntries.push({
       label: "Buildings",
-      iconName: "organization",
+      iconName: "fas fa-building",
       onClick: this._showWidget.bind(this, this.createBuilding),
     });
     this.mainMenuEntries.push({
       label: "Icons",
-      iconName: "map-pin",
+      iconName: "fas fa-map-marker-alt",
       onClick: this._showSymbolGallery.bind(this, SymbolGroupId.Icons),
     });
     this.mainMenuEntries.push({
       label: "Trees",
-      iconName: "map-pin",
+      iconName: "fas fa-tree",
       onClick: this._showSymbolGallery.bind(this, SymbolGroupId.Trees),
     });
     this.mainMenuEntries.push({
       label: "Vehicles",
-      iconName: "map-pin",
+      iconName: "fas fa-car",
       onClick: this._showSymbolGallery.bind(this, SymbolGroupId.Vehicles),
     });
     this.mainMenuEntries.push({
       label: "glTF",
-      iconName: "upload",
-      onClick: () => {
+      iconName: "fas fa-cloud-download-alt",
+      onClick: (element) => {
         this.glTFWidget.startImport();
-        this._showWidget(this.glTFWidget);
+        this._showWidget(this.glTFWidget, element);
       },
     });
 
@@ -135,24 +137,30 @@ export default class App extends declared(WidgetBase) {
             <div afterCreate={ this._attachTimeline.bind(this) } />
           </div>
           <div class="content">
-            <div afterCreate={ this._attachMenu.bind(this, this.createArea) } />
-            <div afterCreate={ this._attachMenu.bind(this, this.createPath) } />
-            <div afterCreate={ this._attachMenu.bind(this, this.createBuilding) } />
-            <div afterCreate={ this._attachMenu.bind(this, this.symbolGallery) } />
-            <div afterCreate={ this._attachMenu.bind(this, this.glTFWidget)} />
+            <div class="hide" afterCreate={ this._attachWidget.bind(this, this.createArea) } />
+            <div class="hide" afterCreate={ this._attachWidget.bind(this, this.createPath) } />
+            <div class="hide" afterCreate={ this._attachWidget.bind(this, this.createBuilding) } />
+            <div class="hide" afterCreate={ this._attachWidget.bind(this, this.symbolGallery) } />
+            <div class="hide" afterCreate={ this._attachWidget.bind(this, this.glTFWidget)} />
           </div>
           <div class="bottom">
             <div class="menu">
-            {
-              this.mainMenuEntries.map((entry) => (
-                <div class="menu-item">
-                  <button class="btn" onclick={ entry.onClick }>
-                    <span class={ "font-size-3 icon-ui-" + entry.iconName } /><br />
-                    { entry.label }
-                  </button>
-                </div>
-              ))
-            }
+              <button class="btn btn-large" onclick={ () => { this._hideWidget(); this.timeline.showIntro(); } }>
+                NEW PLAN
+              </button>
+              {
+                this.mainMenuEntries.map((entry) => (
+                  <div class="menu-item">
+                    <button class="btn" afterCreate={ this._attachWidgetButton.bind(this, entry) }>
+                      <span class={ "font-size-3 " + entry.iconName } /><br />
+                      { entry.label }
+                    </button>
+                  </div>
+                ))
+              }
+              <button class="btn btn-large" onclick={ () => { this._hideWidget(); this.timeline.takeScreenshot(); } }>
+                SUBMIT PLAN
+              </button>
             </div>
           </div>
         </div>
@@ -183,9 +191,9 @@ export default class App extends declared(WidgetBase) {
                   </ul>
                 </p>
                 <div menu>
-                  <button class="menu-item btn btn-grouped"
+                  <button class="menu-item btn"
                     onclick={ () => this.timeline.playIntroAnimation() }>Start Planning</button>
-                  <button class="menu-item btn btn-transparent btn-grouped"
+                  <button class="menu-item btn btn-transparent"
                     onclick={ () => this.timeline.startPlanning() }>Skip Animation</button>
                 </div>
               </div>
@@ -218,35 +226,48 @@ export default class App extends declared(WidgetBase) {
     this.timeline.container = element;
   }
 
-  private _attachMenu(menu: DrawWidget, element: HTMLDivElement) {
+  private _attachWidget(menu: DrawWidget, element: HTMLDivElement) {
     menu.container = element;
-    this._hideWidget(menu);
   }
 
-  private _hideWidget(widget: DrawWidget) {
-    (widget.container as HTMLElement).style.display = "none";
+  private _attachWidgetButton(menu: MainMenu, element: HTMLDivElement) {
+    this.menuButtons.push(element);
+    element.onclick = () => {
+      menu.onClick(element);
+    };
   }
 
-  private _showWidget(widget: DrawWidget) {
+  private _hideWidget() {
+    this.menuButtons.forEach((button) => button.classList.remove("active"));
     if (this.selectedWidget) {
-      this._hideWidget(this.selectedWidget);
+      (this.selectedWidget.container as HTMLElement).classList.add("hide");
+    }
+  }
+
+  private _showWidget(widget: DrawWidget, element: HTMLElement) {
+    this.menuButtons.forEach((button) => button.classList.remove("active"));
+    if (this.selectedWidget) {
+      this._hideWidget();
       if (this.selectedWidget === widget) {
         this.selectedWidget = null;
         return;
       }
     }
     this.selectedWidget = widget;
-    (this.selectedWidget.container as HTMLElement).style.display = "";
+    element.classList.add("active");
+    (this.selectedWidget.container as HTMLElement).classList.remove("hide");
   }
 
-  private _showSymbolGallery(groupId: SymbolGroupId) {
+  private _showSymbolGallery(groupId: SymbolGroupId, element: HTMLElement) {
+    this.menuButtons.forEach((button) => button.classList.remove("active"));
     if (this.symbolGallery.selectedGroupId !== groupId) {
       this.symbolGallery.selectedGroupId = groupId;
       if (this.selectedWidget === this.symbolGallery) {
+        element.classList.add("active");
         return;
       }
     }
-    this._showWidget(this.symbolGallery);
+    this._showWidget(this.symbolGallery, element);
   }
 
   private _updateGraphic(graphic: Graphic): boolean {
