@@ -60,13 +60,23 @@ export default class GlTFWidget extends declared(DrawWidget) {
     return (
       <div>
         <div class={ classList[GlTFWidgetState.Import].join(" ") }
-          afterCreate={ this._attachImportWidget.bind(this) } />
+          afterCreate={ this._attachImportWidget.bind(this) }>
+            <div id="glTFLogo" class="gltf-logo"></div>
+          </div>
       </div>
     );
   }
 
   public startImport() {
     this.state = GlTFWidgetState.Import;
+    window.onblur = () => this._removeGlTFLogo();
+  }
+
+  private _removeGlTFLogo() {
+    const logo = document.getElementById("glTFLogo");
+    if (logo) {
+      logo.classList.add("hide");
+    }
   }
 
   private _importGlTF(url: string) {

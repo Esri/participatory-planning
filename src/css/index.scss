@@ -42,10 +42,6 @@ body {
   transform: translate(-50%, -50%);
 }
 
-.hide {
-  display: none;
-}
-
 #app,
 #scene {
   position: relative;
@@ -73,6 +69,9 @@ body {
 .box > .content > div > * {
   position: absolute;
   bottom: 0px;
+}
+
+.box > .content > div > .menu {
   transform: translate(-50%, 0);
   display: inline-block;
 }
@@ -142,17 +141,17 @@ body {
 }
 
 .bottom .btn.btn-large {
-  top: 4px;
+  top: 6px;
 }
 
 .bottom .btn-large:first-child {
-    margin-right: 35px;
-    margin-left: 13px;
+  margin-right: 35px;
+  margin-left: 13px;
 }
 
 .bottom .btn-large:last-child {
-    margin-right: 13px;
-    margin-left: 35px;
+  margin-right: 13px;
+  margin-left: 35px;
 }
 
 #overlay {
@@ -202,14 +201,27 @@ body {
 }
 
 .sketchfab-widget {
-  width: 90%;
   display: block;
   position: absolute;
   height: auto;
+  left: 40px;
+  right: 40px;
   bottom: 0;
   top: 0;
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.gltf-logo {
+  z-index: 100;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-image: url(images/gltf.png);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  pointer-events: none;
 }
 
 [class^="icon-ui-"]:before, [class*=" icon-ui-"]:before {
@@ -217,7 +229,7 @@ body {
 }
 
 .gallery-grid {
-  width: 90%;
+  width: 100%;
   overflow-x: auto;
   overflow-y: auto;
   text-align: center;
