@@ -6,7 +6,7 @@
     "@types/animejs": "^2.0.1",
     "@types/sinon": "^5.0.5",
     "animejs": "^3.0.1",
-    "arcgis-js-api": "http://zrh-devweb.esri.com/arno9993/npm/arcgis-js-api.tgz",
+    "arcgis-js-api": "https://jscore.esri.com/people/rene/arcgis-js-api.tgz",
     "calcite-web": "github:esri/calcite-web",
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "4.5.2",
