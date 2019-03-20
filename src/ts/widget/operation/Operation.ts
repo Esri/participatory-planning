@@ -19,8 +19,11 @@ export default class Operation {
 
   protected reject: (error?: any) => void;
 
+  protected layer: GraphicsLayer;
+
   constructor(public widget: DrawWidget, protected sketchGraphic: Graphic) {
     this.scene = widget.scene;
+    this.layer = sketchGraphic.layer as GraphicsLayer;
     this.finished = createPromise(((resolve: (_: Graphic) => void, reject: (error?: any) => void) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -43,10 +46,8 @@ export default class Operation {
     this.reject("canceled");
 
     this.finished.catch(() => {
-      const layer = this.sketchGraphic.layer as GraphicsLayer;
-      const graphic = this.sketchGraphic;
-      if (removeGraphic && layer) {
-        layer.remove(this.sketchGraphic);
+      if (removeGraphic) {
+        this.layer.remove(this.sketchGraphic);
       }
     });
   }
@@ -68,6 +69,10 @@ export default class Operation {
     } else {
       return clips;
     }
+  }
+
+  protected isValidGeometry(geometry: Geometry): boolean {
+    return ge.contains(this.scene.maskPolygon, geometry);
   }
 
 }

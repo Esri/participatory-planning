@@ -13,8 +13,16 @@ export default class UpdateOperation extends Operation {
 
   private sketchViewModel: SketchViewModel;
 
+  private resultingGraphic: Graphic;
+
+  private lastValidGeometry: Geometry;
+
   constructor(widget: DrawWidget, graphic: Graphic) {
     super(widget, graphic);
+
+    this.resultingGraphic = graphic.clone();
+    this.layer.add(this.resultingGraphic);
+    // graphic.visible = false;
 
     this.sketchViewModel = new SketchViewModel({
       view: this.scene.view,
@@ -31,12 +39,21 @@ export default class UpdateOperation extends Operation {
     this.sketchViewModel.on("update", (event) => {
       if (event.state === "complete" || event.state === "cancel") {
         this.complete(graphic);
+      } else {
+        if (this.isValidGeometry(graphic.geometry)) {
+          this.lastValidGeometry = graphic.geometry;
+        } else {
+          graphic.geometry = this.lastValidGeometry;
+        }
+        console.log(event.state, this.isValidGeometry(graphic.geometry), event);
       }
     });
 
     this.finished.always(() => {
       this.sketchViewModel.cancel();
       this.sketchViewModel.destroy();
+      this.layer.remove(this.resultingGraphic);
+      graphic.visible = true;
     });
 
     // Workaround for `SketchViewModel` not supporting flying graphics
