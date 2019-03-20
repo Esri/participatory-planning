@@ -6,14 +6,19 @@ import {
   subclass,
 } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
+import { eachAlways } from "esri/core/promiseUtils";
+import { whenNotOnce } from "esri/core/watchUtils";
 import geometryEngine from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
 import Polygon from "esri/geometry/Polygon";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
+import IntegratedMeshLayer from "esri/layers/IntegratedMeshLayer";
 import SceneLayer from "esri/layers/SceneLayer";
 import UniqueValueRenderer from "esri/renderers/UniqueValueRenderer";
+import SceneLayerView from "esri/views/layers/SceneLayerView";
+import FeatureFilter from "esri/views/layers/support/FeatureFilter";
 import SceneView from "esri/views/SceneView";
 import WebScene from "esri/WebScene";
 import { tsx } from "esri/widgets/support/widget";
@@ -21,12 +26,11 @@ import Widget from "esri/widgets/Widget";
 
 import { computeBoundingPolygon } from "./support/geometry";
 import Operation from "./widget/operation/Operation";
-import IntegratedMeshLayer = require('esri/layers/IntegratedMeshLayer');
 
-// Hard coded constants
+// Constants
 
 // One of low, medium, high
-export const QUALITY = "high";
+export const QUALITY = "medium";
 
 export const MASKED_OBJIDS = [
   158321, 106893, 158711, 158613, 158632, 159047, 158099, 158249, 147102, 106899, 107439, 158654, 158247, 158307,
@@ -82,10 +86,17 @@ export default class Scene extends declared(Widget) {
 
   private sceneLayer: SceneLayer;
 
+  private sceneLayerView: SceneLayerView;
+
+  private sceneLayerFilter = new FeatureFilter({
+    spatialRelationship: "disjoint",
+    geometry: this.maskPolygon,
+  });
+
   private sceneLayerRenderer = new UniqueValueRenderer({
     // field: "OBJECTID",
-    valueExpression: "When(indexof([" + MASKED_OBJIDS.join(",") + "], $feature.OBJECTID) < 0, 'show', 'hide')",
-    // When(OBJECTID IN (" + MASKED_OBJIDS.join(",") + "), 'hide', 'show')",
+    valueExpression: "When(indexof([" + MASKED_OBJIDS.join(",")
+    + "], $feature.OBJECTID) < 0, 'show', 'hide')",
     defaultSymbol: {
       type: "mesh-3d",
       symbolLayers: [{
@@ -115,6 +126,9 @@ export default class Scene extends declared(Widget) {
 
   public postInitialize() {
 
+    // Create global view reference
+    (window as any).view = this.view;
+
     this.map.when(() => {
       this.map.add(this.sketchLayer);
       this.map.add(this.texturedBuildings);
@@ -122,6 +136,9 @@ export default class Scene extends declared(Widget) {
       this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
       this.sceneLayer.renderer = this.sceneLayerRenderer;
       this.sceneLayer.popupEnabled = false;
+      this.view.whenLayerView(this.sceneLayer).then((lv: SceneLayerView) => {
+        this.sceneLayerView = lv;
+      });
       this.showMaskedBuildings("white");
     });
 
@@ -188,13 +205,13 @@ export default class Scene extends declared(Widget) {
             width: 0,
           },
         } as any;
-      this.sceneLayer.definitionExpression = "";
+      this.sceneLayerView.set("filter", null);
       this._drawLayers().forEach((layer) => layer.visible = false);
     } else {
 
       // Do not show masked buildings and dimm surounding ones
       uniqueValueInfos.push({
-        value: "show",
+        value: "showwww",
         symbol: {
           type: "mesh-3d",
           symbolLayers: [{
@@ -211,7 +228,7 @@ export default class Scene extends declared(Widget) {
           }],
         },
       } as any);
-      this.sceneLayer.definitionExpression = "OBJECTID NOT IN (" + MASKED_OBJIDS.join(",") + ")";
+      this.sceneLayerView.filter = this.sceneLayerFilter;
       this._drawLayers().forEach((layer) => layer.visible = true);
       this.boundingPolygonGraphic.symbol = {
           type: "simple-fill",
@@ -273,6 +290,20 @@ export default class Scene extends declared(Widget) {
         return max2;
       }, max1);
     }, 0);
+  }
+
+  public whenNotUpdating(): IPromise {
+    // Wait for map to load
+    return this.map.when().then(() => {
+      // For each loaded layer, wait for its layer view
+      const lvPromises = this.map.allLayers.map((layer) => {
+        // For each layer view, wait for it to be done updating
+        return this.view.whenLayerView(layer).then((lv) => {
+          return whenNotOnce(lv, "updating");
+        });
+      });
+      return eachAlways(lvPromises);
+    });
   }
 
   private _dimmUpperLayers() {

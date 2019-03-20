@@ -145,7 +145,7 @@ export default class App extends declared(WidgetBase) {
           </div>
           <div class="bottom">
             <div class="menu">
-              <button class="btn btn-large" onclick={ () => { this._hideWidget(); this.timeline.showIntro(); } }>
+              <button class="btn btn-large" onclick={ () => { this._reset(); this.timeline.showIntro(); } }>
                 NEW PLAN
               </button>
               {
@@ -158,7 +158,7 @@ export default class App extends declared(WidgetBase) {
                   </div>
                 ))
               }
-              <button class="btn btn-large" onclick={ () => { this._hideWidget(); this.timeline.takeScreenshot(); } }>
+              <button class="btn btn-large" onclick={ () => { this._reset(); this.timeline.takeScreenshot(); } }>
                 SUBMIT PLAN
               </button>
             </div>
@@ -217,7 +217,7 @@ export default class App extends declared(WidgetBase) {
           </div>
           <div>
             <div class="center">
-              <button class="btn btn-large btn-white">
+              <button class="btn btn-large btn-white" onclick={ () => this.timeline.downloadScreenshot()}>
                 <span class="font-size-3 fas fa-share-square" /><br />
                 Share
               </button>
@@ -245,6 +245,14 @@ export default class App extends declared(WidgetBase) {
     element.onclick = () => {
       menu.onClick(element);
     };
+  }
+
+  private _reset() {
+    this._hideWidget();
+    // Cancel any ongoing operation
+    if (this.scene.currentOperation) {
+      this.scene.currentOperation.cancel();
+    }
   }
 
   private _hideWidget() {

@@ -4,12 +4,9 @@ import Color from "esri/Color";
 import {
   aliasOf,
   declared,
-  property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
-import { eachAlways } from "esri/core/promiseUtils";
-import { whenNotOnce } from "esri/core/watchUtils";
 import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
@@ -147,7 +144,7 @@ export default class Timeline extends declared(WidgetBase) {
   public playIntroAnimation(): IPromise {
     this.toggleElement("intro", false);
     return this
-      ._waitForSceneToUpdate()
+      .scene.whenNotUpdating()
       .then(() => {
         this.toggleOverlay(false);
         this.toggleLoadingIndicator(false);
@@ -160,12 +157,18 @@ export default class Timeline extends declared(WidgetBase) {
   }
 
   public startPlanning() {
-    this.toggleOverlay(false);
-    this.toggleLoadingIndicator(false);
     this.toggleElement("intro", false);
-    this.toggleElement("screenshot", false);
-    this._showFirstEditSlide();
-    this._toggleBasemap(false);
+    return this
+      .scene.whenNotUpdating()
+      .then(() => {
+        this.toggleOverlay(false);
+        this.toggleLoadingIndicator(false);
+        this.toggleElement("intro", false);
+        this.toggleElement("screenshot", false);
+        this._showFirstEditSlide();
+        this._toggleBasemap(false);
+        this.scene.showMaskedBuildings();
+      });
   }
 
   public takeScreenshot() {
@@ -175,13 +178,13 @@ export default class Timeline extends declared(WidgetBase) {
     this.toggleLoadingIndicator(true, "Capturing Scene");
 
     setTimeout(() => {
-      this._waitForSceneToUpdate()
+      this.scene.whenNotUpdating()
         .then(() => view.takeScreenshot(options))
         .then((after) => {
           this.scene.showTexturedBuildings();
           this._toggleBasemap(true);
           setTimeout(() => {
-            this._waitForSceneToUpdate()
+            this.scene.whenNotUpdating()
               .then(() => view.takeScreenshot(options))
               .then((before) => {
                 this._showScreenshot(before, after);
@@ -192,6 +195,44 @@ export default class Timeline extends declared(WidgetBase) {
           }, 100);
         });
     }, 100);
+  }
+
+  public downloadScreenshot() {
+
+    const filename = "ParticipatoryPlanning.png";
+    const canvas = document.getElementById("screenshotCanvas") as HTMLCanvasElement;
+    const dataUrl = canvas.toDataURL("image/png");
+
+    // Taken from https://developers.arcgis.com/javascript/latest/sample-code/sceneview-screenshot/index.html
+    // the download is handled differently in Microsoft browsers
+    // because the download attribute for <a> elements is not supported
+    if (!window.navigator.msSaveOrOpenBlob) {
+      // in browsers that support the download attribute
+      // a link is created and a programmatic click will trigger the download
+      const element = document.createElement("a");
+      element.setAttribute("href", dataUrl);
+      element.setAttribute("download", filename);
+      element.style.display = "none";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    } else {
+      // for MS browsers convert dataUrl to Blob
+      const byteString = atob(dataUrl.split(",")[1]);
+      const mimeString = dataUrl
+        .split(",")[0]
+        .split(":")[1]
+        .split(";")[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], { type: mimeString });
+
+      // download file
+      window.navigator.msSaveOrOpenBlob(blob, filename);
+    }
   }
 
   private _showFirstEditSlide(): IPromise {
@@ -209,7 +250,7 @@ export default class Timeline extends declared(WidgetBase) {
     context.putImageData(before.data, x, -dirtyY, 0, dirtyY, before.data.width, height / 2);
     context.putImageData(after.data, x, height / 2 - dirtyY, 0, dirtyY, after.data.width, height / 2);
 
-    context.font = "bold 50px Avenir";
+    context.font = "bold 50px Helvetica";
     context.fillStyle = "white";
     context.fillText("Now", 15, height / 2 - 22);
     context.fillText("My Plan", 15, height - 22);
@@ -217,12 +258,6 @@ export default class Timeline extends declared(WidgetBase) {
     this.toggleLoadingIndicator(false);
     this.toggleOverlay(true, 0.9);
     this.toggleElement("screenshot", true);
-  }
-
-  private _waitForSceneToUpdate(): IPromise {
-    return eachAlways(this.scene.view.allLayerViews.map((layerView) => {
-      return whenNotOnce(layerView, "updating");
-    }));
   }
 
   private _goToSlide(slide: Slide, duration = 800): IPromise {
@@ -233,7 +268,7 @@ export default class Timeline extends declared(WidgetBase) {
       view.set("environment.lighting.date", "Thu Jun 20 2019 11:40:00 GMT-0500");
 
       // Wait for all layers to update after applying a new slide
-      return this._waitForSceneToUpdate();
+      return this.scene.whenNotUpdating();
 
       // Catching any exceptions in case animation gets canceled
     }).catch(console.log);
@@ -337,7 +372,7 @@ export default class Timeline extends declared(WidgetBase) {
   private _toggleBasemap(show: boolean): IPromise {
     this.scene.map.basemap = (show ? "satellite" : null) as any;
     this.vectorTileLayer.visible = !show;
-    return this._waitForSceneToUpdate();
+    return this.scene.whenNotUpdating();
   }
 
 }
