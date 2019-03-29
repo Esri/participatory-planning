@@ -12,12 +12,14 @@ import Polyline from "esri/geometry/Polyline";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import EsriSymbol from "esri/symbols/Symbol";
 
+import Geometry = require("esri/geometry/Geometry");
 import Graphic from "esri/Graphic";
-import CreatePoint from "./operation/CreatePoint";
-import CreatePolygon from "./operation/CreatePolygon";
-import CreatePolyline from "./operation/CreatePolyline";
-import Operation from "./operation/Operation";
-import UpdateOperation from "./operation/UpdateOperation";
+import SimpleFillSymbol = require("esri/symbols/SimpleFillSymbol");
+import SimpleLineSymbol = require("esri/symbols/SimpleLineSymbol");
+import DrawGeometry from "./operation/DrawGeometry";
+import DrawPoint from "./operation/DrawPoint";
+import DrawPolygon from "./operation/DrawPolygon";
+import DrawPolyline from "./operation/DrawPolyline";
 import WidgetBase from "./WidgetBase";
 
 @subclass("app.draw.DrawWidget")
@@ -34,30 +36,80 @@ export default class DrawWidget extends declared(WidgetBase) {
         mode: "on-the-ground",
       },
     });
-    whenOnce(this, "scene", () => this.scene.map.add(this.layer));
+    whenOnce(this, "app.scene", () => this.app.scene.map.add(this.layer));
   }
 
-  public updateGraphic(graphic: Graphic) {
-    this.update(graphic);
-  }
-
-  protected update(graphic: Graphic): IPromise<Graphic> {
-    if (graphic.layer !== this.layer) {
-      throw new Error("Graphic must belong to this widget's layer");
+  public updateGraphic(graphic: Graphic): IPromise<Graphic[]> {
+    if (graphic.geometry.type === "point") {
+      return new DrawPoint(this, graphic).update().then(() => [graphic]);
+    } else {
+      throw new Error("Implement in subclass");
     }
-    return new UpdateOperation(this, graphic).finished;
   }
 
-  protected createPolygon(color: Color): IPromise<Graphic> {
-    return new CreatePolygon(this, new Color("#00FFFF")).finished;
+  protected createPolylineGraphic(symbol: EsriSymbol, sketchColor: string): IPromise<Graphic[]> {
+    const graphic = new Graphic({ symbol });
+    return new DrawPolyline(this, graphic, sketchColor)
+      .create()
+      .then((polyline) => this.splitPolyline(polyline, graphic));
   }
 
-  protected createPolyline(color: Color): IPromise<Graphic> {
-    return new CreatePolyline(this, new Color("#00FFFF")).finished;
+  protected createPolygonGraphic(symbol: EsriSymbol, sketchColor: string): IPromise<Graphic[]> {
+    const graphic = new Graphic({ symbol });
+    return new DrawPolygon(this, graphic, sketchColor)
+      .create()
+      .then((polygon) => this.splitPolygon(polygon, graphic));
   }
 
-  protected createPoint(symbol: EsriSymbol): IPromise<Graphic> {
-    return new CreatePoint(this, symbol).finished;
+  protected createPointGraphic(symbol: EsriSymbol): IPromise<Graphic> {
+    const graphic = new Graphic({ symbol });
+    return new DrawPoint(this, graphic)
+      .create()
+      .then(() => {
+        return graphic;
+      });
+  }
+
+  protected updatePolylineGraphic(graphic: Graphic, sketchColor: string): IPromise<Graphic[]> {
+    return new DrawPolyline(this, graphic, sketchColor)
+      .update()
+      .then((polyline) => this.splitPolyline(polyline, graphic));
+  }
+
+  protected updatePolygonGraphic(graphic: Graphic, sketchColor: string): IPromise<Graphic[]> {
+    return new DrawPolygon(this, graphic, sketchColor)
+      .update()
+      .then((polygon) => this.splitPolygon(polygon, graphic));
+  }
+
+  private splitPolyline(polyline: Polyline, graphic: Graphic): Graphic[] {
+    if (1 < polyline.paths.length) {
+      const splitGeometries = polyline.paths.map((path) => {
+        const clonedGraphic = graphic.clone();
+        (clonedGraphic.geometry as Polyline).paths = [path];
+        return clonedGraphic;
+      });
+      this.layer.remove(graphic);
+      this.layer.addMany(splitGeometries);
+      return splitGeometries;
+    } else {
+      return [graphic];
+    }
+  }
+
+  private splitPolygon(polygon: Polygon, graphic: Graphic): Graphic[] {
+    if (1 < polygon.rings.length) {
+      const splitGeometries = polygon.rings.map((ring) => {
+        const clonedGraphic = graphic.clone();
+        (clonedGraphic.geometry as Polygon).rings = [ring];
+        return clonedGraphic;
+      });
+      this.layer.remove(graphic);
+      this.layer.addMany(splitGeometries);
+      return splitGeometries;
+    } else {
+      return [graphic];
+    }
   }
 
 }

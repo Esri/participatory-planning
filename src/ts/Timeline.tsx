@@ -49,7 +49,7 @@ export default class Timeline extends declared(WidgetBase) {
   private vectorTileLayer: Layer;
 
   @renderable()
-  @aliasOf("scene.map.presentation.slides")
+  @aliasOf("app.scene.map.presentation.slides")
   private slides: Collection<Slide>;
 
   private maskColor = new Color([226, 119, 40]);
@@ -75,8 +75,8 @@ export default class Timeline extends declared(WidgetBase) {
     const queryParams = document.location.search.substr(1);
     this.showIntroDialog = queryParams !== "skipTutorial";
 
-    this.scene.map.when(() => {
-      this.scene.map.layers.some((layer) => {
+    this.app.scene.map.when(() => {
+      this.app.scene.map.layers.some((layer) => {
         if (layer.type === "vector-tile") {
           this.vectorTileLayer = layer;
           return true;
@@ -85,15 +85,13 @@ export default class Timeline extends declared(WidgetBase) {
 
       this.maskPolygon = new Graphic({
         symbol: maskPolygonSymbol(this.maskColor.withAlpha(0)),
-        geometry: this.scene.maskPolygon,
+        geometry: this.app.scene.maskPolygon,
       } as any);
 
-      this.scene.sketchLayer.add(this.maskPolyline);
-      this.scene.sketchLayer.add(this.maskPolygon);
+      this.app.scene.sketchLayer.add(this.maskPolyline);
+      this.app.scene.sketchLayer.add(this.maskPolygon);
 
-      this.scene.map.ground.surfaceColor = new Color("#f0f0f0");
-
-      this.showIntro();
+      this.app.scene.map.ground.surfaceColor = new Color("#f0f0f0");
     });
 
     this.toggleElement("screenshot", false);
@@ -127,8 +125,8 @@ export default class Timeline extends declared(WidgetBase) {
 
   public showIntro(): IPromise {
     this.toggleLoadingIndicator(true);
-    this.scene.showMaskedBuildings("white");
-    this.scene.clear();
+    this.app.scene.showMaskedBuildings("white");
+    this.app.scene.clear();
     return this._goToSlide(this.slides.getItemAt(0))
       .then(() => {
         this._toggleBasemap(true);
@@ -144,7 +142,7 @@ export default class Timeline extends declared(WidgetBase) {
   public playIntroAnimation(): IPromise {
     this.toggleElement("intro", false);
     return this
-      .scene.whenNotUpdating()
+      .app.scene.whenNotUpdating()
       .then(() => {
         this.toggleOverlay(false);
         this.toggleLoadingIndicator(false);
@@ -159,7 +157,7 @@ export default class Timeline extends declared(WidgetBase) {
   public startPlanning() {
     this.toggleElement("intro", false);
     return this
-      .scene.whenNotUpdating()
+      .app.scene.whenNotUpdating()
       .then(() => {
         this.toggleOverlay(false);
         this.toggleLoadingIndicator(false);
@@ -167,29 +165,29 @@ export default class Timeline extends declared(WidgetBase) {
         this.toggleElement("screenshot", false);
         this._showFirstEditSlide();
         this._toggleBasemap(false);
-        this.scene.showMaskedBuildings();
+        this.app.scene.showMaskedBuildings();
       });
   }
 
   public takeScreenshot() {
-    const view = this.scene.view;
-    const width = Math.min(this.scene.view.width, this.scene.view.height);
+    const view = this.app.scene.view;
+    const width = Math.min(this.app.scene.view.width, this.app.scene.view.height);
     const options = { format: "png", width: width * 0.8 };
     this.toggleLoadingIndicator(true, "Capturing Scene");
 
     setTimeout(() => {
-      this.scene.whenNotUpdating()
+      this.app.scene.whenNotUpdating()
         .then(() => view.takeScreenshot(options))
         .then((after) => {
-          this.scene.showTexturedBuildings();
+          this.app.scene.showTexturedBuildings();
           this._toggleBasemap(true);
           setTimeout(() => {
-            this.scene.whenNotUpdating()
+            this.app.scene.whenNotUpdating()
               .then(() => view.takeScreenshot(options))
               .then((before) => {
                 this._showScreenshot(before, after);
 
-                this.scene.showMaskedBuildings();
+                this.app.scene.showMaskedBuildings();
                 this._toggleBasemap(false);
               });
           }, 100);
@@ -238,7 +236,7 @@ export default class Timeline extends declared(WidgetBase) {
   private _showFirstEditSlide(): IPromise {
     return this
       ._goToSlide(this.slides.getItemAt(2))
-      .then(() => this.scene.showMaskedBuildings());
+      .then(() => this.app.scene.showMaskedBuildings());
   }
 
   private _showScreenshot(before: __esri.Screenshot, after: __esri.Screenshot) {
@@ -261,14 +259,14 @@ export default class Timeline extends declared(WidgetBase) {
   }
 
   private _goToSlide(slide: Slide, duration = 800): IPromise {
-    const view = this.scene.view;
+    const view = this.app.scene.view;
     return view.goTo(slide.viewpoint, { duration }).then(() => {
 
       view.set("environment.lighting.ambientOcclusionEnabled", true);
       view.set("environment.lighting.date", "Thu Jun 20 2019 11:40:00 GMT-0500");
 
       // Wait for all layers to update after applying a new slide
-      return this.scene.whenNotUpdating();
+      return this.app.scene.whenNotUpdating();
 
       // Catching any exceptions in case animation gets canceled
     }).catch(console.log);
@@ -345,7 +343,7 @@ export default class Timeline extends declared(WidgetBase) {
     const timeline = anime.timeline({
       update: () => {
         this.maskPolygon.symbol = maskPolygonSymbol(color);
-        this.scene.showMaskedBuildings(buildingColor);
+        this.app.scene.showMaskedBuildings(buildingColor);
       },
     }).add({
       targets: [color, buildingColor],
@@ -370,9 +368,9 @@ export default class Timeline extends declared(WidgetBase) {
   }
 
   private _toggleBasemap(show: boolean): IPromise {
-    this.scene.map.basemap = (show ? "satellite" : null) as any;
+    this.app.scene.map.basemap = (show ? "satellite" : null) as any;
     this.vectorTileLayer.visible = !show;
-    return this.scene.whenNotUpdating();
+    return this.app.scene.whenNotUpdating();
   }
 
 }

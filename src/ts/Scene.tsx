@@ -74,9 +74,6 @@ export default class Scene extends declared(Widget) {
   })
   public readonly sketchLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" }});
 
-  @property()
-  public currentOperation: Operation | null;
-
   public readonly maskPolygon = new Polygon({
     rings: [MASK_AREA],
     spatialReference: SpatialReference.WebMercator,
@@ -139,26 +136,6 @@ export default class Scene extends declared(Widget) {
       this.view.whenLayerView(this.sceneLayer).then((lv: SceneLayerView) => {
         this.sceneLayerView = lv;
       });
-      this.showMaskedBuildings("white");
-    });
-
-    this.watch("currentOperation", () => {
-      this._dimmUpperLayers();
-      if (this.currentOperation) {
-        this.currentOperation.finished.always(() => {
-          this.adjustSymbolHeights();
-        });
-      }
-    });
-
-    this.view.on("key-down", (event) => {
-      if (this.currentOperation) {
-        if (event.key === "Escape") {
-          this.currentOperation.cancel();
-        } else if (event.key === "Delete" || event.key === "Backspace") {
-          this.currentOperation.cancel(true);
-        }
-      }
     });
   }
 
@@ -171,7 +148,7 @@ export default class Scene extends declared(Widget) {
   }
 
   public clear() {
-    this._drawLayers().forEach((layer) => layer.removeAll());
+    this.drawLayers().forEach((layer) => layer.removeAll());
   }
 
   public showMaskedBuildings(color?: any) {
@@ -206,7 +183,7 @@ export default class Scene extends declared(Widget) {
           },
         } as any;
       this.sceneLayerView.set("filter", null);
-      this._drawLayers().forEach((layer) => layer.visible = false);
+      this.drawLayers().forEach((layer) => layer.visible = false);
     } else {
 
       // Do not show masked buildings and dimm surounding ones
@@ -229,7 +206,7 @@ export default class Scene extends declared(Widget) {
         },
       } as any);
       this.sceneLayerView.filter = this.sceneLayerFilter;
-      this._drawLayers().forEach((layer) => layer.visible = true);
+      this.drawLayers().forEach((layer) => layer.visible = true);
       this.boundingPolygonGraphic.symbol = {
           type: "simple-fill",
           color: [0, 0, 0, 0.15],
@@ -246,7 +223,7 @@ export default class Scene extends declared(Widget) {
 
   public showTexturedBuildings() {
     this.texturedBuildings.visible = true;
-    this._drawLayers().forEach((layer) => layer.visible = false);
+    this.drawLayers().forEach((layer) => layer.visible = false);
     this.sceneLayer.visible = false;
     this.boundingPolygonGraphic.symbol = {
         type: "simple-fill",
@@ -258,7 +235,7 @@ export default class Scene extends declared(Widget) {
   }
 
   public adjustSymbolHeights() {
-    this._drawLayers().forEach((layer) => {
+    this.drawLayers().forEach((layer) => {
       if (layer.get("elevationInfo.mode") === "relative-to-ground") {
         layer.graphics.toArray().forEach((graphic) => {
           this.adjustHeight(graphic);
@@ -280,7 +257,7 @@ export default class Scene extends declared(Widget) {
   }
 
   public heightAtPoint(mapPoint: Point): number {
-    return this._drawLayers().reduceRight((max1, layer) => {
+    return this.drawLayers().reduceRight((max1, layer) => {
       return layer.graphics.reduceRight((max2, graphic) => {
         const layers = graphic.get<any>("symbol.symbolLayers");
         const extrusion = layers && layers.getItemAt(0).size;
@@ -306,18 +283,7 @@ export default class Scene extends declared(Widget) {
     });
   }
 
-  private _dimmUpperLayers() {
-    const activeLayer = this.currentOperation ? this.currentOperation.widget.layer : null;
-    let dimmFactor = 1;
-    this._drawLayers().forEach((layer) => {
-      layer.opacity = dimmFactor;
-      if (layer === activeLayer) {
-        dimmFactor = 0.2;
-      }
-    });
-  }
-
-  private _drawLayers(): Collection<GraphicsLayer> {
+  public drawLayers(): Collection<GraphicsLayer> {
     return this.map.layers.filter((layer) => {
       if (layer instanceof GraphicsLayer) {
         return layer !== this.sketchLayer;

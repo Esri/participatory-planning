@@ -1,6 +1,5 @@
 
 import DrawWidget from "./DrawWidget";
-import UpdateOperation from "./operation/UpdateOperation";
 import GlTFImport from "./support/GlTFImport";
 
 // esri
@@ -87,9 +86,9 @@ export default class GlTFWidget extends declared(DrawWidget) {
 
       this.toggleLoadingIndicator(false);
 
-      const point = this.scene.maskPolygon.centroid;
+      const point = this.app.scene.maskPolygon.centroid;
       point.hasZ = true;
-      point.z = this.scene.heightAtPoint(point);
+      point.z = this.app.scene.heightAtPoint(point);
 
       const graphic = new Graphic({
         geometry: point,

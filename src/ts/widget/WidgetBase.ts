@@ -1,19 +1,21 @@
 
 // esri
 import {
+  aliasOf,
   declared,
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
 import Widget from "esri/widgets/Widget";
 
+import App from "../App";
 import Scene from "../Scene";
 
 @subclass("app.widgets.WidgetBase")
 export default class WidgetBase extends declared(Widget) {
 
   @property()
-  public scene: Scene;
+  public app: App;
 
   constructor(params: any = {}) {
     super(params);

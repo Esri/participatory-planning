@@ -8,7 +8,10 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
+import Graphic = require("esri/Graphic");
+import SimpleLineSymbol = require("esri/symbols/SimpleLineSymbol");
 import { renderable, tsx } from "esri/widgets/support/widget";
+import DrawPolyline from "./operation/DrawPolyline";
 
 interface PathMenu {
   label: string;
@@ -54,16 +57,20 @@ export default class CreatePath extends declared(DrawWidget) {
     );
   }
 
+  public updateGraphic(graphic: Graphic): IPromise<Graphic[]> {
+    return this.updatePolylineGraphic(graphic, graphic.symbol.color.toHex());
+  }
+
   private _startDrawing(menu: PathMenu) {
-    this.activeMenu = menu;
-    this.createPolyline(new Color(menu.color)).then((newPath) => {
-      newPath.symbol = {
-        type: "simple-line",
-        color: menu.color,
-        width: menu.width,
-      } as any;
+    const symbol = new SimpleLineSymbol({
+      color: menu.color,
+      width: menu.width,
+    });
+
+    this.createPolylineGraphic(symbol, menu.color).always(() => {
       this.activeMenu = null;
     });
+    this.activeMenu = menu;
   }
 
 }

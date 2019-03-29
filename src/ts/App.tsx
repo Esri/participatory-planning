@@ -19,12 +19,14 @@ import GlTFWidget from "./widget/GlTFWidget";
 import SymbolGallery, { SymbolGroupId } from "./widget/SymbolGallery";
 import WidgetBase from "./widget/WidgetBase";
 
-const scene = new Scene();
-
 interface MainMenu {
   label: string;
   iconName: string;
   onClick: (element: HTMLElement) => void;
+}
+
+export interface Operation {
+  cancel(): void;
 }
 
 @subclass("app.widgets.webmapview")
@@ -34,17 +36,31 @@ export default class App extends declared(WidgetBase) {
   @renderable()
   public title: string;
 
-  private timeline = new Timeline({scene});
+  @property()
+  public scene = new Scene();
 
-  private createArea = new CreateArea({scene});
+  public set currentOperation(operation: Operation | null) {
+    if (this.operation) {
+      this.operation.cancel();
+    }
+    this.operation = operation;
+  }
 
-  private createPath = new CreatePath({scene});
+  public get currentOperation(): Operation | null {
+    return this.operation;
+  }
 
-  private createBuilding = new CreateBuilding({scene});
+  private timeline = new Timeline({app: this});
 
-  private symbolGallery = new SymbolGallery({scene});
+  private createArea = new CreateArea({app: this});
 
-  private glTFWidget = new GlTFWidget({scene});
+  private createPath = new CreatePath({app: this});
+
+  private createBuilding = new CreateBuilding({app: this});
+
+  private symbolGallery = new SymbolGallery({app: this});
+
+  private glTFWidget = new GlTFWidget({app: this});
 
   @property()
   private selectedWidget: DrawWidget | null = null;
@@ -55,10 +71,7 @@ export default class App extends declared(WidgetBase) {
 
   private menuButtons: HTMLElement[] = [];
 
-  public constructor() {
-    super();
-    this.scene = scene;
-  }
+  private operation: Operation | null;
 
   public postInitialize() {
     const view = this.scene.view;
@@ -67,7 +80,7 @@ export default class App extends declared(WidgetBase) {
         console.log("[" + event.mapPoint.x + ", " + event.mapPoint.y + "]", event);
       }
 
-      if (!this.scene.currentOperation) {
+      if (!this.currentOperation) {
         view.hitTest(event)
         .then((response) => {
           // check if a feature is returned from the hurricanesLayer
@@ -250,8 +263,8 @@ export default class App extends declared(WidgetBase) {
   private _reset() {
     this._hideWidget();
     // Cancel any ongoing operation
-    if (this.scene.currentOperation) {
-      this.scene.currentOperation.cancel();
+    if (this.currentOperation) {
+      this.currentOperation.cancel();
     }
   }
 

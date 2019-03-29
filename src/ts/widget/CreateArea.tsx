@@ -8,7 +8,10 @@ import {
   property,
   subclass,
 } from "esri/core/accessorSupport/decorators";
+import Graphic = require("esri/Graphic");
+import SimpleFillSymbol = require("esri/symbols/SimpleFillSymbol");
 import { renderable, tsx } from "esri/widgets/support/widget";
+import DrawPolygon from "./operation/DrawPolygon";
 
 interface ColorMenu {
   label: string;
@@ -59,18 +62,23 @@ export default class CreateArea extends declared(DrawWidget) {
     );
   }
 
-  private _startDrawing(color: string, sketchColor: string = color) {
-    this.activeColor = color;
-    this.createPolygon(new Color(sketchColor)).then((newArea) => {
-      newArea.symbol = {
-        type: "simple-fill",
-        color: this.activeColor,
-        outline: {
-          width: 0,
-        },
-      } as any;
+  public updateGraphic(graphic: Graphic): IPromise<Graphic[]> {
+    return this.updatePolygonGraphic(graphic, graphic.symbol.color.toHex());
+  }
+
+  private _startDrawing(color: string) {
+
+    const symbol = new SimpleFillSymbol({
+      color,
+      outline: {
+        width: 0,
+      },
+    });
+
+    this.createPolygonGraphic(symbol, color).always(() => {
       this.activeColor = null;
     });
+    this.activeColor = color;
   }
 
 }

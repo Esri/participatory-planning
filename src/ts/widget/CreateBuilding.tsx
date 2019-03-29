@@ -12,7 +12,11 @@ import PolygonSymbol3D from "esri/symbols/PolygonSymbol3D";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
+import DrawPolygon from "./operation/DrawPolygon";
 import "./support/extensions";
+
+const BUILDING_COLOR = "#FFFFFF";
+const BUILDING_FLOOR_HEIGHT = 3;
 
 @subclass("app.draw.CreateBuilding")
 export default class CreateBuilding extends declared(DrawWidget) {
@@ -39,38 +43,33 @@ export default class CreateBuilding extends declared(DrawWidget) {
     );
   }
 
-  public updateGraphic(buildingGraphic: Graphic) {
-    const size = this._getSize(buildingGraphic);
-    buildingGraphic.symbol = this._createSymbol(size, 0.5);
-    this.update(buildingGraphic).then((updatedBuilding) => {
-      updatedBuilding.symbol = this._createSymbol(size, 1);
-    });
+  public updateGraphic(graphic: Graphic): IPromise<Graphic[]> {
+    return this.updatePolygonGraphic(graphic, BUILDING_COLOR);
   }
 
   private _startDrawing(stories: number) {
-    this.stories = stories;
-    this.createPolygon(new Color("#d6bb7a"))
-    .then((newBuilding) => {
-      newBuilding.symbol = this._createSymbol(stories * 3, 1);
-      this.stories = 0;
-    });
-  }
 
-  private _createSymbol(size: number, opacity: number): any {
-    return {
-      type: "polygon-3d",
+    const size = stories * BUILDING_FLOOR_HEIGHT;
+
+    const color = BUILDING_COLOR;
+
+    const symbol = new PolygonSymbol3D({
       symbolLayers: [{
         type: "extrude",
         material: {
-          color: [255, 255, 255, opacity],
+          color,
         },
         edges: {
           type: "solid",
           color: [100, 100, 100],
         },
         size,
-      }],
-    };
+      }] as any,
+    });
+    this.createPolygonGraphic(symbol, color).always(() => {
+      this.stories = 0;
+    });
+    this.stories = stories;
   }
 
   private _getSize(buildingGraphic: Graphic): number {

@@ -4,7 +4,6 @@ import DrawWidget from "./DrawWidget";
 
 // esri
 import {
-  aliasOf,
   declared,
   property,
   subclass,
@@ -17,6 +16,7 @@ import PortalQueryResult from "esri/portal/PortalQueryResult";
 import EsriSymbol from "esri/symbols/Symbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
+import DrawPoint from "./operation/DrawPoint";
 import SymbolGroup from "./SymbolGallery/SymbolGroup";
 import SymbolItem from "./SymbolGallery/SymbolItem";
 
@@ -104,8 +104,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
   }
 
   private _placeSymbol(symbol: EsriSymbol) {
-    this.createPoint(symbol).then((graphic) => {
-      // Continue placing the same symbol
+    this.createPointGraphic(symbol).then((graphic) => {
       this._placeSymbol(graphic.symbol);
     });
   }
