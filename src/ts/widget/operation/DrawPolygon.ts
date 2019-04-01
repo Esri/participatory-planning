@@ -1,5 +1,3 @@
-import "../support/extensions";
-
 import Color from "esri/Color";
 import Polygon from "esri/geometry/Polygon";
 import Graphic from "esri/Graphic";

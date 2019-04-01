@@ -1,5 +1,3 @@
-import "../support/extensions";
-
 import Geometry from "esri/geometry/Geometry";
 import geometryEngine from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";

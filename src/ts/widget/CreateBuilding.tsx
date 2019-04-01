@@ -1,5 +1,3 @@
-import "./support/extensions";
-
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import PolygonSymbol3D from "esri/symbols/PolygonSymbol3D";

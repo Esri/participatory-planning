@@ -1,5 +1,3 @@
-import "../support/extensions";
-
 import Point from "esri/geometry/Point";
 import Graphic from "esri/Graphic";
 

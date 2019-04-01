@@ -1,5 +1,3 @@
-import "./widget/support/extensions";
-
 import anime from "animejs";
 import Color from "esri/Color";
 import { aliasOf, declared, subclass } from "esri/core/accessorSupport/decorators";
