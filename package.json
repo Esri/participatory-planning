@@ -6,7 +6,7 @@
     "@types/animejs": "^2.0.1",
     "@types/sinon": "^5.0.5",
     "animejs": "^3.0.1",
-    "arcgis-js-api": "http://jscore.esri.com/people/rene/arcgis-js-api.tgz",
+    "arcgis-js-api": "4.11.1",
     "calcite-web": "github:esri/calcite-web",
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "4.5.2",
@@ -33,7 +33,6 @@
   },
   "license": "Apache-2.0",
   "scripts": {
-    "prepare": "mkdir -p typings/arcgis-js-api && curl -o typings/arcgis-js-api/index.d.ts https://jscore.esri.com/javascript/latest/api-reference/typings/arcgis-js-api-4.11.d.ts",
     "start": "webpack-dev-server --mode development --open",
     "build": "webpack --mode production",
     "serve": "webpack-dev-server --mode production --open --https --compress",
@@ -41,7 +40,7 @@
     "lint": "tslint --fix \"src/**/*.ts?(x)\""
   },
   "dependencies": {
-    "@arcgis/webpack-plugin": "~4.10.0"
+    "@arcgis/webpack-plugin": "~4.11.0"
   },
   "arcgis": {
     "type": "jsapi"
