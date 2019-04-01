@@ -76,7 +76,8 @@ export default class GlTFWidget extends declared(DrawWidget) {
 
       this.toggleLoadingIndicator(false);
 
-      const point = this.app.scene.maskPolygon.centroid;
+      // Place imported glTF in center of view
+      const point = this.app.scene.view.center.clone();
       point.hasZ = true;
       point.z = this.app.scene.heightAtPoint(point);
 
