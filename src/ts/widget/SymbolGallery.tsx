@@ -1,13 +1,6 @@
 
-import Scene from "../Scene";
-import DrawWidget from "./DrawWidget";
-
 // esri
-import {
-  declared,
-  property,
-  subclass,
-} from "esri/core/accessorSupport/decorators";
+import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import Portal from "esri/portal/Portal";
 import PortalItem from "esri/portal/PortalItem";
@@ -15,8 +8,8 @@ import PortalQueryParams from "esri/portal/PortalQueryParams";
 import PortalQueryResult from "esri/portal/PortalQueryResult";
 import EsriSymbol from "esri/symbols/Symbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
-
-import DrawPoint from "./operation/DrawPoint";
+import Scene from "../Scene";
+import DrawWidget from "./DrawWidget";
 import SymbolGroup from "./SymbolGallery/SymbolGroup";
 import SymbolItem from "./SymbolGallery/SymbolItem";
 

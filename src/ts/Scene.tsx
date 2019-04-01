@@ -1,10 +1,6 @@
 
 // esri
-import {
-  declared,
-  property,
-  subclass,
-} from "esri/core/accessorSupport/decorators";
+import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import { eachAlways } from "esri/core/promiseUtils";
 import { whenNotOnce } from "esri/core/watchUtils";
@@ -23,9 +19,7 @@ import SceneView from "esri/views/SceneView";
 import WebScene from "esri/WebScene";
 import { tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
-
 import { computeBoundingPolygon } from "./support/geometry";
-import Operation from "./widget/operation/Operation";
 
 // Constants
 

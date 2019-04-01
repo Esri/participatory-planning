@@ -1,17 +1,10 @@
 
+import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { renderable, tsx } from "esri/widgets/support/widget";
 import DrawWidget from "./DrawWidget";
 
-// esri
-import Color from "esri/Color";
-import {
-  declared,
-  property,
-  subclass,
-} from "esri/core/accessorSupport/decorators";
-import Graphic = require("esri/Graphic");
-import SimpleFillSymbol = require("esri/symbols/SimpleFillSymbol");
-import { renderable, tsx } from "esri/widgets/support/widget";
-import DrawPolygon from "./operation/DrawPolygon";
+import Graphic from "esri/Graphic";
+import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
 
 interface ColorMenu {
   label: string;

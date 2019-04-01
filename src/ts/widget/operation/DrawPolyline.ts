@@ -1,9 +1,8 @@
 
-import Color = require("esri/Color");
+import Color from "esri/Color";
 import Polyline from "esri/geometry/Polyline";
 import Graphic from "esri/Graphic";
-import SketchViewModel = require("esri/widgets/Sketch/SketchViewModel");
-
+import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import DrawWidget from "../DrawWidget";
 import "../support/extensions";
 import DrawGeometry from "./DrawGeometry";

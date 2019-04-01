@@ -1,26 +1,17 @@
 
 // esri
+// animejs
+import anime from "animejs";
 import Color from "esri/Color";
-import {
-  aliasOf,
-  declared,
-  subclass,
-} from "esri/core/accessorSupport/decorators";
+import { aliasOf, declared, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import Layer from "esri/layers/Layer";
 import Slide from "esri/webscene/Slide";
-import {
-  renderable,
-  tsx,
-} from "esri/widgets/support/widget";
-
-// animejs
-import anime from "animejs";
-
-import {MASK_AREA} from "./Scene";
+import { renderable, tsx } from "esri/widgets/support/widget";
+import { MASK_AREA } from "./Scene";
 import { dojoPromise } from "./support/promises";
 import "./widget/support/extensions";
 import WidgetBase from "./widget/WidgetBase";

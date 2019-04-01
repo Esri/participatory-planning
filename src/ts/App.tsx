@@ -1,14 +1,8 @@
 
-import {
-  aliasOf,
-  declared,
-  property,
-  subclass,
-} from "esri/core/accessorSupport/decorators";
+import { aliasOf, declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import { renderable, tsx } from "esri/widgets/support/widget";
-
 import Scene from "./Scene";
 import Timeline from "./Timeline";
 import CreateArea from "./widget/CreateArea";

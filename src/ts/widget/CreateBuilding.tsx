@@ -1,18 +1,11 @@
 
 // esri
-import Color from "esri/Color";
-import {
-  declared,
-  property,
-  subclass,
-} from "esri/core/accessorSupport/decorators";
+import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import ExtrudeSymbol3DLayer from "esri/symbols/ExtrudeSymbol3DLayer";
 import PolygonSymbol3D from "esri/symbols/PolygonSymbol3D";
 import { renderable, tsx } from "esri/widgets/support/widget";
-
 import DrawWidget from "./DrawWidget";
-import DrawPolygon from "./operation/DrawPolygon";
 import "./support/extensions";
 
 const BUILDING_COLOR = "#FFFFFF";

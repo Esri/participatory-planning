@@ -1,9 +1,5 @@
 import Accessor from "esri/core/Accessor";
-import {
-  declared,
-  property,
-  subclass,
-} from "esri/core/accessorSupport/decorators";
+import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import PortalItem from "esri/portal/PortalItem";
 import { SymbolGroupId } from "../SymbolGallery";

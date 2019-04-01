@@ -1,21 +1,11 @@
 
-import DrawWidget from "./DrawWidget";
-import GlTFImport from "./support/GlTFImport";
-
-// esri
-import Color from "esri/Color";
-import {
-  aliasOf,
-  declared,
-  property,
-  subclass,
-} from "esri/core/accessorSupport/decorators";
-import Point from "esri/geometry/Point";
+import { aliasOf, declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
-import GraphicsLayer from "esri/layers/GraphicsLayer";
 import ObjectSymbol3DLayer from "esri/symbols/ObjectSymbol3DLayer";
 import PointSymbol3D from "esri/symbols/PointSymbol3D";
 import { renderable, tsx } from "esri/widgets/support/widget";
+import DrawWidget from "./DrawWidget";
+import GlTFImport from "./support/GlTFImport";
 
 enum GlTFWidgetState {
   Import = "Import",

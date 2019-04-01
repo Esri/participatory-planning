@@ -1,16 +1,14 @@
 
-import Geometry from "esri/geometry/Geometry";
 import Polygon from "esri/geometry/Polygon";
 import Graphic from "esri/Graphic";
-import SimpleFillSymbol = require("esri/symbols/SimpleFillSymbol");
-import EsriSymbol from "esri/symbols/Symbol";
-import SketchViewModel = require("esri/widgets/Sketch/SketchViewModel");
-
-import Color = require("esri/Color");
-import SimpleLineSymbol = require("esri/symbols/SimpleLineSymbol");
+import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
+import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import DrawWidget from "../DrawWidget";
 import "../support/extensions";
 import DrawGeometry from "./DrawGeometry";
+
+import Color from "esri/Color";
+import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
 
 export default class DrawPolygon extends DrawGeometry<Polygon> {
 

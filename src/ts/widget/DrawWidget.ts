@@ -1,22 +1,11 @@
 
-import Color from "esri/Color";
-import {
-  declared,
-  property,
-  subclass,
-} from "esri/core/accessorSupport/decorators";
+import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import { whenOnce } from "esri/core/watchUtils";
-import Point from "esri/geometry/Point";
 import Polygon from "esri/geometry/Polygon";
 import Polyline from "esri/geometry/Polyline";
+import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import EsriSymbol from "esri/symbols/Symbol";
-
-import Geometry = require("esri/geometry/Geometry");
-import Graphic from "esri/Graphic";
-import SimpleFillSymbol = require("esri/symbols/SimpleFillSymbol");
-import SimpleLineSymbol = require("esri/symbols/SimpleLineSymbol");
-import DrawGeometry from "./operation/DrawGeometry";
 import DrawPoint from "./operation/DrawPoint";
 import DrawPolygon from "./operation/DrawPolygon";
 import DrawPolyline from "./operation/DrawPolyline";

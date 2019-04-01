@@ -1,12 +1,8 @@
 
 import Geometry from "esri/geometry/Geometry";
 import geometryEngine from "esri/geometry/geometryEngine";
-import Graphic from "esri/Graphic";
-
 import Point from "esri/geometry/Point";
-import GraphicsLayer from "esri/layers/GraphicsLayer";
-import Draw from "esri/views/draw/Draw";
-import GraphicsLayerView = require("esri/views/layers/GraphicsLayerView");
+import Graphic from "esri/Graphic";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import Scene from "../../Scene";
 import DrawWidget from "../DrawWidget";
@@ -86,7 +82,7 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
         sketchGraphic.geometry.hasZ = false;
       }
 
-      sketchViewModel.update(sketchGraphic, {tool: "reshape"});
+      sketchViewModel.update(sketchGraphic, { tool: "reshape" });
 
       if (hasZ) {
         sketchGraphic.geometry = lastGeometry;
@@ -174,17 +170,6 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
       return event.graphics[0];
     }
     return event.graphic;
-  }
-
-  // Move this to widgets
-  private toggleLayers(widgetLayer: GraphicsLayer, dimm: boolean) {
-    let dimmFactor = 1;
-    this.scene.drawLayers().forEach((layer) => {
-      layer.opacity = dimmFactor;
-      if (dimm && layer === widgetLayer) {
-        dimmFactor = 0.9;
-      }
-    });
   }
 
 }

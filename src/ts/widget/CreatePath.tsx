@@ -1,17 +1,10 @@
 
+import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { renderable, tsx } from "esri/widgets/support/widget";
 import DrawWidget from "./DrawWidget";
 
-// esri
-import Color from "esri/Color";
-import {
-  declared,
-  property,
-  subclass,
-} from "esri/core/accessorSupport/decorators";
-import Graphic = require("esri/Graphic");
-import SimpleLineSymbol = require("esri/symbols/SimpleLineSymbol");
-import { renderable, tsx } from "esri/widgets/support/widget";
-import DrawPolyline from "./operation/DrawPolyline";
+import Graphic from "esri/Graphic";
+import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
 
 interface PathMenu {
   label: string;

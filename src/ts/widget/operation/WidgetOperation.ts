@@ -1,6 +1,5 @@
 
 import { create as createPromise } from "esri/core/promiseUtils";
-
 import { Operation } from "../../App";
 import DrawWidget from "../DrawWidget";
 
