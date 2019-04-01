@@ -69,7 +69,7 @@ export default class App extends declared(WidgetBase) {
 
   public postInitialize() {
     const view = this.scene.view;
-    view.on("click", (event: any) => {
+    view.on("click", (event) => {
       if (event.mapPoint) {
         console.log("[" + event.mapPoint.x + ", " + event.mapPoint.y + "]", event);
       }

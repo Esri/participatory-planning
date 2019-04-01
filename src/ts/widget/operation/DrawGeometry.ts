@@ -32,10 +32,11 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
     const sketchViewModel = this.createSketchViewModel();
 
     const keyEventListener = this.scene.view.on("key-down", (event) => {
-      if (event.key === "Escape") {
-        this.cancel();
-      } else if (event.key === "Delete" || event.key === "Backspace") {
-        this.widget.layer.remove(this.graphic);
+      const remove = (event.key === "Delete" || event.key === "Backspace");
+      if (remove || event.key === "Escape") {
+        if (remove || create) {
+          this.widget.layer.remove(this.graphic);
+        }
         this.cancel();
       }
     });
@@ -58,11 +59,15 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
     // Clean up
     promise.always(() => {
+      // Cleanup resources
       keyEventListener.remove();
       sketchViewModel.cancel();
       sketchViewModel.destroy();
+
+      // Reset scene
       this.scene.view.highlightOptions.haloOpacity = haloOpacity;
       this.scene.view.highlightOptions.fillOpacity = fillOpacity;
+      this.scene.adjustSymbolHeights();
     });
 
     return promise;
@@ -99,19 +104,13 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
     }
 
     if (event.state === "cancel" || sketch === null) {
+      if (event.type === "create") {
+        this.widget.layer.remove(this.graphic);
+      }
       handle.reject();
     } else {
       const geometry = this.geometryFromSketch(sketch);
-      if (geometry) {
-        this.graphic.geometry = geometry;
-        this.graphic.visible = true;
-      } else {
-        this.graphic.visible = false;
-      }
-
-      if (!this.graphic.layer) {
-        this.widget.layer.add(this.graphic);
-      }
+      this.updateGraphicFromGeometry(geometry);
 
       if (event.state === "complete") {
         if (geometry) {
@@ -138,6 +137,19 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
   protected geometryFromSketch(sketchGraphic: Graphic): G | null {
     return sketchGraphic.geometry.clone() as G;
+  }
+
+  protected updateGraphicFromGeometry(geometry: G | null) {
+    if (geometry) {
+      this.graphic.geometry = geometry;
+      this.graphic.visible = true;
+
+      if (!this.graphic.layer) {
+        this.widget.layer.add(this.graphic);
+      }
+    } else {
+      this.graphic.visible = false;
+    }
   }
 
   protected clippedGeometry<T extends Geometry>(geometry: T): T | null {
