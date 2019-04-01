@@ -1,6 +1,5 @@
+import "./widget/support/extensions";
 
-// esri
-// animejs
 import anime from "animejs";
 import Color from "esri/Color";
 import { aliasOf, declared, subclass } from "esri/core/accessorSupport/decorators";
@@ -11,11 +10,13 @@ import Graphic from "esri/Graphic";
 import Layer from "esri/layers/Layer";
 import Slide from "esri/webscene/Slide";
 import { renderable, tsx } from "esri/widgets/support/widget";
+
 import { MASK_AREA } from "./Scene";
 import { dojoPromise } from "./support/promises";
-import "./widget/support/extensions";
 import WidgetBase from "./widget/WidgetBase";
 
+// esri
+// animejs
 export const AREA_ANIMATION_DURATION = 2000;
 export const MASK_ANIMATION_DURATION = 1000;
 
@@ -74,8 +75,10 @@ export default class Timeline extends declared(WidgetBase) {
         }
       });
 
+      const color = this.maskColor.clone();
+      color.a = 0;
       this.maskPolygon = new Graphic({
-        symbol: maskPolygonSymbol(this.maskColor.withAlpha(0)),
+        symbol: maskPolygonSymbol(color),
         geometry: this.app.scene.maskPolygon,
       } as any);
 

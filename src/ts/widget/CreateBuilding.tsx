@@ -1,13 +1,13 @@
-
-// esri
-import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
-import Graphic from "esri/Graphic";
-import ExtrudeSymbol3DLayer from "esri/symbols/ExtrudeSymbol3DLayer";
-import PolygonSymbol3D from "esri/symbols/PolygonSymbol3D";
-import { renderable, tsx } from "esri/widgets/support/widget";
-import DrawWidget from "./DrawWidget";
 import "./support/extensions";
 
+import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import Graphic from "esri/Graphic";
+import PolygonSymbol3D from "esri/symbols/PolygonSymbol3D";
+import { renderable, tsx } from "esri/widgets/support/widget";
+
+import DrawWidget from "./DrawWidget";
+
+// esri
 const BUILDING_COLOR = "#FFFFFF";
 const BUILDING_FLOOR_HEIGHT = 3;
 
@@ -63,14 +63,6 @@ export default class CreateBuilding extends declared(DrawWidget) {
       this.stories = 0;
     });
     this.stories = stories;
-  }
-
-  private _getSize(buildingGraphic: Graphic): number {
-    const layers = (buildingGraphic.symbol as PolygonSymbol3D).symbolLayers;
-    if (layers && layers.length) {
-      return (layers.getItemAt(0) as ExtrudeSymbol3DLayer).size;
-    }
-    return 9;
   }
 
 }

@@ -1,5 +1,3 @@
-
-// esri
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import Portal from "esri/portal/Portal";
@@ -8,11 +6,13 @@ import PortalQueryParams from "esri/portal/PortalQueryParams";
 import PortalQueryResult from "esri/portal/PortalQueryResult";
 import EsriSymbol from "esri/symbols/Symbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
+
 import Scene from "../Scene";
 import DrawWidget from "./DrawWidget";
 import SymbolGroup from "./SymbolGallery/SymbolGroup";
 import SymbolItem from "./SymbolGallery/SymbolItem";
 
+// esri
 export enum SymbolGroupId {
   Icons = "EsriIconsStyle",
   Trees = "EsriRealisticTreesStyle",

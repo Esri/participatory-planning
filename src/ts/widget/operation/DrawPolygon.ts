@@ -1,14 +1,12 @@
-
-import Polygon from "esri/geometry/Polygon";
-import Graphic from "esri/Graphic";
-import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
-import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
-import DrawWidget from "../DrawWidget";
 import "../support/extensions";
-import DrawGeometry from "./DrawGeometry";
 
 import Color from "esri/Color";
-import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
+import Polygon from "esri/geometry/Polygon";
+import Graphic from "esri/Graphic";
+import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
+
+import DrawWidget from "../DrawWidget";
+import DrawGeometry from "./DrawGeometry";
 
 export default class DrawPolygon extends DrawGeometry<Polygon> {
 

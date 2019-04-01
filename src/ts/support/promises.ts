@@ -1,4 +1,3 @@
-
 import { create as createPromise } from "esri/core/promiseUtils";
 
 export const dojoPromise = <T>(nativePromise: Promise<T>): IPromise<T> => {

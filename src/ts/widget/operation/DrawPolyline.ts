@@ -1,10 +1,11 @@
+import "../support/extensions";
 
 import Color from "esri/Color";
 import Polyline from "esri/geometry/Polyline";
 import Graphic from "esri/Graphic";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
+
 import DrawWidget from "../DrawWidget";
-import "../support/extensions";
 import DrawGeometry from "./DrawGeometry";
 
 export default class DrawPolyline extends DrawGeometry<Polyline> {

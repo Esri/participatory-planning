@@ -1,4 +1,3 @@
-
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import { whenOnce } from "esri/core/watchUtils";
 import Polygon from "esri/geometry/Polygon";
@@ -6,6 +5,7 @@ import Polyline from "esri/geometry/Polyline";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import EsriSymbol from "esri/symbols/Symbol";
+
 import DrawPoint from "./operation/DrawPoint";
 import DrawPolygon from "./operation/DrawPolygon";
 import DrawPolyline from "./operation/DrawPolyline";

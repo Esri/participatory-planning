@@ -1,12 +1,13 @@
+import "../support/extensions";
 
 import Geometry from "esri/geometry/Geometry";
 import geometryEngine from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
 import Graphic from "esri/Graphic";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
+
 import Scene from "../../Scene";
 import DrawWidget from "../DrawWidget";
-import "../support/extensions";
 import WidgetOperation, { OperationHandle } from "./WidgetOperation";
 
 export default class DrawGeometry<G extends Geometry> extends WidgetOperation {

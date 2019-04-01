@@ -2,6 +2,7 @@ import Accessor from "esri/core/Accessor";
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import EsriSymbol from "esri/symbols/Symbol";
 import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
+
 import SymbolGroup from "./SymbolGroup";
 
 @subclass("widgets.symbolgallery.SymbolItem")

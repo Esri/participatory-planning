@@ -1,10 +1,9 @@
-
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
-import { renderable, tsx } from "esri/widgets/support/widget";
-import DrawWidget from "./DrawWidget";
-
 import Graphic from "esri/Graphic";
 import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
+import { renderable, tsx } from "esri/widgets/support/widget";
+
+import DrawWidget from "./DrawWidget";
 
 interface PathMenu {
   label: string;

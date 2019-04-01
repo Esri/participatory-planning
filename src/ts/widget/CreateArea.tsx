@@ -1,10 +1,9 @@
-
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
-import { renderable, tsx } from "esri/widgets/support/widget";
-import DrawWidget from "./DrawWidget";
-
 import Graphic from "esri/Graphic";
 import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
+import { renderable, tsx } from "esri/widgets/support/widget";
+
+import DrawWidget from "./DrawWidget";
 
 interface ColorMenu {
   label: string;

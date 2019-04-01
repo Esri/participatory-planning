@@ -1,5 +1,3 @@
-
-// esri
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import { eachAlways } from "esri/core/promiseUtils";
@@ -19,8 +17,10 @@ import SceneView from "esri/views/SceneView";
 import WebScene from "esri/WebScene";
 import { tsx } from "esri/widgets/support/widget";
 import Widget from "esri/widgets/Widget";
+
 import { computeBoundingPolygon } from "./support/geometry";
 
+// esri
 // Constants
 
 // One of low, medium, high

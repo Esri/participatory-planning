@@ -1,8 +1,9 @@
+import "../support/extensions";
 
 import Point from "esri/geometry/Point";
 import Graphic from "esri/Graphic";
+
 import DrawWidget from "../DrawWidget";
-import "../support/extensions";
 import DrawGeometry from "./DrawGeometry";
 
 export default class DrawPoint extends DrawGeometry<Point> {
