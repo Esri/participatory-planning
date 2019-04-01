@@ -17,8 +17,8 @@ export default class DrawPoint extends DrawGeometry<Point> {
     // Update graphic when mouse moves
     const handler = view.on("pointer-move", (event) => {
       const mapPoint = view.toMap(event);
-      this.addZ(mapPoint);
-      this.updateGraphicFromGeometry(mapPoint);
+      const snappedPoint = this.snapAndAddZ(mapPoint);
+      this.updateGraphicFromGeometry(snappedPoint);
     });
 
     // Remove event listener when operation is done
@@ -27,16 +27,18 @@ export default class DrawPoint extends DrawGeometry<Point> {
     return result;
   }
 
-  protected addZ(point: Point | null) {
-    if (point) {
-      point.z = this.scene.heightAtPoint(point);
-    }
+  protected snapAndAddZ(point: Point ) {
+    const snappedPoint = this.snapPoint(point);
+    snappedPoint.z = this.scene.heightAtPoint(snappedPoint);
+    return snappedPoint;
   }
 
   protected geometryFromSketch(sketchGraphic: Graphic): Point | null {
     const point = super.geometryFromSketch(sketchGraphic);
-    this.addZ(point);
-    return point;
+    if (point) {
+      return this.snapAndAddZ(point);
+    }
+    return null;
   }
 
 }
