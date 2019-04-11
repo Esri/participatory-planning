@@ -23,6 +23,12 @@ export interface Operation {
   cancel(): void;
 }
 
+export interface Settings {
+  planningArea: number[][];
+  webSceneId: string;
+  integratedMeshLayerId: string;
+}
+
 @subclass("app.widgets.webmapview")
 export default class App extends declared(WidgetBase) {
 
@@ -31,7 +37,7 @@ export default class App extends declared(WidgetBase) {
   public title: string;
 
   @property()
-  public scene = new Scene();
+  public scene = new Scene({app: this});
 
   public set currentOperation(operation: Operation | null) {
     if (this.operation) {
@@ -66,6 +72,10 @@ export default class App extends declared(WidgetBase) {
   private menuButtons: HTMLElement[] = [];
 
   private operation: Operation | null;
+
+  public constructor(public settings: Settings) {
+    super();
+  }
 
   public postInitialize() {
     const view = this.scene.view;

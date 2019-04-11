@@ -16,9 +16,9 @@ import FeatureFilter from "esri/views/layers/support/FeatureFilter";
 import SceneView from "esri/views/SceneView";
 import WebScene from "esri/WebScene";
 import { tsx } from "esri/widgets/support/widget";
-import Widget from "esri/widgets/Widget";
 
 import { computeBoundingPolygon } from "./support/geometry";
+import WidgetBase from "./widget/WidgetBase";
 
 // esri
 // Constants
@@ -26,57 +26,27 @@ import { computeBoundingPolygon } from "./support/geometry";
 // One of low, medium, high
 export const QUALITY = "medium";
 
-export const MASK_AREA = [
-  [-8235924.058660398, 4968738.274357371],
-  [-8235409.000644938, 4968717.325404106],
-  [-8235333.439527529, 4968898.289607817],
-  [-8235295.877979361, 4969109.891441089],
-  [-8236134.357229519, 4969027.878528339],
-  [-8236138.632189713, 4968850.261903069],
-  [-8235919.081131686, 4968836.806196137],
-];
-
 @subclass("app.widgets.webmapview")
-export default class Scene extends declared(Widget) {
+export default class Scene extends declared(WidgetBase) {
 
   @property()
-  public readonly map: WebScene = new WebScene({
-    portalItem: {
-      id: "8dd394c07205432bad112c21cbbc307f",
-    },
-  });
+  public map: WebScene;
 
-  @property({
-    readOnly: true,
-  })
-  public readonly view = new SceneView({
-    map: this.map,
-    ui: {
-      components: [],
-    },
-    qualityProfile: QUALITY,
-  } as any);
+  @property()
+  public view: SceneView;
 
   @property({
     readOnly: true,
   })
   public readonly sketchLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" }});
 
-  public readonly maskPolygon = new Polygon({
-    rings: [MASK_AREA],
-    spatialReference: SpatialReference.WebMercator,
-  });
-
-  public readonly boundingPolygon = computeBoundingPolygon(this.maskPolygon);
+  public maskPolygon: Polygon;
 
   private sceneLayer: SceneLayer;
 
   private sceneLayerView: SceneLayerView;
 
-  private sceneLayerFilter = new FeatureFilter({
-    spatialRelationship: "disjoint",
-    geometry: this.maskPolygon,
-  });
+  private sceneLayerFilter: FeatureFilter;
 
   private sceneLayerRenderer = new SimpleRenderer({
     symbol: {
@@ -95,21 +65,50 @@ export default class Scene extends declared(Widget) {
     },
   } as any);
 
-  private boundingPolygonGraphic = new Graphic({
-    geometry: this.boundingPolygon,
-  });
+  private boundingPolygonGraphic: Graphic;
 
-  private texturedBuildings = new IntegratedMeshLayer({
-    portalItem: {
-      id: "0406ec9f82824f368d8710ec42b8e5f6",
-    },
-    visible: false,
-  });
+  private texturedBuildings: IntegratedMeshLayer;
 
   public postInitialize() {
 
     // Create global view reference
     (window as any).view = this.view;
+
+    this.map = new WebScene({
+      portalItem: {
+        id: this.app.settings.webSceneId,
+      },
+    });
+
+    this.view = new SceneView({
+      map: this.map,
+      ui: {
+        components: [],
+      },
+      qualityProfile: QUALITY,
+    } as any);
+
+    this.texturedBuildings = new IntegratedMeshLayer({
+      portalItem: {
+        id: this.app.settings.integratedMeshLayerId,
+      },
+      visible: false,
+    });
+
+    this.maskPolygon = new Polygon({
+      rings: [this.app.settings.planningArea],
+      spatialReference: SpatialReference.WebMercator,
+    });
+
+    this.sceneLayerFilter = new FeatureFilter({
+      spatialRelationship: "disjoint",
+      geometry: this.maskPolygon,
+    });
+
+    const geometry = computeBoundingPolygon(this.maskPolygon);
+    this.boundingPolygonGraphic = new Graphic({
+      geometry,
+    });
 
     this.map.when(() => {
       this.map.add(this.sketchLayer);

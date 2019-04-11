@@ -9,7 +9,6 @@ import Layer from "esri/layers/Layer";
 import Slide from "esri/webscene/Slide";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
-import { MASK_AREA } from "./Scene";
 import { dojoPromise } from "./support/promises";
 import WidgetBase from "./widget/WidgetBase";
 
@@ -266,16 +265,17 @@ export default class Timeline extends declared(WidgetBase) {
 
   private _animateArea(): IPromise<void> {
 
-    const start = MASK_AREA[0];
-    const waypoints = MASK_AREA.slice(1);
+    const planningArea = this.app.settings.planningArea;
+    const start = planningArea[0];
+    const waypoints = planningArea.slice(1);
     waypoints.push(start);
 
     const durations: number[] = [];
     let totalLength = 0;
 
     waypoints.forEach((point, index) => {
-      const a = point[0] - MASK_AREA[index][0];
-      const b = point[1] - MASK_AREA[index][1];
+      const a = point[0] - planningArea[index][0];
+      const b = point[1] - planningArea[index][1];
       const length = Math.sqrt(a * a + b * b); // Math.abs(a * b);
       durations.push(length);
       totalLength += length;
