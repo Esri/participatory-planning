@@ -49,7 +49,7 @@ export default class GlTFWidget extends declared(DrawWidget) {
     return (
       <div>
         <div class={ classList[GlTFWidgetState.Import].join(" ") }
-          afterCreate={ this._attachImportWidget.bind(this) }>
+          afterCreate={ this.attachImportWidget.bind(this) }>
             <div id="glTFLogo" class="gltf-logo"></div>
           </div>
       </div>
@@ -58,17 +58,17 @@ export default class GlTFWidget extends declared(DrawWidget) {
 
   public startImport() {
     this.state = GlTFWidgetState.Import;
-    window.onblur = () => this._removeGlTFLogo();
+    window.onblur = () => this.removeGlTFLogo();
   }
 
-  private _removeGlTFLogo() {
+  private removeGlTFLogo() {
     const logo = document.getElementById("glTFLogo");
     if (logo) {
       logo.classList.add("hide");
     }
   }
 
-  private _importGlTF(url: string) {
+  private importGlTF(url: string) {
     this.toggleLoadingIndicator(true);
     this.state = GlTFWidgetState.Loading;
     this.currentImport = new GlTFImport(url);
@@ -110,12 +110,12 @@ export default class GlTFWidget extends declared(DrawWidget) {
     });
   }
 
-  private _attachImportWidget(element: HTMLDivElement) {
+  private attachImportWidget(element: HTMLDivElement) {
     const importer = new (window as any).SketchfabImporter(
         element, {
         onModelSelected: (result: any) => {
           console.log("Selected Sketchfab model", result);
-          this._importGlTF(result.download.gltf.url);
+          this.importGlTF(result.download.gltf.url);
         },
     });
     console.log("Initialized importer", importer);

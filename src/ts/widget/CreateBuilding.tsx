@@ -26,7 +26,7 @@ export default class CreateBuilding extends declared(DrawWidget) {
             <div class="menu-item">
               <button
                 class={stories === this.stories ? active : inactive}
-                onclick={ this._startDrawing.bind(this, stories) }>{stories}-Story Building</button>
+                onclick={ this.startDrawing.bind(this, stories) }>{stories}-Story Building</button>
             </div>
           )) }
         </div>
@@ -38,7 +38,7 @@ export default class CreateBuilding extends declared(DrawWidget) {
     return this.updatePolygonGraphic(graphic, BUILDING_COLOR);
   }
 
-  private _startDrawing(stories: number) {
+  private startDrawing(stories: number) {
 
     const size = stories * BUILDING_FLOOR_HEIGHT;
 

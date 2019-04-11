@@ -33,14 +33,14 @@ export default class SymbolGroup extends declared(Accessor) {
   public loadItems(): IPromise {
     if (!this.loadingPromise) {
       this.loadingPromise = this
-        ._fetchSymbolItems()
+        .fetchSymbolItems()
         .then(() => console.log("Loaded symbols", this.title, this.items.length) )
         .catch((error) => console.error("Failed to load symbols", error) );
     }
     return this.loadingPromise;
   }
 
-  private _fetchSymbolItems(): IPromise {
+  private fetchSymbolItems(): IPromise {
     console.log("Fetching symbol items", this.category);
     return this.portalItem.fetchData().then((data) => {
       this.items.addMany(

@@ -129,7 +129,7 @@ export default class Timeline extends declared(WidgetBase) {
     this.app.scene.clear();
     return this.goTo(this.initialViewpoint)
       .then(() => {
-        this._toggleBasemap(true);
+        this.toggleBasemap(true);
         if (this.showIntroDialog) {
           this.toggleElement("intro", true);
         } else {
@@ -148,10 +148,10 @@ export default class Timeline extends declared(WidgetBase) {
         this.toggleLoadingIndicator(false);
       })
       .then(() => this.goTo(this.maskPolygon, 1500))
-      .then(() => this._animateArea())
-      .then(() => this._animateMask())
+      .then(() => this.animateArea())
+      .then(() => this.animateMask())
       .then(() => this.goTo(this.drawViewpoint))
-      .then(() => this._toggleBasemap(false));
+      .then(() => this.toggleBasemap(false));
   }
 
   public startPlanning() {
@@ -166,7 +166,7 @@ export default class Timeline extends declared(WidgetBase) {
 
         // Not strickly serial, simply to speed up scene getting ready to edit
         this.goTo(this.drawViewpoint);
-        this._toggleBasemap(false);
+        this.toggleBasemap(false);
         this.app.scene.showMaskedBuildings();
       });
   }
@@ -182,15 +182,15 @@ export default class Timeline extends declared(WidgetBase) {
         .then(() => view.takeScreenshot(options))
         .then((after) => {
           this.app.scene.showTexturedBuildings();
-          this._toggleBasemap(true);
+          this.toggleBasemap(true);
           setTimeout(() => {
             this.app.scene.whenNotUpdating()
               .then(() => view.takeScreenshot(options))
               .then((before) => {
-                this._showScreenshot(before, after);
+                this.showScreenshot(before, after);
 
                 this.app.scene.showMaskedBuildings();
-                this._toggleBasemap(false);
+                this.toggleBasemap(false);
               });
           }, 100);
         });
@@ -235,7 +235,7 @@ export default class Timeline extends declared(WidgetBase) {
     }
   }
 
-  private _showScreenshot(before: __esri.Screenshot, after: __esri.Screenshot) {
+  private showScreenshot(before: __esri.Screenshot, after: __esri.Screenshot) {
     const canvas = document.getElementById("screenshotCanvas") as HTMLCanvasElement;
     const context = canvas.getContext("2d") as CanvasRenderingContext2D;
     const height = canvas.width = canvas.height = Math.min(before.data.width, 2 * before.data.height);
@@ -265,7 +265,7 @@ export default class Timeline extends declared(WidgetBase) {
     }).catch(console.log);
   }
 
-  private _animateArea(): IPromise<void> {
+  private animateArea(): IPromise<void> {
 
     const planningArea = this.app.settings.planningArea;
     const start = planningArea[0];
@@ -320,7 +320,7 @@ export default class Timeline extends declared(WidgetBase) {
     return dojoPromise(timeline.finished);
   }
 
-  private _animateMask(): IPromise<void> {
+  private animateMask(): IPromise<void> {
     const color = new Color({
       r: 226,
       g: 119,
@@ -361,7 +361,7 @@ export default class Timeline extends declared(WidgetBase) {
     return dojoPromise(timeline.finished);
   }
 
-  private _toggleBasemap(show: boolean): IPromise {
+  private toggleBasemap(show: boolean): IPromise {
     this.app.scene.map.basemap = (show ? "satellite" : null) as any;
     this.vectorTileLayer.visible = !show;
     return this.app.scene.whenNotUpdating();

@@ -41,7 +41,7 @@ export default class CreatePath extends declared(DrawWidget) {
             <div class="menu-item">
               <button
                 class={menu === this.activeMenu ? active : inactive}
-                onclick={ this._startDrawing.bind(this, menu) }>Create {menu.label}</button>
+                onclick={ this.startDrawing.bind(this, menu) }>Create {menu.label}</button>
             </div>
           )) }
         </div>
@@ -53,7 +53,7 @@ export default class CreatePath extends declared(DrawWidget) {
     return this.updatePolylineGraphic(graphic, graphic.symbol.color.toHex());
   }
 
-  private _startDrawing(menu: PathMenu) {
+  private startDrawing(menu: PathMenu) {
     const symbol = new SimpleLineSymbol({
       color: menu.color,
       width: menu.width,

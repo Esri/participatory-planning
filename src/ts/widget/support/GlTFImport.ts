@@ -32,18 +32,18 @@ export default class GlTFImport extends declared(Accessor) {
   constructor(public url: string) {
     super();
 
-    this._reportProgress("start", 0);
+    this.reportProgress("start", 0);
     this.blobUrl = this
-      ._downloadAndExtractZip(this.url)
-      .then((entries) => this._zipEntriesToBlob(entries))
-      .then((blobEntries) => this._combineToSingleBlob(blobEntries))
+      .downloadAndExtractZip(this.url)
+      .then((entries) => this.zipEntriesToBlob(entries))
+      .then((blobEntries) => this.combineToSingleBlob(blobEntries))
       .then((gltfBlob) => gltfBlob.url);
   }
 
-  private _downloadAndExtractZip(url: string): IPromise<ZIPEntry[]> {
+  private downloadAndExtractZip(url: string): IPromise<ZIPEntry[]> {
     return createPromise(((resolve: (_: ZIPEntry[]) => void, reject: (error?: any) => void) => {
       const reader = new this.zip.HttpProgressReader(url, {
-        onProgress: this._reportDownloadProgress.bind(this),
+        onProgress: this.reportDownloadProgress.bind(this),
       });
       this.zip.createReader(
           reader,
@@ -55,7 +55,7 @@ export default class GlTFImport extends declared(Accessor) {
     }) as any);
   }
 
-  private _zipEntriesToBlob(entries: ZIPEntry[]): IPromise<BlobZIPEntry[]> {
+  private zipEntriesToBlob(entries: ZIPEntry[]): IPromise<BlobZIPEntry[]> {
 
     entries = entries.filter((entry) => !entry.directory);
 
@@ -65,9 +65,9 @@ export default class GlTFImport extends declared(Accessor) {
 
     const promises = entries.map(
       (entry) => this
-        ._saveEntryToBlob(entry)
+        .saveEntryToBlob(entry)
         .then((blob) => {
-          this._reportUnzipProgress(entries.length, ++completedBlobs);
+          this.reportUnzipProgress(entries.length, ++completedBlobs);
           return blob;
         }),
     );
@@ -77,7 +77,7 @@ export default class GlTFImport extends declared(Accessor) {
     });
   }
 
-  private _saveEntryToBlob(entry: ZIPEntry): IPromise<BlobZIPEntry> {
+  private saveEntryToBlob(entry: ZIPEntry): IPromise<BlobZIPEntry> {
     return createPromise(((resolve: (_: BlobZIPEntry) => void) => {
       entry.getData(
           new this.zip.BlobWriter("text/plain"),
@@ -93,7 +93,7 @@ export default class GlTFImport extends declared(Accessor) {
     }) as any);
   }
 
-  private _combineToSingleBlob(entries: BlobZIPEntry[]): IPromise<BlobZIPEntry> {
+  private combineToSingleBlob(entries: BlobZIPEntry[]): IPromise<BlobZIPEntry> {
 
     const rootEntry = entries.reduce(
       (previous, entry) => !previous && entry.name.match(/\.gltf$/) ? entry : previous,
@@ -144,17 +144,17 @@ export default class GlTFImport extends declared(Accessor) {
     }) as any);
   }
 
-  private _reportDownloadProgress(event: any) {
+  private reportDownloadProgress(event: any) {
     const value = (event.loaded / event.total) * (1 - ZIP_PROGRESS_FACTOR);
-    this._reportProgress("download", value);
+    this.reportProgress("download", value);
   }
 
-  private _reportUnzipProgress(total: number, completed: number) {
+  private reportUnzipProgress(total: number, completed: number) {
     const value = ZIP_PROGRESS_FACTOR + completed / total * ZIP_PROGRESS_FACTOR;
-    this._reportProgress("unzip", value);
+    this.reportProgress("unzip", value);
   }
 
-  private _reportProgress(task: string, value: number) {
+  private reportProgress(task: string, value: number) {
     this.task = task;
     value = Math.floor(100 * value);
     if (value >= this.progress) {

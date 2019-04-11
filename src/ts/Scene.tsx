@@ -125,7 +125,7 @@ export default class Scene extends declared(WidgetBase) {
   public render() {
     return (
       <div>
-        <div id="sceneView" bind={ this } afterCreate={ this._attachSceneView } />
+        <div id="sceneView" bind={ this } afterCreate={ this.attachSceneView } />
       </div>
     );
   }
@@ -233,7 +233,7 @@ export default class Scene extends declared(WidgetBase) {
     }) as any;
   }
 
-  private _attachSceneView(sceneViewDiv: HTMLDivElement) {
+  private attachSceneView(sceneViewDiv: HTMLDivElement) {
     this.view.container = sceneViewDiv;
   }
 

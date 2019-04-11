@@ -46,7 +46,7 @@ export default class CreateArea extends declared(DrawWidget) {
             <div class="menu-item">
               <button
                 class={menu.color === this.activeColor ? active : inactive}
-                onclick={ this._startDrawing.bind(this, menu.color) }>Create {menu.label}</button>
+                onclick={ this.startDrawing.bind(this, menu.color) }>Create {menu.label}</button>
             </div>
           )) }
         </div>
@@ -58,7 +58,7 @@ export default class CreateArea extends declared(DrawWidget) {
     return this.updatePolygonGraphic(graphic, graphic.symbol.color.toHex());
   }
 
-  private _startDrawing(color: string) {
+  private startDrawing(color: string) {
 
     const symbol = new SimpleFillSymbol({
       color,
