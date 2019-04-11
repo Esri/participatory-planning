@@ -10,7 +10,7 @@ import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import IntegratedMeshLayer from "esri/layers/IntegratedMeshLayer";
 import SceneLayer from "esri/layers/SceneLayer";
-import UniqueValueRenderer from "esri/renderers/UniqueValueRenderer";
+import { SimpleRenderer } from "esri/renderers";
 import SceneLayerView from "esri/views/layers/SceneLayerView";
 import FeatureFilter from "esri/views/layers/support/FeatureFilter";
 import SceneView from "esri/views/SceneView";
@@ -25,12 +25,6 @@ import { computeBoundingPolygon } from "./support/geometry";
 
 // One of low, medium, high
 export const QUALITY = "medium";
-
-export const MASKED_OBJIDS = [
-  158321, 106893, 158711, 158613, 158632, 159047, 158099, 158249, 147102, 106899, 107439, 158654, 158247, 158307,
-  158610, 158963, 154542, 158869, 158814, 158900, 107340, 107395, 107172, 158336, 158784, 158571, 158600, 158348,
-  158955, 158205, 158883, 158431, 158326, 158353, 158449, 158587, 158251, 158857, 159069, 158706,
-];
 
 export const MASK_AREA = [
   [-8235924.058660398, 4968738.274357371],
@@ -84,11 +78,8 @@ export default class Scene extends declared(Widget) {
     geometry: this.maskPolygon,
   });
 
-  private sceneLayerRenderer = new UniqueValueRenderer({
-    // field: "OBJECTID",
-    valueExpression: "When(indexof([" + MASKED_OBJIDS.join(",")
-    + "], $feature.OBJECTID) < 0, 'show', 'hide')",
-    defaultSymbol: {
+  private sceneLayerRenderer = new SimpleRenderer({
+    symbol: {
       type: "mesh-3d",
       symbolLayers: [{
         type: "fill",
@@ -147,28 +138,8 @@ export default class Scene extends declared(Widget) {
 
   public showMaskedBuildings(color?: any) {
 
-    const uniqueValueInfos = [];
     if (color && color.a !== 0) {
-
       // Show masked buildings with provided color, all other buildings are white
-      uniqueValueInfos.push({
-        value: "hide",
-        symbol: {
-          type: "mesh-3d",
-          symbolLayers: [{
-            type: "fill",
-            material: {
-              color,
-              colorMixMode: "replace",
-            },
-            edges: {
-              type: "solid",
-              color: [150, 150, 150, color.a],
-              size: .5,
-            },
-          }],
-        },
-      } as any);
       this.boundingPolygonGraphic.symbol = {
           type: "simple-fill",
           color: [0, 0, 0, 0],
@@ -179,26 +150,6 @@ export default class Scene extends declared(Widget) {
       this.sceneLayerView.set("filter", null);
       this.drawLayers().forEach((layer) => layer.visible = false);
     } else {
-
-      // Do not show masked buildings and dimm surounding ones
-      uniqueValueInfos.push({
-        value: "showwww",
-        symbol: {
-          type: "mesh-3d",
-          symbolLayers: [{
-            type: "fill",
-            material: {
-              color: [180, 180, 180],
-              colorMixMode: "replace",
-            },
-            edges: {
-              type: "solid",
-              color: [100, 100, 100],
-              size: .5,
-            },
-          }],
-        },
-      } as any);
       this.sceneLayerView.filter = this.sceneLayerFilter;
       this.drawLayers().forEach((layer) => layer.visible = true);
       this.boundingPolygonGraphic.symbol = {
@@ -209,8 +160,6 @@ export default class Scene extends declared(Widget) {
           },
         } as any;
     }
-    this.sceneLayerRenderer.uniqueValueInfos = uniqueValueInfos;
-    this.sceneLayer.renderer = this.sceneLayerRenderer.clone();
     this.texturedBuildings.visible = false;
     this.sceneLayer.visible = true;
   }
