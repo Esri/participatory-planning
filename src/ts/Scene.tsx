@@ -20,9 +20,6 @@ import { tsx } from "esri/widgets/support/widget";
 import { computeBoundingPolygon } from "./support/geometry";
 import WidgetBase from "./widget/WidgetBase";
 
-// esri
-// Constants
-
 // One of low, medium, high
 export const QUALITY = "medium";
 
@@ -35,10 +32,12 @@ export default class Scene extends declared(WidgetBase) {
   @property()
   public view: SceneView;
 
-  @property({
-    readOnly: true,
-  })
-  public readonly sketchLayer: GraphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "on-the-ground" }});
+  @property()
+  public sketchLayer = new GraphicsLayer({
+    elevationInfo: {
+      mode: "on-the-ground",
+    },
+  });
 
   public maskPolygon: Polygon;
 
