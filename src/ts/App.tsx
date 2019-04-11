@@ -80,16 +80,10 @@ export default class App extends declared(WidgetBase) {
   public postInitialize() {
     const view = this.scene.view;
     view.on("click", (event) => {
-      if (event.mapPoint) {
-        console.log("[" + event.mapPoint.x + ", " + event.mapPoint.y + "]", event);
-      }
-
       if (!this.currentOperation) {
         view.hitTest(event)
         .then((response) => {
-          // check if a feature is returned from the hurricanesLayer
-          // do something with the result graphic
-          console.log("hitTest", response.results);
+          // check user clicked on a graphic, in which case we try to pass it to a SketchViewModel
           response.results.some((result) => {
             const graphic = result.graphic;
             if (graphic && graphic.geometry) {
@@ -310,7 +304,6 @@ export default class App extends declared(WidgetBase) {
     if (layer) {
       return this.drawWidgets.some((widget) => {
         if (widget.layer === layer) {
-          console.log("Editing", graphic);
           widget.updateGraphic(graphic);
           return true;
         }

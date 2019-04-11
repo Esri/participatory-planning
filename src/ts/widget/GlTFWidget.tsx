@@ -97,8 +97,6 @@ export default class GlTFWidget extends declared(DrawWidget) {
         }),
       });
 
-      console.log("Adding glTF to layer", blobUrl);
-
       // this.layer.removeAll();
       this.layer.add(graphic);
       this.updateGraphic(graphic);
@@ -110,15 +108,13 @@ export default class GlTFWidget extends declared(DrawWidget) {
     });
   }
 
-  private attachImportWidget(element: HTMLDivElement) {
-    const importer = new (window as any).SketchfabImporter(
+  private attachImportWidget(element: HTMLDivElement): any {
+    return new (window as any).SketchfabImporter(
         element, {
         onModelSelected: (result: any) => {
-          console.log("Selected Sketchfab model", result);
           this.importGlTF(result.download.gltf.url);
         },
     });
-    console.log("Initialized importer", importer);
   }
 
 }

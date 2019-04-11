@@ -1,7 +1,6 @@
 import { convexHull, difference } from "esri/geometry/geometryEngine";
 import Polygon from "esri/geometry/Polygon";
 
-// esri
 export const computeBoundingPolygon = (polygon: Polygon): Polygon => {
   const hull = convexHull(polygon) as Polygon;
   const centroid = hull.centroid;
