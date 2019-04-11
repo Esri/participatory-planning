@@ -6,6 +6,7 @@ import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import Layer from "esri/layers/Layer";
+import Viewpoint from "esri/Viewpoint";
 import Slide from "esri/webscene/Slide";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
@@ -35,9 +36,13 @@ export default class Timeline extends declared(WidgetBase) {
 
   private vectorTileLayer: Layer;
 
+  private initialViewpoint: Viewpoint;
+
   @renderable()
   @aliasOf("app.scene.map.presentation.slides")
   private slides: Collection<Slide>;
+
+  private drawViewpoint: Viewpoint;
 
   private maskColor = new Color([226, 119, 40]);
 
@@ -62,8 +67,14 @@ export default class Timeline extends declared(WidgetBase) {
     const queryParams = document.location.search.substr(1);
     this.showIntroDialog = queryParams !== "skipTutorial";
 
-    this.app.scene.map.when(() => {
-      this.app.scene.map.layers.some((layer) => {
+    const scene = this.app.scene;
+    const map = scene.map;
+    map.when(() => {
+
+      this.initialViewpoint = map.initialViewProperties.viewpoint;
+      this.drawViewpoint = this.slides.length ? this.slides.getItemAt(0).viewpoint : this.initialViewpoint;
+
+      map.layers.some((layer) => {
         if (layer.type === "vector-tile") {
           this.vectorTileLayer = layer;
           return true;
@@ -74,13 +85,13 @@ export default class Timeline extends declared(WidgetBase) {
       color.a = 0;
       this.maskPolygon = new Graphic({
         symbol: maskPolygonSymbol(color),
-        geometry: this.app.scene.maskPolygon,
+        geometry: scene.maskPolygon,
       } as any);
 
-      this.app.scene.sketchLayer.add(this.maskPolyline);
-      this.app.scene.sketchLayer.add(this.maskPolygon);
+      scene.sketchLayer.add(this.maskPolyline);
+      scene.sketchLayer.add(this.maskPolygon);
 
-      this.app.scene.map.ground.surfaceColor = new Color("#f0f0f0");
+      map.ground.surfaceColor = new Color("#f0f0f0");
     });
 
     this.toggleElement("screenshot", false);
@@ -88,7 +99,7 @@ export default class Timeline extends declared(WidgetBase) {
 
   public render() {
 
-    const slides = this.slides.slice(2).toArray();
+    const slides = this.slides.toArray();
 
     return (
       <div class="timeline">
@@ -103,7 +114,7 @@ export default class Timeline extends declared(WidgetBase) {
         )}
         <div class="menu phone-hide">
           { slides.map((slide) => (<div class="menu-item" key={ slide.id }>
-              <button class="btn btn-large" onclick={ () => this._goToSlide(slide) }>
+              <button class="btn btn-large" onclick={ () => this.goTo(slide.viewpoint) }>
                 { slide.title.text }
               </button>
             </div>)) }
@@ -116,7 +127,7 @@ export default class Timeline extends declared(WidgetBase) {
     this.toggleLoadingIndicator(true);
     this.app.scene.showMaskedBuildings("white");
     this.app.scene.clear();
-    return this._goToSlide(this.slides.getItemAt(0))
+    return this.goTo(this.initialViewpoint)
       .then(() => {
         this._toggleBasemap(true);
         if (this.showIntroDialog) {
@@ -136,10 +147,10 @@ export default class Timeline extends declared(WidgetBase) {
         this.toggleOverlay(false);
         this.toggleLoadingIndicator(false);
       })
-      .then(() => this._goToSlide(this.slides.getItemAt(1), 1500))
+      .then(() => this.goTo(this.maskPolygon, 1500))
       .then(() => this._animateArea())
       .then(() => this._animateMask())
-      .then(() => this._goToSlide(this.slides.getItemAt(2)))
+      .then(() => this.goTo(this.drawViewpoint))
       .then(() => this._toggleBasemap(false));
   }
 
@@ -152,7 +163,9 @@ export default class Timeline extends declared(WidgetBase) {
         this.toggleLoadingIndicator(false);
         this.toggleElement("intro", false);
         this.toggleElement("screenshot", false);
-        this._showFirstEditSlide();
+
+        // Not strickly serial, simply to speed up scene getting ready to edit
+        this.goTo(this.drawViewpoint);
         this._toggleBasemap(false);
         this.app.scene.showMaskedBuildings();
       });
@@ -222,12 +235,6 @@ export default class Timeline extends declared(WidgetBase) {
     }
   }
 
-  private _showFirstEditSlide(): IPromise {
-    return this
-      ._goToSlide(this.slides.getItemAt(2))
-      .then(() => this.app.scene.showMaskedBuildings());
-  }
-
   private _showScreenshot(before: __esri.Screenshot, after: __esri.Screenshot) {
     const canvas = document.getElementById("screenshotCanvas") as HTMLCanvasElement;
     const context = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -247,12 +254,9 @@ export default class Timeline extends declared(WidgetBase) {
     this.toggleElement("screenshot", true);
   }
 
-  private _goToSlide(slide: Slide, duration = 800): IPromise {
+  private goTo(target: Viewpoint | Graphic, duration = 800): IPromise {
     const view = this.app.scene.view;
-    return view.goTo(slide.viewpoint, { duration }).then(() => {
-
-      view.set("environment.lighting.ambientOcclusionEnabled", true);
-      view.set("environment.lighting.date", "Thu Jun 20 2019 11:40:00 GMT-0500");
+    return view.goTo(target, { duration }).then(() => {
 
       // Wait for all layers to update after applying a new slide
       return this.app.scene.whenNotUpdating();
