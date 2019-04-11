@@ -9,8 +9,8 @@ import { renderable, tsx } from "esri/widgets/support/widget";
 
 import Scene from "../Scene";
 import DrawWidget from "./DrawWidget";
-import SymbolGroup from "./SymbolGallery/SymbolGroup";
-import SymbolItem from "./SymbolGallery/SymbolItem";
+import SymbolGroup from "./symbols/SymbolGroup";
+import SymbolItem from "./symbols/SymbolItem";
 
 // esri
 export enum SymbolGroupId {
