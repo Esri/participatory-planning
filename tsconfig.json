@@ -22,12 +22,9 @@
     "noUnusedLocals": true,
     "importHelpers": true,
     "skipLibCheck": true,
-    "typeRoots" : ["./nodes_modules/@types", "./typings"]
+    "typeRoots" : ["./nodes_modules/@types"],
+    "types": ["arcgis-js-api", "moment"],
   },
-  "types": [
-    "arcgis-js-api",
-    "moment"
-  ],
   "include": [
     "src/*"
   ]
