@@ -7,7 +7,7 @@ import PortalQueryResult from "esri/portal/PortalQueryResult";
 import EsriSymbol from "esri/symbols/Symbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
-import Scene from "../Scene";
+import PlanningScene from "../PlanningScene";
 import DrawWidget from "./DrawWidget";
 import SymbolGroup from "./symbols/SymbolGroup";
 import SymbolItem from "./symbols/SymbolItem";
@@ -22,7 +22,7 @@ export enum SymbolGroupId {
 @subclass("app.draw.SymbolGallery")
 export default class SymbolGallery extends declared(DrawWidget) {
 
-  @property() public scene: Scene;
+  @property() public scene: PlanningScene;
 
   @property() public groups = new Collection<SymbolGroup>();
 

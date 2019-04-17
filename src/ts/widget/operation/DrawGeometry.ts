@@ -4,13 +4,13 @@ import Point from "esri/geometry/Point";
 import Graphic from "esri/Graphic";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 
-import Scene from "../../Scene";
+import PlanningScene from "../../PlanningScene";
 import DrawWidget from "../DrawWidget";
 import WidgetOperation, { OperationHandle } from "./WidgetOperation";
 
 export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
-  protected scene: Scene;
+  protected scene: PlanningScene;
 
   constructor(widget: DrawWidget, public readonly graphic: Graphic, protected geometryType: string) {
     super(widget);

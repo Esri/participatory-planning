@@ -3,7 +3,7 @@ import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
-import Scene from "./Scene";
+import PlanningScene from "./PlanningScene";
 import Timeline from "./Timeline";
 import CreateArea from "./widget/CreateArea";
 import CreateBuilding from "./widget/CreateBuilding";
@@ -37,7 +37,7 @@ export default class App extends declared(WidgetBase) {
   public title: string;
 
   @property()
-  public scene = new Scene({app: this});
+  public scene = new PlanningScene({app: this});
 
   public set currentOperation(operation: Operation | null) {
     if (this.operation) {

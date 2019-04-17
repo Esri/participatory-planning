@@ -24,7 +24,7 @@ import WidgetBase from "./widget/WidgetBase";
 export const QUALITY = "medium";
 
 @subclass("app.widgets.webmapview")
-export default class Scene extends declared(WidgetBase) {
+export default class PlanningScene extends declared(WidgetBase) {
 
   @property()
   public map: WebScene;
