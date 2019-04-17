@@ -1,3 +1,20 @@
+/*
+ * Copyright 2019 Esri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import Portal from "esri/portal/Portal";
@@ -12,7 +29,6 @@ import DrawWidget from "./DrawWidget";
 import SymbolGroup from "./symbols/SymbolGroup";
 import SymbolItem from "./symbols/SymbolItem";
 
-// esri
 export enum SymbolGroupId {
   Icons = "EsriIconsStyle",
   Trees = "EsriRealisticTreesStyle",
