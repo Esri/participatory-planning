@@ -1,6 +1,6 @@
 # Participatory Planning
 
-This is a non-commercial demo application made by the Esri R&D Center Zurich to show Participatory Planning using the [ArcGIS API for JavaScript](https://developers.arcgis.com/javascript/).
+An interactive 3D web application enabling citizens to engage in urban planning, using the [ArcGIS API for JavaScript](https://developers.arcgis.com/javascript/). This is a non-commercial demo application made by the Esri R&D Center Zurich. It is intended for presentations or as a starting point for new projects.
 
 [![screenshot](./screenshot.png)](https://esri.github.io/participatory-planning)
 
@@ -23,7 +23,7 @@ npm run start # serves application at http://localhost:8080
 
 ## Configuration
 
-If you would like to use the app for a different area or city, see the file [index.ts](https://github.com/ArcGIS/participatory-planning/blob/master/src/index.ts) for available options.
+If you would like to use the app for a different area or city, see the file [index.ts](./src/index.ts) for available options.
 
 ## Resources
 The following external libraries, APIs, open datasets and specifications were used to make this application:
