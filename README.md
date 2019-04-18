@@ -38,7 +38,7 @@ The following external libraries, APIs, open datasets and specifications were us
 
 ## Disclaimer
 
-This demo application is for illustrative purposes only and it is not maintained. There is no support available for deployment or development of the application.
+This demo application is for illustrative purposes only and it is not maintained. The area in Dumbo, Brooklyn NY used in the application is a fictional redevelopment area. There is no support available for deployment or development of the application.
 
 ## Contributing
 
