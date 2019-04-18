@@ -44,23 +44,6 @@ This demo application is for illustrative purposes only and it is not maintained
 
 Esri welcomes contributions from anyone and everyone. Please see our [guidelines for contributing](https://github.com/esri/contributing).
 
-## Deployment
-
-The live version is deployed using GitHub pages. The `gh-pages` branch represents a separate `git worktree` directly pointing to the contents of the `dist/` build output folder. The following commands update the `gh-pages` branch to the latest source code version:
-
-```
-git clone https://github.com/Esri/participatory-planning.git -b gh-pages dist
-npm run build
-cd dist/
-git add .
-git commit -am 'Deploy latest version from master branch'
-git push
-```
-Usually the changes become available shortly after at
-[https://esri.github.io/participatory-planning](https://esri.github.io/participatory-planning).
-
-See this [tutorial](https://medium.com/linagora-engineering/deploying-your-js-app-to-github-pages-the-easy-way-or-not-1ef8c48424b7) for informations how to set this up.
-
 ## Licensing
 Copyright 2019 Esri
 
