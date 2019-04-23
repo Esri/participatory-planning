@@ -167,8 +167,8 @@ export default class Timeline extends declared(WidgetBase) {
       .then(() => this.goTo(this.maskPolygon, 1500))
       .then(() => this.animateArea())
       .then(() => this.animateMask())
-      .then(() => this.goTo(this.drawViewpoint))
-      .then(() => this.toggleBasemap(false));
+      .then(() => this.toggleBasemap(false))
+      .then(() => this.goTo(this.drawViewpoint));
   }
 
   public startPlanning() {
@@ -317,7 +317,6 @@ export default class Timeline extends declared(WidgetBase) {
           this.maskPolyline.geometry = {
             type: "polyline",
             paths: [paths.concat([[movingPoint.x, movingPoint.y]])],
-            spatialReference: SpatialReference.WebMercator,
           } as any;
         }
       },
