@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import { eachAlways } from "esri/core/promiseUtils";
@@ -25,7 +24,6 @@ import Polygon from "esri/geometry/Polygon";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
-import IntegratedMeshLayer from "esri/layers/IntegratedMeshLayer";
 import SceneLayer from "esri/layers/SceneLayer";
 import { SimpleRenderer } from "esri/renderers";
 import SceneLayerView from "esri/views/layers/SceneLayerView";
@@ -37,8 +35,9 @@ import { tsx } from "esri/widgets/support/widget";
 import { computeBoundingPolygon } from "./support/geometry";
 import WidgetBase from "./widget/WidgetBase";
 
+
 // One of low, medium, high
-export const QUALITY = "medium";
+export const QUALITY = "high";
 
 @subclass("app.widgets.webmapview")
 export default class PlanningScene extends declared(WidgetBase) {
@@ -83,8 +82,6 @@ export default class PlanningScene extends declared(WidgetBase) {
 
   private boundingPolygonGraphic: Graphic;
 
-  private texturedBuildings: IntegratedMeshLayer;
-
   public postInitialize() {
 
     // Create global view reference
@@ -104,13 +101,6 @@ export default class PlanningScene extends declared(WidgetBase) {
       qualityProfile: QUALITY,
     } as any);
 
-    this.texturedBuildings = new IntegratedMeshLayer({
-      portalItem: {
-        id: this.app.settings.integratedMeshLayerId,
-      },
-      visible: false,
-    });
-
     this.maskPolygon = new Polygon({
       rings: [this.app.settings.planningArea],
       spatialReference: SpatialReference.WebMercator,
@@ -128,7 +118,6 @@ export default class PlanningScene extends declared(WidgetBase) {
 
     this.map.when(() => {
       this.map.add(this.sketchLayer);
-      this.map.add(this.texturedBuildings);
       this.sketchLayer.add(this.boundingPolygonGraphic);
       this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
       this.sceneLayer.renderer = this.sceneLayerRenderer;
@@ -152,7 +141,6 @@ export default class PlanningScene extends declared(WidgetBase) {
   }
 
   public showMaskedBuildings(color?: any) {
-
     if (color && color.a !== 0) {
       // Show masked buildings with provided color, all other buildings are white
       this.boundingPolygonGraphic.symbol = {
@@ -175,12 +163,10 @@ export default class PlanningScene extends declared(WidgetBase) {
           },
         } as any;
     }
-    this.texturedBuildings.visible = false;
     this.sceneLayer.visible = true;
   }
 
   public showTexturedBuildings() {
-    this.texturedBuildings.visible = true;
     this.drawLayers().forEach((layer) => layer.visible = false);
     this.sceneLayer.visible = false;
     this.boundingPolygonGraphic.symbol = {

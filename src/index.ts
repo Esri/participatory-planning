@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-
 import "./config";
 
 import App from "./ts/App";
+
 
 const planningArea = [
   [-8235924.058660398, 4968738.274357371],
@@ -29,9 +29,7 @@ const planningArea = [
   [-8235919.081131686, 4968836.806196137],
 ];
 
-const webSceneId = "8dd394c07205432bad112c21cbbc307f";
-
-const integratedMeshLayerId = "0406ec9f82824f368d8710ec42b8e5f6";
+const webSceneId = "bceae470c9a04e5bb3ad42323c726c97";
 
 /**
  * Initialize application
@@ -39,6 +37,5 @@ const integratedMeshLayerId = "0406ec9f82824f368d8710ec42b8e5f6";
 export const app = new App({
   planningArea,
   webSceneId,
-  integratedMeshLayerId,
 });
 app.container = "app";

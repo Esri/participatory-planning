@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 import { aliasOf, declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
@@ -30,6 +29,7 @@ import GlTFWidget from "./widget/GlTFWidget";
 import SymbolGallery, { SymbolGroupId } from "./widget/SymbolGallery";
 import WidgetBase from "./widget/WidgetBase";
 
+
 interface MainMenu {
   label: string;
   iconName: string;
@@ -43,7 +43,6 @@ export interface Operation {
 export interface Settings {
   planningArea: number[][];
   webSceneId: string;
-  integratedMeshLayerId: string;
 }
 
 @subclass("app.widgets.webmapview")

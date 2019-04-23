@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 import anime from "animejs";
 import Color from "esri/Color";
 import { aliasOf, declared, subclass } from "esri/core/accessorSupport/decorators";
@@ -29,6 +28,7 @@ import { renderable, tsx } from "esri/widgets/support/widget";
 
 import { dojoPromise } from "./support/promises";
 import WidgetBase from "./widget/WidgetBase";
+
 
 export const AREA_ANIMATION_DURATION = 2000;
 export const MASK_ANIMATION_DURATION = 1000;
