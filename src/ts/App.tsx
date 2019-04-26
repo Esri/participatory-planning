@@ -172,9 +172,11 @@ export default class App extends declared(WidgetBase) {
           </div>
           <div class="bottom">
             <div class="menu">
-              <button class="btn btn-large" onclick={ () => { this.reset(); this.timeline.showIntro(); } }>
-                NEW PLAN
-              </button>
+              <div class="menu-item">
+                <button class="btn btn-large" onclick={ () => { this.reset(); this.timeline.showIntro(); } }>
+                  NEW PLAN
+                </button>
+              </div>
               {
                 this.mainMenuEntries.map((entry) => (
                   <div class="menu-item">
@@ -185,9 +187,11 @@ export default class App extends declared(WidgetBase) {
                   </div>
                 ))
               }
-              <button class="btn btn-large" onclick={ () => { this.reset(); this.timeline.takeScreenshot(); } }>
-                SUBMIT PLAN
-              </button>
+              <div class="menu-item">
+                <button class="btn btn-large" onclick={ () => { this.reset(); this.timeline.takeScreenshot(); } }>
+                  SUBMIT PLAN
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -147,10 +147,6 @@ body {
   font-size: 12px;
 }
 
-.bottom .btn.btn-large {
-  top: 6px;
-}
-
 .bottom .btn-large:first-child {
   margin-right: 35px;
   margin-left: 13px;
@@ -201,6 +197,7 @@ body {
 .menu-item {
   display: inline-block;
   margin: 5px;
+  vertical-align: middle;
 }
 
 .primary-menu .menu-item {
