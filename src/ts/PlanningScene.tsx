@@ -21,6 +21,7 @@ import { whenNotOnce } from "esri/core/watchUtils";
 import geometryEngine from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
 import Polygon from "esri/geometry/Polygon";
+import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import SceneLayer from "esri/layers/SceneLayer";
@@ -102,6 +103,7 @@ export default class PlanningScene extends declared(WidgetBase) {
 
     this.maskPolygon = new Polygon({
       rings: [this.app.settings.planningArea],
+      spatialReference: SpatialReference.WebMercator,
     });
 
     this.sceneLayerFilter = new FeatureFilter({
