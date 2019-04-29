@@ -42,6 +42,7 @@ export interface Operation {
 
 export interface Settings {
   planningArea: number[][];
+  planningAreaName: string;
   webSceneId: string;
 }
 
@@ -51,6 +52,10 @@ export default class App extends declared(WidgetBase) {
   @aliasOf("scene.map.portalItem.title")
   @renderable()
   public title: string;
+
+  @property()
+  @renderable()
+  public thumbnailUrl: string;
 
   @property()
   public scene = new PlanningScene({app: this});
@@ -150,11 +155,21 @@ export default class App extends declared(WidgetBase) {
       },
     });
 
+    this.scene.map.when(() => {
+      this.thumbnailUrl = this.scene.map.portalItem.getThumbnailUrl(400);
+    });
+
     // Leave a reference of the view on the window for debugging
     (window as any).app = this;
   }
 
   public render() {
+    const planningAreaName = this.settings.planningAreaName;
+
+    const thumbnail = this.thumbnailUrl ?
+      <img class="card-wide-image" src={ this.thumbnailUrl } alt={ planningAreaName } /> :
+      null;
+
     return (
       <div>
         <div id="scene" afterCreate={ this.attachScene.bind(this) } />
@@ -207,13 +222,13 @@ export default class App extends declared(WidgetBase) {
           <div class="column-17">
             <div class="card card-wide">
               <figure class="card-wide-image-wrap">
-                <img class="card-wide-image" src="./images/dumbo.png" alt="Dumbo" />
+                { thumbnail }
                 <div class="card-image-caption">
-                  Dumbo, Brooklyn NY
+                { planningAreaName }
                 </div>
               </figure>
               <div class="card-content">
-                <h4 class="trailer-half">{ this.title }</h4>
+                <h4 class="trailer-half">Participatory Planning</h4>
                 <p class="font-size--1 trailer-half">
                   <ul>
                     <li>When creating shapes, either double click or press <code>C</code> to complete.</li>
