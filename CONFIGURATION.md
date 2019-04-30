@@ -12,7 +12,7 @@ The settings parameter is expected to be a URL pointing to JSON file with the fo
   "planningArea": [
     [-8235924.058660398, 4968738.274357371],
     [-8235409.000644938, 4968717.325404106],
-    // ...
+
     [-8235919.081131686, 4968836.806196137]
   ],
   "planningAreaName": "Dumbo, Brooklyn NY",
