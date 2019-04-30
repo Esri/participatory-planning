@@ -32,7 +32,7 @@ The settings parameter is expected to be a URL pointing to JSON file with the fo
 
 A simple way of providing your own settings file is using [GitHub Gist](https://gist.github.com/) and passing the Gist's URL (raw version) to the app. This is an example for a planning area in Zug, Switzerland:
 
-`https://esri.github.io/participatory-planning?settings=https://gist.githubusercontent.com/arnofiva/82f57a3cc2d99769f573898560f74e3f/raw/zug.pp.json`
+[`https://esri.github.io/participatory-planning?settings=https://gist.githubusercontent.com/arnofiva/82f57a3cc2d99769f573898560f74e3f/raw/zug.pp.json`](https://esri.github.io/participatory-planning?settings=https://gist.githubusercontent.com/arnofiva/82f57a3cc2d99769f573898560f74e3f/raw/zug.pp.json)
 
 ## GitHub Deployment
 
