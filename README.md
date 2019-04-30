@@ -23,7 +23,7 @@ npm run start # serves application at http://localhost:8080
 
 ## Configuration
 
-If you would like to use the app for a different area or city, see the file [index.ts](./src/index.ts) for available options.
+If you would like to use the app for a different area or city, see the [CONFIGURATION.md](./CONFIGURATION.md) file for details.
 
 ## Resources
 The following external libraries, APIs, open datasets and specifications were used to make this application:

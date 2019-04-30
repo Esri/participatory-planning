@@ -20,6 +20,7 @@ import request from "esri/request";
 
 import App from "./ts/App";
 
+// See DEPLOYMENT.md for customization or deploying your own version of this app.
 const params = {
   settings: "./js/settings.json",
 };
