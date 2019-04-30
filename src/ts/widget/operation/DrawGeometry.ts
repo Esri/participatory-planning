@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 import Geometry from "esri/geometry/Geometry";
 import geometryEngine from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
@@ -24,6 +23,7 @@ import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
 import PlanningScene from "../../PlanningScene";
 import DrawWidget from "../DrawWidget";
 import WidgetOperation, { OperationHandle } from "./WidgetOperation";
+
 
 export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
@@ -70,6 +70,7 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
       });
 
       this.launchSketchViewModel(sketchViewModel, create);
+      this.scene.view.focus();
     }, () => {
       sketchViewModel.cancel();
     });
