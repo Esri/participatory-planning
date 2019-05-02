@@ -27,7 +27,7 @@ The settings parameter is expected to be a URL pointing to JSON file with the fo
 2. `planningAreaName` is the name of the area shown in the welcome screen of the app
 3. `webSceneId` must point to a [Webscene](https://doc.arcgis.com/en/arcgis-online/reference/what-is-web-scene.htm), you can follow these steps to create your own:
     1.  Create a [Webscene in ArcGIS Online](https://doc.arcgis.com/en/arcgis-online/get-started/get-started-with-scenes.htm)
-    2.  Add some 3D data for things that currently exist in that area, such as buildings or trees
+    2.  The Webscene must contain a scene layer with 3D data for things that currently exist in that area (such as buildings or trees), together with this vector tile layer: http://www.arcgis.com/home/item.html?id=5cf1abb43c25482e8a9e37395349899
     2.  Capture a few slides with different perspectives of the planning area, they will show up at the upper navigation menu in the app
 
 A simple way of providing your own settings file is using [GitHub Gist](https://gist.github.com/) and passing the Gist's URL (raw version) to the app. This is an example for a planning area in Zug, Switzerland:
