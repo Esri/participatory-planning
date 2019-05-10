@@ -221,7 +221,7 @@ export default class App extends declared(WidgetBase) {
         <div id="intro" class="center">
           <div class="column-17">
             <div class="card card-wide">
-              <figure class="card-wide-image-wrap">
+              <figure class="card-wide-image-wrap phone-hide">
                 { thumbnail }
                 <div class="card-image-caption">
                 { planningAreaName }
