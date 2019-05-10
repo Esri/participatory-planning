@@ -64,7 +64,9 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(["dist/*"]),
 
-    new ArcGISPlugin(),
+    new ArcGISPlugin({
+      useDefaultAssetLoaders: false,
+    }),
 
     new HtmlWebPackPlugin({
       title: "ArcGIS Template Application",
