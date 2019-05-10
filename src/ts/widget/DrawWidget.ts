@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import { whenOnce } from "esri/core/watchUtils";
 import Polygon from "esri/geometry/Polygon";
@@ -77,45 +76,82 @@ export default class DrawWidget extends declared(WidgetBase) {
   }
 
   protected updatePolylineGraphic(graphic: Graphic, sketchColor: string): IPromise<Graphic[]> {
-    return new DrawPolyline(this, graphic, sketchColor)
+    const zIndex = this.zIndexOf(graphic);
+    const updatedGraphics = new DrawPolyline(this, graphic, sketchColor)
       .update()
-      .then((polyline) => this.splitPolyline(polyline, graphic));
+      .then((polyline) => this.splitPolyline(polyline, graphic))
+      .then((graphics) => {
+        this.reorderGraphics(graphics, zIndex);
+        return graphics;
+      });
+
+    this.revertOrderedGraphic(updatedGraphics, graphic, zIndex);
+    return updatedGraphics;
   }
 
   protected updatePolygonGraphic(graphic: Graphic, sketchColor: string): IPromise<Graphic[]> {
-    return new DrawPolygon(this, graphic, sketchColor)
+    const zIndex = this.zIndexOf(graphic);
+    const updatedGraphics = new DrawPolygon(this, graphic, sketchColor)
       .update()
-      .then((polygon) => this.splitPolygon(polygon, graphic));
+      .then((polygon) => this.splitPolygon(polygon, graphic))
+      .then((graphics) => {
+        this.reorderGraphics(graphics, zIndex);
+        return graphics;
+      });
+
+    this.revertOrderedGraphic(updatedGraphics, graphic, zIndex);
+    return updatedGraphics;
+  }
+
+  private zIndexOf(graphic: Graphic): number {
+    return this.layer.graphics.indexOf(graphic);
+  }
+
+  private reorderGraphics(graphics: Graphic[], zIndex: number) {
+    this.layer.removeMany(graphics);
+    const graphicsOnTop = this.layer.graphics.slice(zIndex).toArray();
+    this.layer.removeMany(graphicsOnTop);
+    this.layer.addMany(graphics);
+    this.layer.addMany(graphicsOnTop.map((g) => Graphic.fromJSON(g.toJSON())));
+  }
+
+  private revertOrderedGraphic(promise: IPromise<any>, originalGraphic: Graphic, zIndex: number) {
+    // The JS API will emit a cancel event if the graphic has not changed, even if it changed the order. We fix this
+    // by catching and calling reorderGraphics().
+    promise.catch(() => {
+      const newZIndex = this.zIndexOf(originalGraphic);
+      if (0 <= newZIndex) {
+        this.reorderGraphics([originalGraphic], zIndex);
+      }
+    });
   }
 
   private splitPolyline(polyline: Polyline, graphic: Graphic): Graphic[] {
+    const graphics: Graphic[] = [];
     if (1 < polyline.paths.length) {
-      const splitGeometries = polyline.paths.map((path) => {
+      polyline.paths.forEach((path) => {
         const clonedGraphic = graphic.clone();
         (clonedGraphic.geometry as Polyline).paths = [path];
-        return clonedGraphic;
+        graphics.push(clonedGraphic);
       });
-      this.layer.remove(graphic);
-      this.layer.addMany(splitGeometries);
-      return splitGeometries;
     } else {
-      return [graphic];
+      graphics.push(graphic);
     }
+    return graphics;
   }
 
   private splitPolygon(polygon: Polygon, graphic: Graphic): Graphic[] {
+    const graphics = [];
     if (1 < polygon.rings.length) {
-      const splitGeometries = polygon.rings.map((ring) => {
+      polygon.rings.forEach((ring) => {
         const clonedGraphic = graphic.clone();
         (clonedGraphic.geometry as Polygon).rings = [ring];
-        return clonedGraphic;
+        graphics.push(clonedGraphic);
       });
-      this.layer.remove(graphic);
-      this.layer.addMany(splitGeometries);
-      return splitGeometries;
     } else {
-      return [graphic];
+      graphics.push(graphic);
     }
+    return graphics;
   }
 
 }
