@@ -95,9 +95,6 @@ export default class PlanningScene extends declared(WidgetBase) {
 
     this.view = new SceneView({
       map: this.map,
-      ui: {
-        components: [],
-      },
       qualityProfile: QUALITY,
     } as any);
 
