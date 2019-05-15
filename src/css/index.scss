@@ -37,6 +37,10 @@ body {
     box-shadow: none;
 }
 
+.esri-view-surface--inset-outline:focus::after {
+    outline: none !important;
+}
+
 // General
 .center {
     position: absolute;
