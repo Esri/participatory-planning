@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
-
 import Point from "esri/geometry/Point";
 import Graphic from "esri/Graphic";
 
 import DrawWidget from "../DrawWidget";
 import DrawGeometry from "./DrawGeometry";
+
 
 export default class DrawPoint extends DrawGeometry<Point> {
 
@@ -34,8 +34,10 @@ export default class DrawPoint extends DrawGeometry<Point> {
     // Update graphic when mouse moves
     const handler = view.on("pointer-move", (event) => {
       const mapPoint = view.toMap(event);
-      const snappedPoint = this.snapAndAddZ(mapPoint);
-      this.updateGraphicFromGeometry(snappedPoint);
+      if (mapPoint) {
+        const snappedPoint = this.snapAndAddZ(mapPoint);
+        this.updateGraphicFromGeometry(snappedPoint);
+      }
     });
 
     // Remove event listener when operation is done
