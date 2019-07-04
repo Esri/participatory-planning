@@ -108,9 +108,15 @@ export default class PlanningScene extends declared(WidgetBase) {
       geometry: this.maskPolygon,
     });
 
-    const geometry = computeBoundingPolygon(this.maskPolygon);
     this.boundingPolygonGraphic = new Graphic({
-      geometry,
+      geometry: computeBoundingPolygon(this.maskPolygon),
+      symbol: {
+        type: "simple-fill",
+        color: [0, 0, 0, 0.15],
+        outline: {
+          width: 0,
+        },
+      } as any,
     });
 
     this.map.when(() => {
@@ -140,25 +146,13 @@ export default class PlanningScene extends declared(WidgetBase) {
   public showMaskedBuildings(color?: any) {
     if (color && color.a !== 0) {
       // Show masked buildings with provided color, all other buildings are white
-      this.boundingPolygonGraphic.symbol = {
-          type: "simple-fill",
-          color: [0, 0, 0, 0],
-          outline: {
-            width: 0,
-          },
-        } as any;
+      this.boundingPolygonGraphic.visible = false;
       this.sceneLayerView.set("filter", null);
       this.drawLayers().forEach((layer) => layer.visible = false);
     } else {
       this.sceneLayerView.filter = this.sceneLayerFilter;
       this.drawLayers().forEach((layer) => layer.visible = true);
-      this.boundingPolygonGraphic.symbol = {
-          type: "simple-fill",
-          color: [0, 0, 0, 0.15],
-          outline: {
-            width: 0,
-          },
-        } as any;
+      this.boundingPolygonGraphic.visible = true;
     }
     this.sceneLayer.visible = true;
   }
