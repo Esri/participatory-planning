@@ -1,13 +1,14 @@
 {
-  "name": "demo",
-  "version": "0.0.1",
+  "name": "participatory-planning",
+  "version": "1.0.0",
+  "repository": "https://github.com/Esri/participatory-planning",
   "devDependencies": {
     "@theintern/istanbul-loader": "^1.0.0-beta.2",
     "@types/animejs": "^2.0.1",
     "@types/arcgis-js-api": "4.11.0",
     "@types/sinon": "^5.0.5",
     "animejs": "^3.0.1",
-    "arcgis-js-api": "4.11.1",
+    "arcgis-js-api": "4.12.0",
     "calcite-web": "github:esri/calcite-web",
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "4.5.2",
@@ -15,22 +16,22 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.4.4",
-    "node-sass": "4.9.3",
-    "prettier": "^1.17.0",
+    "node-sass": "4.12.0",
+    "prettier": "^1.18.2",
     "resolve-url-loader": "^2.3.1",
     "sass-loader": "^7.1.0",
     "style-loader": "0.23.0",
     "ts-loader": "^4.5.0",
-    "tslib": "^1.9.3",
-    "tslint": "^5.16.0",
+    "tslib": "^1.10.0",
+    "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.15.0",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-plugin-prettier": "^1.3.0",
-    "typescript": "^3.4.5",
+    "typescript": "^3.5.2",
     "uglifyjs-webpack-plugin": "^1.3.0",
-    "webpack": "^4.31.0",
+    "webpack": "^4.35.2",
     "webpack-cli": "~3.1.1",
-    "webpack-dev-server": "^3.3.1"
+    "webpack-dev-server": "^3.7.2"
   },
   "license": "Apache-2.0",
   "scripts": {
@@ -41,7 +42,7 @@
     "lint": "tslint --fix \"src/**/*.ts?(x)\""
   },
   "dependencies": {
-    "@arcgis/webpack-plugin": "~4.11.0"
+    "@arcgis/webpack-plugin": "~4.12.1"
   },
   "arcgis": {
     "type": "jsapi"
