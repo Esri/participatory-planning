@@ -41,7 +41,7 @@
     "lint": "tslint --fix \"src/**/*.ts?(x)\""
   },
   "dependencies": {
-    "@arcgis/webpack-plugin": "~4.11.0"
+    "@arcgis/webpack-plugin": "~4.12.1"
   },
   "arcgis": {
     "type": "jsapi"

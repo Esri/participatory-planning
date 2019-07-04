@@ -66,6 +66,12 @@ module.exports = {
 
     new ArcGISPlugin({
       useDefaultAssetLoaders: false,
+      features: {
+        has: {
+          // enable native promise in ArcGIS API for JavaScript
+          'esri-native-promise': true,
+        }
+      }
     }),
 
     new HtmlWebPackPlugin({
