@@ -21,7 +21,7 @@ import Collection from "esri/core/Collection";
 import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
-import Layer from "esri/layers/Layer";
+import VectorTileLayer from "esri/layers/VectorTileLayer";
 import Viewpoint from "esri/Viewpoint";
 import Slide from "esri/webscene/Slide";
 import { renderable, tsx } from "esri/widgets/support/widget";
@@ -51,7 +51,12 @@ const EMPTY_POLYLINE = new Polyline({
 @subclass("app.widgets.Timeline")
 export default class Timeline extends declared(WidgetBase) {
 
-  private vectorTileLayer: Layer;
+  private vectorTileLayer = new VectorTileLayer({
+    portalItem: {
+      id: "5cf1abb43c25482e8a9e373953498999",
+    },
+    visible: false,
+  } as any);
 
   private initialViewpoint: Viewpoint;
 
@@ -91,12 +96,7 @@ export default class Timeline extends declared(WidgetBase) {
       this.initialViewpoint = map.initialViewProperties.viewpoint;
       this.drawViewpoint = this.slides.length ? this.slides.getItemAt(0).viewpoint : this.initialViewpoint;
 
-      map.layers.some((layer) => {
-        if (layer.type === "vector-tile") {
-          this.vectorTileLayer = layer;
-          return true;
-        }
-      });
+      map.layers.add(this.vectorTileLayer);
 
       const color = this.maskColor.clone();
       color.a = 0;
