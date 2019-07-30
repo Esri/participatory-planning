@@ -14,13 +14,14 @@
  * limitations under the License.
  *
  */
-
 import Accessor from "esri/core/Accessor";
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import IconSymbol3DLayer = require("esri/symbols/IconSymbol3DLayer");
 import EsriSymbol from "esri/symbols/Symbol";
 import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
 
 import SymbolGroup from "./SymbolGroup";
+
 
 @subclass("widgets.symbolgallery.SymbolItem")
 export default class SymbolItem extends declared(Accessor) {
@@ -52,7 +53,34 @@ export default class SymbolItem extends declared(Accessor) {
 
   public fetchSymbol(): IPromise<EsriSymbol> {
     if (!this.fetchPromise) {
-      this.fetchPromise = this.webSymbol.fetchSymbol().then((actualSymbol) => actualSymbol);
+      this.fetchPromise = this.webSymbol.fetchSymbol().then(
+        (actualSymbol) => {
+
+          // Add vertical offset to icon symbols as otherwise they vanish inside
+          // extruded buildings where the ground is not even.
+
+          if (actualSymbol.symbolLayers.length) {
+            const symbolLayer = actualSymbol.symbolLayers.getItemAt(0);
+            if (symbolLayer.type === "icon") {
+              const icon = symbolLayer as IconSymbol3DLayer;
+              icon.anchor = "relative";
+              icon.anchorPosition = { x: 0, y: 0.6 };
+              actualSymbol.verticalOffset = {
+                screenLength: 20,
+                maxWorldLength: 50,
+                minWorldLength: 5,
+              };
+              actualSymbol.callout = {
+                type: "line",
+                color: [200, 200, 200],
+                size: 0.8,
+              } as any;
+
+              return actualSymbol.clone();
+            }
+          }
+          return actualSymbol;
+        });
     }
     return this.fetchPromise;
   }

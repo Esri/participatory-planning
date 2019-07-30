@@ -193,12 +193,8 @@ export default class PlanningScene extends declared(WidgetBase) {
   public heightAtPoint(mapPoint: Point): number {
     return this.drawLayers().reduceRight((max1, layer) => {
       return layer.graphics.reduceRight((max2, graphic) => {
-        const layers = graphic.get<any>("symbol.symbolLayers");
-        const extrusion = layers && layers.getItemAt(0).size;
-        if (max2 < extrusion && geometryEngine.contains(graphic.geometry, mapPoint)) {
-          return extrusion;
-        }
-        return max2;
+        const extrusion = this.getExtrudedHeight(mapPoint, graphic);
+        return Math.max(extrusion, max2);
       }, max1);
     }, 0);
   }
@@ -228,6 +224,15 @@ export default class PlanningScene extends declared(WidgetBase) {
 
   private attachSceneView(sceneViewDiv: HTMLDivElement) {
     this.view.container = sceneViewDiv;
+  }
+
+  private getExtrudedHeight(point: Point, graphic: Graphic) {
+    if (graphic.symbol.type === "polygon-3d" && geometryEngine.contains(graphic.geometry, point)) {
+      const layers = graphic.get<any>("symbol.symbolLayers");
+      const extrusion = layers && layers.getItemAt(0).size;
+      return extrusion;
+    }
+    return 0;
   }
 
 }
