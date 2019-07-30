@@ -35,7 +35,6 @@ import { tsx } from "esri/widgets/support/widget";
 import { computeBoundingPolygon } from "./support/geometry";
 import WidgetBase from "./widget/WidgetBase";
 
-
 // One of low, medium, high
 export const QUALITY = "high";
 
