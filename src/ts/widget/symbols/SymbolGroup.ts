@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 import Accessor from "esri/core/Accessor";
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
@@ -34,36 +33,48 @@ export default class SymbolGroup extends declared(Accessor) {
   })
   public readonly items = new SymbolItemCollection();
 
-  @property()
-  public title: string;
+  constructor(public category: SymbolGroupId, portalItems: IPromise<PortalItem[]>) {
+    super();
 
-  private portalItem: PortalItem;
-
-  private loadingPromise: IPromise;
-
-  constructor(public category: SymbolGroupId, portalItem: PortalItem) {
-    super(portalItem);
-    this.portalItem = portalItem;
-    this.title = portalItem.title;
+    portalItems.then((items) => this.addSymbolItems(items));
   }
 
-  public loadItems(): IPromise {
-    if (!this.loadingPromise) {
-      this.loadingPromise = this
-        .fetchSymbolItems()
-        .catch(console.error.bind("Failed to load symbols"));
-    }
-    return this.loadingPromise;
-  }
+  private addSymbolItems(items: PortalItem[]) {
+    items.forEach((item) => {
+      const styleName = this.getStyleName(item);
 
-  private fetchSymbolItems(): IPromise {
-    return this.portalItem.fetchData().then((data) => {
-      this.items.addMany(
-        data.items
-        //  .filter((symbolItem: any) => symbolItem.thumbnail.href && symbolItem.dimensionality === "volumetric")
-          .map((symbolItem: any) => new SymbolItem(symbolItem, this)),
-      );
+      if (this.styleNameMatchesGroup(styleName)) {
+        item.fetchData().then((data) => {
+          this.items.addMany(
+            data.items
+            //  .filter((symbolItem: any) => symbolItem.thumbnail.href && symbolItem.dimensionality === "volumetric")
+              .map((symbolItem: any) => new SymbolItem(symbolItem, styleName)),
+          );
+        });
+      }
     });
+  }
+
+  private getStyleName(item: PortalItem): string {
+    for (const typeKeyword of item.typeKeywords) {
+      if (/^Esri.*Style$/.test(typeKeyword) && typeKeyword !== "Esri Style") {
+        return typeKeyword;
+      }
+    }
+    return "";
+  }
+
+  private styleNameMatchesGroup(styleName: string): boolean {
+    switch (this.category) {
+      case SymbolGroupId.Icons:
+        return styleName === "EsriIconsStyle";
+      case SymbolGroupId.Trees:
+        return styleName === "EsriRealisticTreesStyle";
+      case SymbolGroupId.Vehicles:
+        return styleName === "EsriRealisticTransportationStyle";
+          // || styleName === "EsriInfrastructureStyle";
+    }
+    return false;
   }
 
 }

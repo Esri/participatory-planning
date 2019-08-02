@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import Portal from "esri/portal/Portal";
@@ -30,9 +29,9 @@ import SymbolGroup from "./symbols/SymbolGroup";
 import SymbolItem from "./symbols/SymbolItem";
 
 export enum SymbolGroupId {
-  Icons = "EsriIconsStyle",
-  Trees = "EsriRealisticTreesStyle",
-  Vehicles = "EsriRealisticTransportationStyle",
+  Icons = "Icons",
+  Trees = "Trees",
+  Vehicles = "Vehicles",
 }
 
 @subclass("app.draw.SymbolGallery")
@@ -66,13 +65,17 @@ export default class SymbolGallery extends declared(DrawWidget) {
 
   private portal: Portal | null = null;
 
-  private loadingPromise: IPromise;
-
   public postInitialize() {
     this.layer.elevationInfo = {
       mode: "relative-to-ground",
     };
-    this.load();
+
+    if (!this.groups.length) {
+      const futureItems = this.queryPortalItems();
+      this.groups.add(new SymbolGroup(SymbolGroupId.Icons, futureItems));
+      this.groups.add(new SymbolGroup(SymbolGroupId.Trees, futureItems));
+      this.groups.add(new SymbolGroup(SymbolGroupId.Vehicles, futureItems));
+    }
   }
 
   public render() {
@@ -92,14 +95,11 @@ export default class SymbolGallery extends declared(DrawWidget) {
 
   private renderSymbolItem(item: SymbolItem) {
     const href = item.thumbnailHref;
-    const key = item.group.category + item.name;
-
     return (
-      <div class="gallery-grid-item" key={key} bind={this} onclick={ this.selectSymbolItem } data-item={item}>
+      <div class="gallery-grid-item" key={href} bind={this} onclick={ this.selectSymbolItem } data-item={item}>
         <img src={href} />
       </div>
     );
-    // draggable="true" bind={this} ondragstart={ this.startDrag }
   }
 
   private selectSymbolItem(event: any) {
@@ -118,21 +118,6 @@ export default class SymbolGallery extends declared(DrawWidget) {
     });
   }
 
-  private load(): IPromise {
-    if (!this.loadingPromise) {
-      this.loadingPromise = this
-        .loadPortal()
-        .then((portal) => this.querySymbolGroups(portal))
-        .then((symbolGroups) => {
-          this.groups = new Collection<SymbolGroup>(symbolGroups);
-          this.groups.forEach((group) => group.loadItems());
-        });
-        // .then(() => this.scheduleRender());
-    }
-
-    return this.loadingPromise;
-  }
-
   private loadPortal(): IPromise<Portal> {
     const portal = this.portal || Portal.getDefault();
 
@@ -142,41 +127,23 @@ export default class SymbolGallery extends declared(DrawWidget) {
     });
   }
 
-  private querySymbolGroups(portal: Portal): IPromise<SymbolGroup[]> {
-    return portal.queryGroups({
-      query: "title:\"Esri Styles\" AND owner:esri_en",
-    })
-    .then((groups: PortalQueryResult) => {
-      const queryParams = new PortalQueryParams({
-        num: 20,
-        sortField: "title",
+  private queryPortalItems(): IPromise<PortalItem[]> {
+    return this.loadPortal()
+      .then((portal) => {
+        return portal.queryGroups({
+          query: "title:\"Esri Styles\" AND owner:esri_en",
+        });
+      })
+      .then((groups: PortalQueryResult) => {
+        const queryParams = new PortalQueryParams({
+          num: 20,
+          sortField: "title",
+        });
+        return groups.results[0].queryItems(queryParams) as IPromise<PortalQueryResult>;
+      })
+      .then((queryResult) => {
+        return queryResult.results;
       });
-      return groups.results[0].queryItems(queryParams) as IPromise<PortalQueryResult>;
-    })
-    .then((queryResult) => {
-      return queryResult.results;
-    })
-    .then((items) => {
-      return items
-        .map((item) => this.groupFromItem(item))
-        .filter((item) => item != null) as SymbolGroup[];
-    });
-  }
-
-  private groupFromItem(item: PortalItem): SymbolGroup | null {
-    const groupId = this.groupIdFromItem(item);
-    return groupId ? new SymbolGroup(groupId, item) : null;
-  }
-
-  private groupIdFromItem(item: PortalItem): SymbolGroupId | undefined {
-  // Find type keyword that looks like it's an esri style and hope it works
-    for (const typeKeyword of item.typeKeywords) {
-      if (/^Esri.*Style$/.test(typeKeyword) && typeKeyword !== "Esri Style") {
-        return Object.keys(SymbolGroupId)
-          .map((key) => SymbolGroupId[key])
-          .find((value) => value === typeKeyword);
-      }
-    }
   }
 
 }

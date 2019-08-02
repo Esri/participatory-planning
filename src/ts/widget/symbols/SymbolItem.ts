@@ -20,9 +20,6 @@ import IconSymbol3DLayer = require("esri/symbols/IconSymbol3DLayer");
 import EsriSymbol from "esri/symbols/Symbol";
 import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
 
-import SymbolGroup from "./SymbolGroup";
-
-
 @subclass("widgets.symbolgallery.SymbolItem")
 export default class SymbolItem extends declared(Accessor) {
 
@@ -32,22 +29,18 @@ export default class SymbolItem extends declared(Accessor) {
   public thumbnailHref: string;
 
   @property()
-  public group: SymbolGroup;
-
-  @property()
   public name: string;
 
   public webSymbol: WebStyleSymbol;
 
   private fetchPromise: IPromise<EsriSymbol>;
 
-  constructor(data: any, group: SymbolGroup) {
+  constructor(data: any, styleName: string) {
     super(data);
-    this.group = group;
     this.thumbnailHref = data.thumbnail.href;
     this.webSymbol = new WebStyleSymbol({
       name: data.name,
-      styleName: group.category,
+      styleName,
     });
   }
 
