@@ -16,7 +16,6 @@
  */
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
-import { eachAlways } from "esri/core/promiseUtils";
 import { whenNotOnce } from "esri/core/watchUtils";
 import geometryEngine from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
@@ -200,17 +199,7 @@ export default class PlanningScene extends declared(WidgetBase) {
   }
 
   public whenNotUpdating(): IPromise {
-    // Wait for map to load
-    return this.map.when().then(() => {
-      // For each loaded layer, wait for its layer view
-      const lvPromises = this.map.allLayers.map((layer) => {
-        // For each layer view, wait for it to be done updating
-        return this.view.whenLayerView(layer).then((lv) => {
-          return whenNotOnce(lv, "updating");
-        });
-      });
-      return eachAlways(lvPromises);
-    });
+    return whenNotOnce(this.view, "updating");
   }
 
   public drawLayers(): Collection<GraphicsLayer> {
