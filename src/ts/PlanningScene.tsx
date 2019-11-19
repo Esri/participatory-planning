@@ -157,7 +157,8 @@ export default class PlanningScene extends declared(WidgetBase) {
 
   public showTexturedBuildings() {
     this.drawLayers().forEach((layer) => layer.visible = false);
-    this.sceneLayer.visible = false;
+    this.sceneLayer.visible = true;
+    this.sceneLayerView.set("filter", null);
     this.boundingPolygonGraphic.symbol = {
         type: "simple-fill",
         color: [0, 0, 0, 0],
