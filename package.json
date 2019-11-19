@@ -20,7 +20,7 @@
     "resolve-url-loader": "^2.3.1",
     "sass-loader": "^7.1.0",
     "style-loader": "0.23.0",
-    "ts-loader": "^4.5.0",
+    "ts-loader": "^6.2.1",
     "tslib": "^1.10.0",
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.15.0",
