@@ -8,7 +8,7 @@
     "@types/arcgis-js-api": "4.13.0",
     "@types/sinon": "^5.0.5",
     "animejs": "^3.1.0",
-    "arcgis-js-api": "4.13.2",
+    "arcgis-js-api": "next",
     "calcite-web": "github:esri/calcite-web",
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "4.5.2",
