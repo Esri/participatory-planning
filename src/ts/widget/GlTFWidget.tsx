@@ -48,7 +48,7 @@ export default class GlTFWidget extends declared(DrawWidget) {
 
   public postInitialize() {
     this.layer.elevationInfo = {
-      mode: "relative-to-ground",
+      mode: "on-the-ground",
     };
     this.watch("progress", (value) => this.toggleLoadingIndicator(true, "Importing " + value + "%"));
   }

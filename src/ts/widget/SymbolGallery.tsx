@@ -67,7 +67,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
 
   public postInitialize() {
     this.layer.elevationInfo = {
-      mode: "relative-to-ground",
+      mode: "on-the-ground",
     };
 
     if (!this.groups.length) {
