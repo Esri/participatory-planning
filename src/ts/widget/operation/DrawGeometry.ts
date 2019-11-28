@@ -104,7 +104,7 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
         sketchGraphic.geometry.hasZ = false;
       }
 
-      sketchViewModel.update(sketchGraphic, { tool: "reshape" });
+      sketchViewModel.update(sketchGraphic, { tool: this.geometryType === "point" ? "transform" : "reshape" });
 
       if (hasZ) {
         sketchGraphic.geometry = lastGeometry;
