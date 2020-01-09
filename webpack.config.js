@@ -1,4 +1,3 @@
-const ArcGISPlugin = require("@arcgis/webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -12,7 +11,8 @@ module.exports = {
     index: ["./src/css/main.scss", "./src/index.ts"]
   },
   output: {
-    filename: "[name].[chunkhash].js",
+    libraryTarget: "amd",
+    filename: "[name].js",
     publicPath: ""
   },
   optimization: {
@@ -24,6 +24,10 @@ module.exports = {
       })
     ]
   },
+  externals: [
+    /^esri\/.*/,
+    /^app\/.*/
+  ],
   module: {
     rules: [
       {
@@ -64,27 +68,19 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(["dist/*"]),
 
-    new ArcGISPlugin({
-      useDefaultAssetLoaders: false,
-      // features: {
-      //   has: {
-      //     // enable native promise in ArcGIS API for JavaScript
-      //     'esri-native-promise': true,
-      //   }
-      // }
-    }),
-
     new HtmlWebPackPlugin({
       title: "ArcGIS Template Application",
       template: "./src/index.html",
       filename: "./index.html",
       favicon: "./src/assets/favicon.ico",
       chunksSortMode: "none",
+      inject: false,
+      hash: false,
       inlineSource: ".(css)$"
     }),
 
     new MiniCssExtractPlugin({
-      filename: "[name].[chunkhash].css",
+      filename: "[name].css",
       chunkFilename: "[id].css"
     }),
 

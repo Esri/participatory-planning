@@ -14,11 +14,34 @@
 
   <script>
     zip.workerScriptsPath = 'js/zip.js/';
+
+    // Local test-apps (dojo-config) will enable native promises but the app uses some dojo promise
+    // stuff. Explicitly force dojo promises for now.
+    var dojoConfig = {
+      has: {
+        "esri-native-promise": false
+      }
+    };
   </script>
+
+  <!-- <link rel="stylesheet" href="https://jsdev.arcgis.com/4.14/esri/css/main.css">
+  <script src="https://jsdev.arcgis.com/4.14/"></script> -->
+
+  <link rel="stylesheet" href="./index.css" />
 
   <title>Participatory Planning</title>
 </head>
 <body id="app">
   <noscript>JavaScript is required in order to use this app </noscript>
+
+  <script>
+    require({
+      packages: [{
+        name: "app",
+        location: document.location.pathname.replace(/\/[^/]+$/, "")
+      }]
+    }, ["app/index"], function() {
+    });
+  </script>
 </body>
 </html>
