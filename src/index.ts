@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-import "./config";
-
 import request from "esri/request";
 
 import App from "./ts/App";
