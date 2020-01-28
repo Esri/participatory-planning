@@ -12,6 +12,9 @@ body,
     width: 100%;
 }
 
+$off-black: #4c4c4c;
+$dark-blue: #005e95;
+
 // Disable selection & highlighting
 body {
     -webkit-touch-callout: none;
@@ -125,10 +128,6 @@ body {
 .btn {
     border-radius: 8px;
     border: none;
-}
-
-.btn-large {
-    @extend .font-size-1;
 }
 
 .btn-white {
