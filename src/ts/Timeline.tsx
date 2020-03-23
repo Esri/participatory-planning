@@ -26,7 +26,6 @@ import Viewpoint from "esri/Viewpoint";
 import Slide from "esri/webscene/Slide";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
-import { dojoPromise } from "./support/promises";
 import WidgetBase from "./widget/WidgetBase";
 
 
@@ -334,7 +333,7 @@ export default class Timeline extends declared(WidgetBase) {
         },
       });
     });
-    return dojoPromise(timeline.finished);
+    return timeline.finished;
   }
 
   private animateMask(): Promise<void> {
@@ -375,7 +374,7 @@ export default class Timeline extends declared(WidgetBase) {
         this.maskPolyline.geometry = EMPTY_POLYLINE;
       },
     });
-    return dojoPromise(timeline.finished);
+    return timeline.finished;
   }
 
   private toggleBasemap(show: boolean): Promise<void> {
