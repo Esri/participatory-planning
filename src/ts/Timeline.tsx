@@ -140,7 +140,7 @@ export default class Timeline extends declared(WidgetBase) {
     );
   }
 
-  public showIntro(): IPromise {
+  public showIntro(): Promise<void> {
     this.toggleLoadingIndicator(true);
     this.app.scene.showMaskedBuildings("white");
     this.app.scene.clear();
@@ -156,7 +156,7 @@ export default class Timeline extends declared(WidgetBase) {
       });
   }
 
-  public playIntroAnimation(): IPromise {
+  public playIntroAnimation(): Promise<void> {
     this.toggleElement("intro", false);
     return this
       .app.scene.whenNotUpdating()
@@ -271,7 +271,7 @@ export default class Timeline extends declared(WidgetBase) {
     this.toggleElement("screenshot", true);
   }
 
-  private goTo(target: Viewpoint | Graphic, duration = 800): IPromise {
+  private goTo(target: Viewpoint | Graphic, duration = 800): Promise<void> {
     const view = this.app.scene.view;
     return view.goTo(target, { duration }).then(() => {
 
@@ -282,7 +282,7 @@ export default class Timeline extends declared(WidgetBase) {
     }).catch(console.log);
   }
 
-  private animateArea(): IPromise<void> {
+  private animateArea(): Promise<void> {
 
     const planningArea = this.app.settings.planningArea;
     const start = planningArea[0];
@@ -337,7 +337,7 @@ export default class Timeline extends declared(WidgetBase) {
     return dojoPromise(timeline.finished);
   }
 
-  private animateMask(): IPromise<void> {
+  private animateMask(): Promise<void> {
     const color = new Color({
       r: 226,
       g: 119,
@@ -378,7 +378,7 @@ export default class Timeline extends declared(WidgetBase) {
     return dojoPromise(timeline.finished);
   }
 
-  private toggleBasemap(show: boolean): IPromise {
+  private toggleBasemap(show: boolean): Promise<void> {
     this.app.scene.map.basemap = (show ? "satellite" : null) as any;
     this.vectorTileLayer.visible = !show;
     return this.app.scene.whenNotUpdating();

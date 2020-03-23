@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 import { aliasOf, declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import ObjectSymbol3DLayer from "esri/symbols/ObjectSymbol3DLayer";
@@ -23,6 +22,7 @@ import { renderable, tsx } from "esri/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
 import GlTFImport from "./support/GlTFImport";
+
 
 enum GlTFWidgetState {
   Import = "Import",

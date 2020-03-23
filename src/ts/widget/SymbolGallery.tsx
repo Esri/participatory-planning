@@ -118,7 +118,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
     });
   }
 
-  private loadPortal(): IPromise<Portal> {
+  private loadPortal(): Promise<Portal> {
     const portal = this.portal || Portal.getDefault();
 
     return portal.load().then(() => {
@@ -127,7 +127,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
     });
   }
 
-  private queryPortalItems(): IPromise<PortalItem[]> {
+  private queryPortalItems(): Promise<PortalItem[]> {
     return this.loadPortal()
       .then((portal) => {
         return portal.queryGroups({
@@ -139,7 +139,7 @@ export default class SymbolGallery extends declared(DrawWidget) {
           num: 20,
           sortField: "title",
         });
-        return groups.results[0].queryItems(queryParams) as IPromise<PortalQueryResult>;
+        return groups.results[0].queryItems(queryParams) as Promise<PortalQueryResult>;
       })
       .then((queryResult) => {
         return queryResult.results;

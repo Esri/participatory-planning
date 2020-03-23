@@ -33,7 +33,7 @@ export default class SymbolItem extends declared(Accessor) {
 
   public webSymbol: WebStyleSymbol;
 
-  private fetchPromise: IPromise<EsriSymbol>;
+  private fetchPromise: Promise<EsriSymbol>;
 
   constructor(data: any, styleName: string) {
     super(data);
@@ -44,7 +44,7 @@ export default class SymbolItem extends declared(Accessor) {
     });
   }
 
-  public fetchSymbol(): IPromise<EsriSymbol> {
+  public fetchSymbol(): Promise<EsriSymbol> {
     if (!this.fetchPromise) {
       this.fetchPromise = this.webSymbol.fetchSymbol().then(
         (actualSymbol) => {

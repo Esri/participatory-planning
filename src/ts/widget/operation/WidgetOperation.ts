@@ -14,9 +14,6 @@
  * limitations under the License.
  *
  */
-
-import { create as createPromise } from "esri/core/promiseUtils";
-
 import { Operation } from "../../App";
 import DrawWidget from "../DrawWidget";
 
@@ -43,9 +40,9 @@ export default class WidgetOperation implements Operation {
     }
   }
 
-  protected initiate<T>(start: (_: OperationHandle<T>) => void, cancel: () => void): IPromise<T> {
+  protected initiate<T>(start: (_: OperationHandle<T>) => void, cancel: () => void): Promise<T> {
 
-    const promise = createPromise(((resolve: (_: T) => void, reject: (error?: any) => void) => {
+    const promise = new Promise<T>(((resolve: (_: T) => void, reject: (error?: any) => void) => {
       // Make this the current running operation
       this.widget.app.currentOperation = this;
 
@@ -54,7 +51,7 @@ export default class WidgetOperation implements Operation {
       start({resolve, reject});
     }) as any);
 
-    promise.always(() => {
+    promise.finally(() => {
       this.widget.app.currentOperation = null;
     });
     return promise;

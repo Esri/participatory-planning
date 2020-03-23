@@ -33,7 +33,7 @@ export default class SymbolGroup extends declared(Accessor) {
   })
   public readonly items = new SymbolItemCollection();
 
-  constructor(public category: SymbolGroupId, portalItems: IPromise<PortalItem[]>) {
+  constructor(public category: SymbolGroupId, portalItems: Promise<PortalItem[]>) {
     super();
 
     portalItems.then((items) => this.addSymbolItems(items));

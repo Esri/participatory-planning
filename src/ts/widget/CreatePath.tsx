@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
+
 
 interface PathMenu {
   label: string;
@@ -66,7 +66,7 @@ export default class CreatePath extends declared(DrawWidget) {
     );
   }
 
-  public updateGraphic(graphic: Graphic): IPromise<Graphic[]> {
+  public updateGraphic(graphic: Graphic): Promise<Graphic[]> {
     return this.updatePolylineGraphic(graphic, graphic.symbol.color.toHex());
   }
 
@@ -76,7 +76,7 @@ export default class CreatePath extends declared(DrawWidget) {
       width: menu.width,
     });
 
-    this.createPolylineGraphic(symbol, menu.color).always(() => {
+    this.createPolylineGraphic(symbol, menu.color).finally(() => {
       this.activeMenu = null;
     });
     this.activeMenu = menu;

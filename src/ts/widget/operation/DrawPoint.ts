@@ -26,7 +26,7 @@ export default class DrawPoint extends DrawGeometry<Point> {
     super(widget, graphic, "point");
   }
 
-  public create(): IPromise<Point> {
+  public create(): Promise<Point> {
     const result = super.create();
     const view = this.widget.app.scene.view;
 
@@ -40,7 +40,7 @@ export default class DrawPoint extends DrawGeometry<Point> {
     });
 
     // Remove event listener when operation is done
-    result.always(() => handler.remove());
+    result.finally(() => handler.remove());
 
     return result;
   }

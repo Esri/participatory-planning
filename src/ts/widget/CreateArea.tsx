@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
+
 
 interface ColorMenu {
   label: string;
@@ -71,7 +71,7 @@ export default class CreateArea extends declared(DrawWidget) {
     );
   }
 
-  public updateGraphic(graphic: Graphic): IPromise<Graphic[]> {
+  public updateGraphic(graphic: Graphic): Promise<Graphic[]> {
     return this.updatePolygonGraphic(graphic, graphic.symbol.color.toHex());
   }
 
@@ -84,7 +84,7 @@ export default class CreateArea extends declared(DrawWidget) {
       },
     });
 
-    this.createPolygonGraphic(symbol, color).always(() => {
+    this.createPolygonGraphic(symbol, color).finally(() => {
       this.activeColor = null;
     });
     this.activeColor = color;

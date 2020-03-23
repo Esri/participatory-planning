@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import PolygonSymbol3D from "esri/symbols/PolygonSymbol3D";
 import { renderable, tsx } from "esri/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
+
 
 const BUILDING_COLOR = "#FFFFFF";
 const BUILDING_FLOOR_HEIGHT = 3;
@@ -50,7 +50,7 @@ export default class CreateBuilding extends declared(DrawWidget) {
     );
   }
 
-  public updateGraphic(graphic: Graphic): IPromise<Graphic[]> {
+  public updateGraphic(graphic: Graphic): Promise<Graphic[]> {
     return this.updatePolygonGraphic(graphic, BUILDING_COLOR);
   }
 
@@ -73,7 +73,7 @@ export default class CreateBuilding extends declared(DrawWidget) {
         size,
       }] as any,
     });
-    this.createPolygonGraphic(symbol, color).always(() => {
+    this.createPolygonGraphic(symbol, color).finally(() => {
       this.stories = 0;
     });
     this.stories = stories;

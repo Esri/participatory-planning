@@ -24,7 +24,6 @@ import PlanningScene from "../../PlanningScene";
 import DrawWidget from "../DrawWidget";
 import WidgetOperation, { OperationHandle } from "./WidgetOperation";
 
-
 export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
   protected scene: PlanningScene;
@@ -34,15 +33,15 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
     this.scene = widget.app.scene;
   }
 
-  public create(): IPromise<G> {
+  public create(): Promise<G> {
     return this.runSketchViewModel(true);
   }
 
-  public update(): IPromise<G> {
+  public update(): Promise<G> {
     return this.runSketchViewModel(false);
   }
 
-  protected runSketchViewModel(create: boolean): IPromise<G> {
+  protected runSketchViewModel(create: boolean): Promise<G> {
     const haloOpacity = this.scene.view.highlightOptions.haloOpacity;
     const fillOpacity = this.scene.view.highlightOptions.fillOpacity;
 
@@ -65,8 +64,8 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
       }
       this.scene.view.highlightOptions.fillOpacity = 0;
 
-      sketchViewModel.on(["create", "update"], (event) => {
-        this.onSketchViewModelEvent(sketchViewModel, event, handle);
+      sketchViewModel.on(["create", "update"] as any, (event) => {
+        this.onSketchViewModelEvent(sketchViewModel, event as any, handle);
       });
 
       this.launchSketchViewModel(sketchViewModel, create);
@@ -76,7 +75,7 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
     });
 
     // Clean up
-    promise.always(() => {
+    promise.finally(() => {
       // Cleanup resources
       keyEventListener.remove();
       sketchViewModel.cancel();
@@ -112,7 +111,9 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
     }
   }
 
-  protected onSketchViewModelEvent(sketchViewModel: SketchViewModel, event: any, handle: OperationHandle<G>) {
+  protected onSketchViewModelEvent(sketchViewModel: SketchViewModel,
+                                   event: __esri.SketchViewModelCreateEvent | __esri.SketchViewModelUpdateEvent,
+                                   handle: OperationHandle<G>) {
     const sketch = this.graphicFromEvent(event);
     // If we are done, remove extra sketch graphic
     if (event.state === "cancel" || event.state === "complete") {

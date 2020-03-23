@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-
 import { create as createPromise } from "esri/core/promiseUtils";
 
-export const dojoPromise = <T>(nativePromise: Promise<T>): IPromise<T> => {
+
+export const dojoPromise = <T>(nativePromise: Promise<T>): Promise<T> => {
   return createPromise(((resolve: any, reject: any) => {
     return nativePromise
       .then(resolve)

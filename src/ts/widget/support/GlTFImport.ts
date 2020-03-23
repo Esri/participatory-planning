@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-
 import Accessor from "esri/core/Accessor";
 import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
 import { create as createPromise, eachAlways, reject as rejectPromise } from "esri/core/promiseUtils";
+
 
 interface BlobZIPEntry {
   name: string;
@@ -42,7 +42,7 @@ export default class GlTFImport extends declared(Accessor) {
   @property()
   public task: string;
 
-  public readonly blobUrl: IPromise<string>;
+  public readonly blobUrl: Promise<string>;
 
   private zip = (window as any).zip;
 
@@ -57,7 +57,7 @@ export default class GlTFImport extends declared(Accessor) {
       .then((gltfBlob) => gltfBlob.url);
   }
 
-  private downloadAndExtractZip(url: string): IPromise<ZIPEntry[]> {
+  private downloadAndExtractZip(url: string): Promise<ZIPEntry[]> {
     return createPromise(((resolve: (_: ZIPEntry[]) => void, reject: (error?: any) => void) => {
       const reader = new this.zip.HttpProgressReader(url, {
         onProgress: this.reportDownloadProgress.bind(this),
@@ -72,7 +72,7 @@ export default class GlTFImport extends declared(Accessor) {
     }) as any);
   }
 
-  private zipEntriesToBlob(entries: ZIPEntry[]): IPromise<BlobZIPEntry[]> {
+  private zipEntriesToBlob(entries: ZIPEntry[]): Promise<BlobZIPEntry[]> {
 
     entries = entries.filter((entry) => !entry.directory);
 
@@ -94,7 +94,7 @@ export default class GlTFImport extends declared(Accessor) {
     });
   }
 
-  private saveEntryToBlob(entry: ZIPEntry): IPromise<BlobZIPEntry> {
+  private saveEntryToBlob(entry: ZIPEntry): Promise<BlobZIPEntry> {
     return createPromise(((resolve: (_: BlobZIPEntry) => void) => {
       entry.getData(
           new this.zip.BlobWriter("text/plain"),
@@ -110,7 +110,7 @@ export default class GlTFImport extends declared(Accessor) {
     }) as any);
   }
 
-  private combineToSingleBlob(entries: BlobZIPEntry[]): IPromise<BlobZIPEntry> {
+  private combineToSingleBlob(entries: BlobZIPEntry[]): Promise<BlobZIPEntry> {
 
     const rootEntry = entries.reduce(
       (previous, entry) => !previous && entry.name.match(/\.gltf$/) ? entry : previous,
