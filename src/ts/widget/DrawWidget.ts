@@ -38,7 +38,7 @@ export default class DrawWidget extends declared(WidgetBase) {
 
     this.layer = new GraphicsLayer({
       elevationInfo: {
-        mode: "on-the-ground",
+        mode: "relative-to-scene",
       },
     });
     whenOnce(this, "app.scene", () => this.app.scene.map.add(this.layer));

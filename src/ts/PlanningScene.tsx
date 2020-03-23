@@ -168,37 +168,6 @@ export default class PlanningScene extends declared(WidgetBase) {
       } as any;
   }
 
-  public adjustSymbolHeights() {
-    this.drawLayers().forEach((layer) => {
-      if (layer.get("elevationInfo.mode") === "relative-to-ground") {
-        layer.graphics.toArray().forEach((graphic) => {
-          this.adjustHeight(graphic);
-        });
-      }
-    });
-  }
-
-  public adjustHeight(graphic: Graphic) {
-    const point = graphic.geometry as Point;
-    if (point.type === "point" && point.hasZ) {
-      const height = this.heightAtPoint(point);
-      if (height !== point.z) {
-        const newPoint = point.clone();
-        newPoint.z = height;
-        graphic.geometry = newPoint;
-      }
-    }
-  }
-
-  public heightAtPoint(mapPoint: Point): number {
-    return this.drawLayers().reduceRight((max1, layer) => {
-      return layer.graphics.reduceRight((max2, graphic) => {
-        const extrusion = this.getExtrudedHeight(mapPoint, graphic);
-        return Math.max(extrusion, max2);
-      }, max1);
-    }, 0);
-  }
-
   public whenNotUpdating(): Promise<void> {
     return whenNotOnce(this.view, "updating");
   }

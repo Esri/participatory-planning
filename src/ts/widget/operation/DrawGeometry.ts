@@ -75,7 +75,7 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
     });
 
     // Clean up
-    promise.finally(() => {
+    return promise.finally(() => {
       // Cleanup resources
       keyEventListener.remove();
       sketchViewModel.cancel();
@@ -84,10 +84,7 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
       // Reset scene
       this.scene.view.highlightOptions.haloOpacity = haloOpacity;
       this.scene.view.highlightOptions.fillOpacity = fillOpacity;
-      this.scene.adjustSymbolHeights();
     });
-
-    return promise;
   }
 
   protected launchSketchViewModel(sketchViewModel: SketchViewModel, create: boolean) {
@@ -147,11 +144,15 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
   }
 
   protected createSketchViewModel(): SketchViewModel {
-    return new SketchViewModel({
+    const svm = new SketchViewModel({
       view: this.scene.view,
       layer: this.widget.layer,
       updateOnGraphicClick: false,
     });
+
+    svm.defaultCreateOptions.hasZ = false;
+
+    return svm;
   }
 
   protected createSketch(_: SketchViewModel): Graphic {

@@ -21,7 +21,6 @@ import { renderable, tsx } from "esri/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
 
-
 interface PathMenu {
   label: string;
   color: string;
@@ -47,6 +46,12 @@ export default class CreatePath extends declared(DrawWidget) {
       width: 3,
     },
   ];
+
+  public postInitialize() {
+    this.layer.elevationInfo = {
+      mode: "on-the-ground",
+    };
+  }
 
   public render() {
     const inactive = "btn btn-large";
@@ -78,6 +83,8 @@ export default class CreatePath extends declared(DrawWidget) {
 
     this.createPolylineGraphic(symbol, menu.color).finally(() => {
       this.activeMenu = null;
+    }).catch(() => {
+      // Ignore
     });
     this.activeMenu = menu;
   }

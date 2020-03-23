@@ -66,10 +66,6 @@ export default class SymbolGallery extends declared(DrawWidget) {
   private portal: Portal | null = null;
 
   public postInitialize() {
-    this.layer.elevationInfo = {
-      mode: "relative-to-ground",
-    };
-
     if (!this.groups.length) {
       const futureItems = this.queryPortalItems();
       this.groups.add(new SymbolGroup(SymbolGroupId.Icons, futureItems));
@@ -107,14 +103,16 @@ export default class SymbolGallery extends declared(DrawWidget) {
     if (selectedSymbol) {
       this.selectedGroupId = null;
       selectedSymbol.fetchSymbol().then((symbol) => {
-        this.placeSymbol(symbol);
+        return this.placeSymbol(symbol);
+      }).catch(() => {
+        // Ignore
       });
     }
   }
 
-  private placeSymbol(symbol: EsriSymbol) {
-    this.createPointGraphic(symbol).then((graphic) => {
-      this.placeSymbol(graphic.symbol);
+  private placeSymbol(symbol: EsriSymbol): Promise<void> {
+    return this.createPointGraphic(symbol).then((graphic) => {
+      return this.placeSymbol(graphic.symbol);
     });
   }
 

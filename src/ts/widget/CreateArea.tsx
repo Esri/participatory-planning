@@ -53,6 +53,12 @@ export default class CreateArea extends declared(DrawWidget) {
     },
   ];
 
+  public postInitialize() {
+    this.layer.elevationInfo = {
+      mode: "on-the-ground",
+    };
+  }
+
   public render() {
     const inactive = "btn btn-large";
     const active = inactive + " active";
@@ -86,6 +92,8 @@ export default class CreateArea extends declared(DrawWidget) {
 
     this.createPolygonGraphic(symbol, color).finally(() => {
       this.activeColor = null;
+    }).catch(() => {
+      // Ignore
     });
     this.activeColor = color;
   }

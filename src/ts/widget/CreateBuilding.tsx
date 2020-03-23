@@ -32,6 +32,12 @@ export default class CreateBuilding extends declared(DrawWidget) {
   @property()
   private stories: number;
 
+  public postInitialize() {
+    this.layer.elevationInfo = {
+      mode: "on-the-ground",
+    };
+  }
+
   public render() {
     const inactive = "btn btn-large";
     const active = inactive + " active";
@@ -57,7 +63,6 @@ export default class CreateBuilding extends declared(DrawWidget) {
   private startDrawing(stories: number) {
 
     const size = stories * BUILDING_FLOOR_HEIGHT;
-
     const color = BUILDING_COLOR;
 
     const symbol = new PolygonSymbol3D({
@@ -73,8 +78,11 @@ export default class CreateBuilding extends declared(DrawWidget) {
         size,
       }] as any,
     });
+
     this.createPolygonGraphic(symbol, color).finally(() => {
       this.stories = 0;
+    }).catch(() => {
+      // Ignore
     });
     this.stories = stories;
   }

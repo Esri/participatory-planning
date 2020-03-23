@@ -47,9 +47,6 @@ export default class GlTFWidget extends declared(DrawWidget) {
   public progress: number;
 
   public postInitialize() {
-    this.layer.elevationInfo = {
-      mode: "relative-to-ground",
-    };
     this.watch("progress", (value) => this.toggleLoadingIndicator(true, "Importing " + value + "%"));
   }
 
@@ -95,8 +92,6 @@ export default class GlTFWidget extends declared(DrawWidget) {
 
       // Place imported glTF in center of view
       const point = this.app.scene.view.center.clone();
-      point.hasZ = true;
-      point.z = this.app.scene.heightAtPoint(point);
 
       const graphic = new Graphic({
         geometry: point,
