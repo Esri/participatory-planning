@@ -64,8 +64,12 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
       }
       this.scene.view.highlightOptions.fillOpacity = 0;
 
-      sketchViewModel.on(["create", "update"] as any, (event) => {
-        this.onSketchViewModelEvent(sketchViewModel, event as any, handle);
+      sketchViewModel.on("create", (event) => {
+        this.onSketchViewModelEvent(sketchViewModel, event, event.state === "cancel", handle);
+      });
+
+      sketchViewModel.on("update", (event) => {
+        this.onSketchViewModelEvent(sketchViewModel, event, event.aborted, handle);
       });
 
       this.launchSketchViewModel(sketchViewModel, create);
@@ -114,16 +118,17 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
   protected onSketchViewModelEvent(sketchViewModel: SketchViewModel,
                                    event: __esri.SketchViewModelCreateEvent | __esri.SketchViewModelUpdateEvent,
+                                   cancel: boolean,
                                    handle: OperationHandle<G>) {
     const sketch = this.graphicFromEvent(event);
     // If we are done, remove extra sketch graphic
-    if (event.state === "cancel" || event.state === "complete") {
+    if (event.state === "complete" || cancel) {
       if (sketch && sketch !== this.graphic) {
         sketchViewModel.layer.remove(sketch);
       }
     }
 
-    if (event.state === "cancel" || sketch === null) {
+    if (cancel || sketch === null) {
       if (event.type === "create") {
         this.widget.layer.remove(this.graphic);
       }
