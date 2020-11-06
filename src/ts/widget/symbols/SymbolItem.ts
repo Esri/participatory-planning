@@ -15,13 +15,13 @@
  *
  */
 import Accessor from "esri/core/Accessor";
-import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { property, subclass } from "esri/core/accessorSupport/decorators";
 import IconSymbol3DLayer = require("esri/symbols/IconSymbol3DLayer");
 import EsriSymbol from "esri/symbols/Symbol";
 import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
 
 @subclass("widgets.symbolgallery.SymbolItem")
-export default class SymbolItem extends declared(Accessor) {
+export default class SymbolItem extends Accessor {
 
   @property({
     constructOnly: true,

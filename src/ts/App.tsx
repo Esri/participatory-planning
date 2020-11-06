@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { aliasOf, declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { aliasOf, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import { renderable, tsx } from "esri/widgets/support/widget";
@@ -28,7 +28,6 @@ import DrawWidget from "./widget/DrawWidget";
 import GlTFWidget from "./widget/GlTFWidget";
 import SymbolGallery, { SymbolGroupId } from "./widget/SymbolGallery";
 import WidgetBase from "./widget/WidgetBase";
-
 
 interface MainMenu {
   label: string;
@@ -47,7 +46,7 @@ export interface Settings {
 }
 
 @subclass("app.widgets.webmapview")
-export default class App extends declared(WidgetBase) {
+export default class App extends WidgetBase {
 
   @aliasOf("scene.map.portalItem.title")
   @renderable()
@@ -58,7 +57,7 @@ export default class App extends declared(WidgetBase) {
   public thumbnailUrl: string;
 
   @property()
-  public scene = new PlanningScene({app: this});
+  public scene: PlanningScene;
 
   public set currentOperation(operation: Operation | null) {
     if (this.operation) {
@@ -96,6 +95,7 @@ export default class App extends declared(WidgetBase) {
 
   public constructor(public settings: Settings) {
     super();
+    this.scene = new PlanningScene(this);
   }
 
   public postInitialize() {

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
@@ -28,7 +28,7 @@ interface ColorMenu {
 }
 
 @subclass("app.draw.CreateArea")
-export default class CreateArea extends declared(DrawWidget) {
+export default class CreateArea extends DrawWidget {
 
   @renderable()
   @property()

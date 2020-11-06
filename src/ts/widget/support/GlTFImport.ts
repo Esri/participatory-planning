@@ -15,7 +15,7 @@
  *
  */
 import Accessor from "esri/core/Accessor";
-import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { property, subclass } from "esri/core/accessorSupport/decorators";
 import { create as createPromise, eachAlways, reject as rejectPromise } from "esri/core/promiseUtils";
 
 
@@ -34,7 +34,7 @@ interface ZIPEntry {
 const ZIP_PROGRESS_FACTOR = 0.5;
 
 @subclass("app.draw.support.GlTFImport")
-export default class GlTFImport extends declared(Accessor) {
+export default class GlTFImport extends Accessor {
 
   @property()
   public progress = 0;

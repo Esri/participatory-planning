@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import { whenNotOnce } from "esri/core/watchUtils";
 import geometryEngine from "esri/geometry/geometryEngine";
@@ -31,6 +31,7 @@ import SceneView from "esri/views/SceneView";
 import WebScene from "esri/WebScene";
 import { tsx } from "esri/widgets/support/widget";
 
+import App from "./App";
 import { computeBoundingPolygon } from "./support/geometry";
 import WidgetBase from "./widget/WidgetBase";
 
@@ -38,7 +39,7 @@ import WidgetBase from "./widget/WidgetBase";
 export const QUALITY = "medium";
 
 @subclass("app.widgets.webmapview")
-export default class PlanningScene extends declared(WidgetBase) {
+export default class PlanningScene extends WidgetBase {
 
   @property()
   public map: WebScene;
@@ -80,14 +81,12 @@ export default class PlanningScene extends declared(WidgetBase) {
 
   private boundingPolygonGraphic: Graphic;
 
-  public postInitialize() {
-
-    // Create global view reference
-    (window as any).view = this.view;
+  public constructor(app: App) {
+    super({ app });
 
     this.map = new WebScene({
       portalItem: {
-        id: this.app.settings.webSceneId,
+        id: app.settings.webSceneId,
       },
     });
 
@@ -95,6 +94,12 @@ export default class PlanningScene extends declared(WidgetBase) {
       map: this.map,
       qualityProfile: QUALITY,
     } as any);
+  }
+
+  public postInitialize() {
+
+    // Create global view reference
+    (window as any).view = this.view;
 
     this.maskPolygon = new Polygon({
       rings: [this.app.settings.planningArea],

@@ -15,7 +15,7 @@
  *
  */
 import Accessor from "esri/core/Accessor";
-import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import PortalItem from "esri/portal/PortalItem";
 
@@ -25,7 +25,7 @@ import SymbolItem from "./SymbolItem";
 export const SymbolItemCollection = Collection.ofType<SymbolItem>(SymbolItem);
 
 @subclass("draw.symbolgallery.SymbolGroup")
-export default class SymbolGroup extends declared(Accessor) {
+export default class SymbolGroup extends Accessor {
 
   @property({
     readOnly: true,

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import SimpleLineSymbol from "esri/symbols/SimpleLineSymbol";
 import { renderable, tsx } from "esri/widgets/support/widget";
@@ -28,7 +28,7 @@ interface PathMenu {
 }
 
 @subclass("app.draw.CreatePath")
-export default class CreatePath extends declared(DrawWidget) {
+export default class CreatePath extends DrawWidget {
 
   @renderable()
   @property()

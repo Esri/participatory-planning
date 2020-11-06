@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { aliasOf, declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { aliasOf, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import ObjectSymbol3DLayer from "esri/symbols/ObjectSymbol3DLayer";
 import PointSymbol3D from "esri/symbols/PointSymbol3D";
@@ -32,7 +32,7 @@ enum GlTFWidgetState {
 }
 
 @subclass("app.draw.GlTFWidget")
-export default class GlTFWidget extends declared(DrawWidget) {
+export default class GlTFWidget extends DrawWidget {
 
   @property()
   @renderable()

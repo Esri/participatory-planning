@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import Portal from "esri/portal/Portal";
 import PortalItem from "esri/portal/PortalItem";
@@ -35,7 +35,7 @@ export enum SymbolGroupId {
 }
 
 @subclass("app.draw.SymbolGallery")
-export default class SymbolGallery extends declared(DrawWidget) {
+export default class SymbolGallery extends DrawWidget {
 
   @property() public scene: PlanningScene;
 

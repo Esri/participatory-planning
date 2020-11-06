@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { declared, property, subclass } from "esri/core/accessorSupport/decorators";
+import { property, subclass } from "esri/core/accessorSupport/decorators";
 import { whenOnce } from "esri/core/watchUtils";
 import Polygon from "esri/geometry/Polygon";
 import Polyline from "esri/geometry/Polyline";
@@ -28,7 +28,7 @@ import DrawPolyline from "./operation/DrawPolyline";
 import WidgetBase from "./WidgetBase";
 
 @subclass("app.draw.DrawWidget")
-export default class DrawWidget extends declared(WidgetBase) {
+export default class DrawWidget extends WidgetBase {
 
   @property()
   public layer: GraphicsLayer;
@@ -41,7 +41,7 @@ export default class DrawWidget extends declared(WidgetBase) {
         mode: "relative-to-scene",
       },
     });
-    whenOnce(this, "app.scene", () => this.app.scene.map.add(this.layer));
+    whenOnce(this, "app.scene.map", () => this.app.scene.map.add(this.layer));
   }
 
   public updateGraphic(graphic: Graphic): Promise<Graphic[]> {

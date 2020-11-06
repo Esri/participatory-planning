@@ -16,7 +16,7 @@
  */
 import anime from "animejs";
 import Color from "esri/Color";
-import { aliasOf, declared, subclass } from "esri/core/accessorSupport/decorators";
+import { aliasOf, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import Polyline from "esri/geometry/Polyline";
 import SpatialReference from "esri/geometry/SpatialReference";
@@ -48,7 +48,7 @@ const EMPTY_POLYLINE = new Polyline({
 });
 
 @subclass("app.widgets.Timeline")
-export default class Timeline extends declared(WidgetBase) {
+export default class Timeline extends WidgetBase {
 
   private vectorTileLayer = new VectorTileLayer({
     portalItem: {
