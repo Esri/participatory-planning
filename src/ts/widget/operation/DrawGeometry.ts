@@ -15,7 +15,7 @@
  *
  */
 import Geometry from "esri/geometry/Geometry";
-import geometryEngine from "esri/geometry/geometryEngine";
+import geometryEngine = require("esri/geometry/geometryEngine");
 import Point from "esri/geometry/Point";
 import Graphic from "esri/Graphic";
 import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
@@ -26,9 +26,11 @@ import WidgetOperation, { OperationHandle } from "./WidgetOperation";
 
 export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
+  private static currentHandle: OperationHandle<any> | null = null;
+
   protected scene: PlanningScene;
 
-  constructor(widget: DrawWidget, public readonly graphic: Graphic, protected geometryType: string) {
+  constructor(widget: DrawWidget, public readonly graphic: Graphic, protected geometryType: "point" | "polyline" | "polygon") {
     super(widget);
     this.scene = widget.app.scene;
   }
@@ -42,6 +44,13 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
   }
 
   protected runSketchViewModel(create: boolean): Promise<G> {
+
+    if (DrawGeometry.currentHandle) {
+      // If a draw operation is already active, we cancel it and ignore the new one.
+      DrawGeometry.currentHandle.reject();
+      return Promise.reject();
+    }
+
     const haloOpacity = this.scene.view.highlightOptions.haloOpacity;
     const fillOpacity = this.scene.view.highlightOptions.fillOpacity;
 
@@ -58,6 +67,8 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
     });
 
     const promise = this.initiate<G>((handle) => {
+
+      DrawGeometry.currentHandle = handle;
 
       if (create) {
         this.scene.view.highlightOptions.haloOpacity = 0;
@@ -80,6 +91,9 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
     // Clean up
     return promise.finally(() => {
+
+      DrawGeometry.currentHandle = null;
+
       // Cleanup resources
       keyEventListener.remove();
       sketchViewModel.cancel();
@@ -116,39 +130,8 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
     }
   }
 
-  protected onSketchViewModelEvent(sketchViewModel: SketchViewModel,
-                                   event: __esri.SketchViewModelCreateEvent | __esri.SketchViewModelUpdateEvent,
-                                   cancel: boolean,
-                                   handle: OperationHandle<G>) {
-    const sketch = this.graphicFromEvent(event);
-    // If we are done, remove extra sketch graphic
-    if (event.state === "complete" || cancel) {
-      if (sketch && sketch !== this.graphic) {
-        sketchViewModel.layer.remove(sketch);
-      }
-    }
-
-    if (cancel || sketch === null) {
-      if (event.type === "create") {
-        this.widget.layer.remove(this.graphic);
-      }
-      handle.reject();
-    } else {
-      const geometry = this.geometryFromSketch(sketch);
-      this.updateGraphicFromGeometry(geometry);
-
-      if (event.state === "complete") {
-        if (geometry) {
-          handle.resolve(geometry);
-        } else {
-          this.widget.layer.remove(this.graphic);
-          handle.reject();
-        }
-      }
-    }
-  }
-
   protected createSketchViewModel(): SketchViewModel {
+
     const svm = new SketchViewModel({
       view: this.scene.view,
       layer: this.widget.layer,
@@ -203,6 +186,38 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
       point[0] = snappedPoint.x;
       point[1] = snappedPoint.y;
     });
+  }
+
+  private onSketchViewModelEvent(sketchViewModel: SketchViewModel,
+                                 event: __esri.SketchViewModelCreateEvent | __esri.SketchViewModelUpdateEvent,
+                                 cancel: boolean,
+                                 handle: OperationHandle<G>) {
+    const sketch = this.graphicFromEvent(event);
+    // If we are done, remove extra sketch graphic
+    if (event.state === "complete" || cancel) {
+      if (sketch && sketch !== this.graphic) {
+        sketchViewModel.layer.remove(sketch);
+      }
+    }
+
+    if (cancel || sketch === null) {
+      if (event.type === "create") {
+        this.widget.layer.remove(this.graphic);
+      }
+      handle.reject();
+    } else {
+      const geometry = this.geometryFromSketch(sketch);
+      this.updateGraphicFromGeometry(geometry);
+
+      if (event.state === "complete") {
+        if (geometry) {
+          handle.resolve(geometry);
+        } else {
+          this.widget.layer.remove(this.graphic);
+          handle.reject();
+        }
+      }
+    }
   }
 
   private graphicFromEvent(event: any): Graphic | null {
