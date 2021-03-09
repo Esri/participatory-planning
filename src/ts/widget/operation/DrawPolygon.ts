@@ -24,8 +24,11 @@ import DrawWidget from "../DrawWidget";
 import DrawGeometry from "./DrawGeometry";
 
 export default class DrawPolygon extends DrawGeometry<Polygon> {
-
-  constructor(widget: DrawWidget, graphic: Graphic, protected sketchColor: string) {
+  constructor(
+    widget: DrawWidget,
+    graphic: Graphic,
+    protected sketchColor: string
+  ) {
     super(widget, graphic, "polygon");
   }
 
@@ -60,5 +63,4 @@ export default class DrawPolygon extends DrawGeometry<Polygon> {
     const geometry = super.geometryFromSketch(sketchGraphic);
     return geometry ? this.clippedGeometry(geometry) : null;
   }
-
 }

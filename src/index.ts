@@ -20,11 +20,11 @@ import App from "./ts/App";
 
 // See DEPLOYMENT.md for customization or deploying your own version of this app.
 const params = {
-  settings: "./js/settings.json",
+  settings: "./js/settings.json"
 };
 
 const queryParams = document.location.search.substr(1);
-queryParams.split("&").forEach((pair) => {
+queryParams.split("&").forEach(pair => {
   const item = pair.split("=");
   params[item[0]] = decodeURIComponent(item[1]);
 });
@@ -32,8 +32,9 @@ queryParams.split("&").forEach((pair) => {
 /**
  * Load settings and initialize application
  */
-request(params.settings).then((settings) => {
-  const app = new App(settings.data);
-  app.container = "app";
-
-}).catch(console.error);
+request(params.settings)
+  .then(settings => {
+    const app = new App(settings.data);
+    app.container = "app";
+  })
+  .catch(console.error);

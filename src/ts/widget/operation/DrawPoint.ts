@@ -21,7 +21,6 @@ import DrawWidget from "../DrawWidget";
 import DrawGeometry from "./DrawGeometry";
 
 export default class DrawPoint extends DrawGeometry<Point> {
-
   constructor(widget: DrawWidget, graphic: Graphic) {
     super(widget, graphic, "point");
   }
@@ -31,11 +30,9 @@ export default class DrawPoint extends DrawGeometry<Point> {
     const view = this.widget.app.scene.view;
 
     // Update graphic when mouse moves
-    const handler = view.on("pointer-move", (event) => {
+    const handler = view.on("pointer-move", event => {
       const mapPoint = view.toMap(event, {
-        include: view.map.allLayers.filter(
-          (l) => l !== this.widget.layer,
-        ),
+        include: view.map.allLayers.filter(l => l !== this.widget.layer)
       });
       if (mapPoint) {
         const snappedPoint = this.snapAndAddZ(mapPoint);
@@ -47,7 +44,7 @@ export default class DrawPoint extends DrawGeometry<Point> {
     return result.finally(() => handler.remove());
   }
 
-  protected snapAndAddZ(point: Point ) {
+  protected snapAndAddZ(point: Point) {
     return this.snapPoint(point);
   }
 
@@ -58,5 +55,4 @@ export default class DrawPoint extends DrawGeometry<Point> {
     }
     return null;
   }
-
 }

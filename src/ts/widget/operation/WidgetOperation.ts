@@ -27,11 +27,9 @@ interface OperationCancel {
 }
 
 export default class WidgetOperation implements Operation {
-
   private handle: OperationCancel | null;
 
-  constructor(protected widget: DrawWidget) {
-  }
+  constructor(protected widget: DrawWidget) {}
 
   public cancel() {
     if (this.handle) {
@@ -40,20 +38,24 @@ export default class WidgetOperation implements Operation {
     }
   }
 
-  protected initiate<T>(start: (_: OperationHandle<T>) => void, cancel: () => void): Promise<T> {
-
-    const promise = new Promise<T>(((resolve: (_: T) => void, reject: (error?: any) => void) => {
+  protected initiate<T>(
+    start: (_: OperationHandle<T>) => void,
+    cancel: () => void
+  ): Promise<T> {
+    const promise = new Promise<T>(((
+      resolve: (_: T) => void,
+      reject: (error?: any) => void
+    ) => {
       // Make this the current running operation
       this.widget.app.currentOperation = this;
 
-      this.handle = {cancel};
+      this.handle = { cancel };
 
-      start({resolve, reject});
+      start({ resolve, reject });
     }) as any);
 
     return promise.finally(() => {
       this.widget.app.currentOperation = null;
     });
   }
-
 }

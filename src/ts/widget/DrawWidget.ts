@@ -29,7 +29,6 @@ import WidgetBase from "./WidgetBase";
 
 @subclass("app.draw.DrawWidget")
 export default class DrawWidget extends WidgetBase {
-
   @property()
   public layer: GraphicsLayer;
 
@@ -38,8 +37,8 @@ export default class DrawWidget extends WidgetBase {
 
     this.layer = new GraphicsLayer({
       elevationInfo: {
-        mode: "relative-to-scene",
-      },
+        mode: "relative-to-scene"
+      }
     });
     whenOnce(this, "app.scene.map", () => this.app.scene.map.add(this.layer));
   }
@@ -52,35 +51,42 @@ export default class DrawWidget extends WidgetBase {
     }
   }
 
-  protected createPolylineGraphic(symbol: EsriSymbol, sketchColor: string): Promise<Graphic[]> {
+  protected createPolylineGraphic(
+    symbol: EsriSymbol,
+    sketchColor: string
+  ): Promise<Graphic[]> {
     const graphic = new Graphic({ symbol });
     return new DrawPolyline(this, graphic, sketchColor)
       .create()
-      .then((polyline) => this.splitPolyline(polyline, graphic));
+      .then(polyline => this.splitPolyline(polyline, graphic));
   }
 
-  protected createPolygonGraphic(symbol: EsriSymbol, sketchColor: string): Promise<Graphic[]> {
+  protected createPolygonGraphic(
+    symbol: EsriSymbol,
+    sketchColor: string
+  ): Promise<Graphic[]> {
     const graphic = new Graphic({ symbol });
     return new DrawPolygon(this, graphic, sketchColor)
       .create()
-      .then((polygon) => this.splitPolygon(polygon, graphic));
+      .then(polygon => this.splitPolygon(polygon, graphic));
   }
 
   protected createPointGraphic(symbol: EsriSymbol): Promise<Graphic> {
     const graphic = new Graphic({ symbol });
-    return new DrawPoint(this, graphic)
-      .create()
-      .then(() => {
-        return graphic;
-      });
+    return new DrawPoint(this, graphic).create().then(() => {
+      return graphic;
+    });
   }
 
-  protected updatePolylineGraphic(graphic: Graphic, sketchColor: string): Promise<Graphic[]> {
+  protected updatePolylineGraphic(
+    graphic: Graphic,
+    sketchColor: string
+  ): Promise<Graphic[]> {
     const zIndex = this.zIndexOf(graphic);
     const updatedGraphics = new DrawPolyline(this, graphic, sketchColor)
       .update()
-      .then((polyline) => this.splitPolyline(polyline, graphic))
-      .then((graphics) => {
+      .then(polyline => this.splitPolyline(polyline, graphic))
+      .then(graphics => {
         this.reorderGraphics(graphics, zIndex);
         return graphics;
       });
@@ -89,12 +95,15 @@ export default class DrawWidget extends WidgetBase {
     return updatedGraphics;
   }
 
-  protected updatePolygonGraphic(graphic: Graphic, sketchColor: string): Promise<Graphic[]> {
+  protected updatePolygonGraphic(
+    graphic: Graphic,
+    sketchColor: string
+  ): Promise<Graphic[]> {
     const zIndex = this.zIndexOf(graphic);
     const updatedGraphics = new DrawPolygon(this, graphic, sketchColor)
       .update()
-      .then((polygon) => this.splitPolygon(polygon, graphic))
-      .then((graphics) => {
+      .then(polygon => this.splitPolygon(polygon, graphic))
+      .then(graphics => {
         this.reorderGraphics(graphics, zIndex);
         return graphics;
       });
@@ -112,10 +121,14 @@ export default class DrawWidget extends WidgetBase {
     const graphicsOnTop = this.layer.graphics.slice(zIndex).toArray();
     this.layer.removeMany(graphicsOnTop);
     this.layer.addMany(graphics);
-    this.layer.addMany(graphicsOnTop.map((g) => Graphic.fromJSON(g.toJSON())));
+    this.layer.addMany(graphicsOnTop.map(g => Graphic.fromJSON(g.toJSON())));
   }
 
-  private revertOrderedGraphic(promise: Promise<any>, originalGraphic: Graphic, zIndex: number) {
+  private revertOrderedGraphic(
+    promise: Promise<any>,
+    originalGraphic: Graphic,
+    zIndex: number
+  ) {
     // The JS API will emit a cancel event if the graphic has not changed, even if it changed the order. We fix this
     // by catching and calling reorderGraphics().
     promise.catch(() => {
@@ -129,7 +142,7 @@ export default class DrawWidget extends WidgetBase {
   private splitPolyline(polyline: Polyline, graphic: Graphic): Graphic[] {
     const graphics: Graphic[] = [];
     if (1 < polyline.paths.length) {
-      polyline.paths.forEach((path) => {
+      polyline.paths.forEach(path => {
         const clonedGraphic = graphic.clone();
         (clonedGraphic.geometry as Polyline).paths = [path];
         graphics.push(clonedGraphic);
@@ -143,7 +156,7 @@ export default class DrawWidget extends WidgetBase {
   private splitPolygon(polygon: Polygon, graphic: Graphic): Graphic[] {
     const graphics = [];
     if (1 < polygon.rings.length) {
-      polygon.rings.forEach((ring) => {
+      polygon.rings.forEach(ring => {
         const clonedGraphic = graphic.clone();
         (clonedGraphic.geometry as Polygon).rings = [ring];
         graphics.push(clonedGraphic);
@@ -153,5 +166,4 @@ export default class DrawWidget extends WidgetBase {
     }
     return graphics;
   }
-
 }

@@ -29,7 +29,6 @@ interface PathMenu {
 
 @subclass("app.draw.CreatePath")
 export default class CreatePath extends DrawWidget {
-
   @renderable()
   @property()
   private activeMenu: PathMenu | null = null;
@@ -38,18 +37,18 @@ export default class CreatePath extends DrawWidget {
     {
       label: "Street",
       color: "#cbcbcb",
-      width: 20,
+      width: 20
     },
     {
       label: "Walking Path",
       color: "#b2b2b2",
-      width: 3,
-    },
+      width: 3
+    }
   ];
 
   public postInitialize() {
     this.layer.elevationInfo = {
-      mode: "on-the-ground",
+      mode: "on-the-ground"
     };
   }
 
@@ -59,13 +58,16 @@ export default class CreatePath extends DrawWidget {
     return (
       <div>
         <div class="menu">
-          { this.menus.map((menu) => (
+          {this.menus.map(menu => (
             <div class="menu-item">
               <button
                 class={menu === this.activeMenu ? active : inactive}
-                onclick={ this.startDrawing.bind(this, menu) }>Create {menu.label}</button>
+                onclick={this.startDrawing.bind(this, menu)}
+              >
+                Create {menu.label}
+              </button>
             </div>
-          )) }
+          ))}
         </div>
       </div>
     );
@@ -78,15 +80,16 @@ export default class CreatePath extends DrawWidget {
   private startDrawing(menu: PathMenu) {
     const symbol = new SimpleLineSymbol({
       color: menu.color,
-      width: menu.width,
+      width: menu.width
     });
 
-    this.createPolylineGraphic(symbol, menu.color).finally(() => {
-      this.activeMenu = null;
-    }).catch(() => {
-      // Ignore
-    });
+    this.createPolylineGraphic(symbol, menu.color)
+      .finally(() => {
+        this.activeMenu = null;
+      })
+      .catch(() => {
+        // Ignore
+      });
     this.activeMenu = menu;
   }
-
 }

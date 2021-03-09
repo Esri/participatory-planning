@@ -24,8 +24,11 @@ import DrawWidget from "../DrawWidget";
 import DrawGeometry from "./DrawGeometry";
 
 export default class DrawPolyline extends DrawGeometry<Polyline> {
-
-  constructor(widget: DrawWidget, graphic: Graphic, protected sketchColor: string) {
+  constructor(
+    widget: DrawWidget,
+    graphic: Graphic,
+    protected sketchColor: string
+  ) {
     super(widget, graphic, "polyline");
   }
 
@@ -66,5 +69,4 @@ export default class DrawPolyline extends DrawGeometry<Polyline> {
     //   });
     // }
   }
-
 }

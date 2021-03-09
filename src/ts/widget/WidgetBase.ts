@@ -19,10 +19,8 @@ import Widget from "esri/widgets/Widget";
 
 import App from "../App";
 
-
 @subclass("app.widgets.WidgetBase")
 export default class WidgetBase extends Widget {
-
   @property()
   public app: App;
 
@@ -57,5 +55,4 @@ export default class WidgetBase extends Widget {
       overlay.style.opacity = opacity.toString();
     }
   }
-
 }

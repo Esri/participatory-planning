@@ -21,7 +21,6 @@ import { renderable, tsx } from "esri/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
 
-
 interface ColorMenu {
   label: string;
   color: string;
@@ -29,7 +28,6 @@ interface ColorMenu {
 
 @subclass("app.draw.CreateArea")
 export default class CreateArea extends DrawWidget {
-
   @renderable()
   @property()
   private activeColor: string | null = null;
@@ -37,25 +35,25 @@ export default class CreateArea extends DrawWidget {
   private colorMenus: ColorMenu[] = [
     {
       label: "Ground",
-      color: "#f0f0f0",
+      color: "#f0f0f0"
     },
     {
       label: "Lawn",
-      color: "#bdce8a",
+      color: "#bdce8a"
     },
     {
       label: "Beach",
-      color: "#dfca8f",
+      color: "#dfca8f"
     },
     {
       label: "Water",
-      color: "#a0b4cf",
-    },
+      color: "#a0b4cf"
+    }
   ];
 
   public postInitialize() {
     this.layer.elevationInfo = {
-      mode: "on-the-ground",
+      mode: "on-the-ground"
     };
   }
 
@@ -65,13 +63,16 @@ export default class CreateArea extends DrawWidget {
     return (
       <div>
         <div class="menu">
-          { this.colorMenus.map((menu) => (
+          {this.colorMenus.map(menu => (
             <div class="menu-item">
               <button
                 class={menu.color === this.activeColor ? active : inactive}
-                onclick={ this.startDrawing.bind(this, menu.color) }>Create {menu.label}</button>
+                onclick={this.startDrawing.bind(this, menu.color)}
+              >
+                Create {menu.label}
+              </button>
             </div>
-          )) }
+          ))}
         </div>
       </div>
     );
@@ -82,20 +83,20 @@ export default class CreateArea extends DrawWidget {
   }
 
   private startDrawing(color: string) {
-
     const symbol = new SimpleFillSymbol({
       color,
       outline: {
-        width: 0,
-      },
+        width: 0
+      }
     });
 
-    this.createPolygonGraphic(symbol, color).finally(() => {
-      this.activeColor = null;
-    }).catch(() => {
-      // Ignore
-    });
+    this.createPolygonGraphic(symbol, color)
+      .finally(() => {
+        this.activeColor = null;
+      })
+      .catch(() => {
+        // Ignore
+      });
     this.activeColor = color;
   }
-
 }
