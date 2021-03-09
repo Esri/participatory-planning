@@ -35,13 +35,17 @@ export default class DrawPolygon extends DrawGeometry<Polygon> {
     const color = new Color(this.sketchColor);
     color.a = 0.5;
 
-    sketchViewModel.polygonSymbol.color = color;
-    sketchViewModel.polygonSymbol.outline.width = 0;
+    if (sketchViewModel.polygonSymbol.type === "simple-fill") {
+      sketchViewModel.polygonSymbol.color = color;
+      sketchViewModel.polygonSymbol.outline.width = 0;
+    }
 
     sketchViewModel.polylineSymbol.color = color;
 
-    sketchViewModel.pointSymbol.color = color;
-    sketchViewModel.pointSymbol.outline.width = 0;
+    if (sketchViewModel.pointSymbol.type === "simple-marker") {
+      sketchViewModel.pointSymbol.color = color;
+      sketchViewModel.pointSymbol.outline.width = 0;
+    }
 
     return sketchViewModel;
   }

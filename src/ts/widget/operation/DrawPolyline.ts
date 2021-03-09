@@ -37,8 +37,10 @@ export default class DrawPolyline extends DrawGeometry<Polyline> {
 
     sketchViewModel.polylineSymbol.color = color;
 
-    sketchViewModel.pointSymbol.color = color;
-    sketchViewModel.pointSymbol.outline.width = 0;
+    if (sketchViewModel.pointSymbol.type === "simple-marker") {
+      sketchViewModel.pointSymbol.color = color;
+      sketchViewModel.pointSymbol.outline.width = 0;
+    }
 
     return sketchViewModel;
   }

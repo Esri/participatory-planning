@@ -17,8 +17,6 @@
 import { property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
 import { whenNotOnce } from "esri/core/watchUtils";
-import geometryEngine from "esri/geometry/geometryEngine";
-import Point from "esri/geometry/Point";
 import Polygon from "esri/geometry/Polygon";
 import SpatialReference from "esri/geometry/SpatialReference";
 import Graphic from "esri/Graphic";
@@ -189,14 +187,4 @@ export default class PlanningScene extends WidgetBase {
   private attachSceneView(sceneViewDiv: HTMLDivElement) {
     this.view.container = sceneViewDiv;
   }
-
-  private getExtrudedHeight(point: Point, graphic: Graphic) {
-    if (graphic.symbol.type === "polygon-3d" && geometryEngine.contains(graphic.geometry, point)) {
-      const layers = graphic.get<any>("symbol.symbolLayers");
-      const extrusion = layers && layers.getItemAt(0).size;
-      return extrusion;
-    }
-    return 0;
-  }
-
 }
