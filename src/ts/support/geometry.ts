@@ -15,8 +15,8 @@
  *
  */
 
-import { convexHull, difference } from "esri/geometry/geometryEngine";
-import Polygon from "esri/geometry/Polygon";
+import { convexHull, difference } from "@arcgis/core/geometry/geometryEngine";
+import Polygon from "@arcgis/core/geometry/Polygon";
 
 export const computeBoundingPolygon = (polygon: Polygon): Polygon => {
   const hull = convexHull(polygon) as Polygon;

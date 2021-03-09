@@ -15,16 +15,16 @@
  *
  */
 import anime from "animejs";
-import Color from "esri/Color";
-import { aliasOf, subclass } from "esri/core/accessorSupport/decorators";
-import Collection from "esri/core/Collection";
-import Polyline from "esri/geometry/Polyline";
-import SpatialReference from "esri/geometry/SpatialReference";
-import Graphic from "esri/Graphic";
-import VectorTileLayer from "esri/layers/VectorTileLayer";
-import Viewpoint from "esri/Viewpoint";
-import Slide from "esri/webscene/Slide";
-import { renderable, tsx } from "esri/widgets/support/widget";
+import Color from "@arcgis/core/Color";
+import { aliasOf, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import Collection from "@arcgis/core/core/Collection";
+import Polyline from "@arcgis/core/geometry/Polyline";
+import SpatialReference from "@arcgis/core/geometry/SpatialReference";
+import Graphic from "@arcgis/core/Graphic";
+import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer";
+import Viewpoint from "@arcgis/core/Viewpoint";
+import Slide from "@arcgis/core/webscene/Slide";
+import { renderable, tsx } from "@arcgis/core/widgets/support/widget";
 
 import WidgetBase from "./widget/WidgetBase";
 

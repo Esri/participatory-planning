@@ -14,11 +14,11 @@
  * limitations under the License.
  *
  */
-import Accessor from "esri/core/Accessor";
-import { property, subclass } from "esri/core/accessorSupport/decorators";
-import IconSymbol3DLayer = require("esri/symbols/IconSymbol3DLayer");
-import EsriSymbol from "esri/symbols/Symbol";
-import WebStyleSymbol from "esri/symbols/WebStyleSymbol";
+import Accessor from "@arcgis/core/core/Accessor";
+import { property, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import IconSymbol3DLayer from "@arcgis/core/symbols/IconSymbol3DLayer";
+import EsriSymbol from "@arcgis/core/symbols/Symbol";
+import WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
 
 @subclass("widgets.symbolgallery.SymbolItem")
 export default class SymbolItem extends Accessor {

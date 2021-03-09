@@ -18,10 +18,10 @@ import {
   aliasOf,
   property,
   subclass
-} from "esri/core/accessorSupport/decorators";
-import Graphic from "esri/Graphic";
-import GraphicsLayer from "esri/layers/GraphicsLayer";
-import { renderable, tsx } from "esri/widgets/support/widget";
+} from "@arcgis/core/core/accessorSupport/decorators";
+import Graphic from "@arcgis/core/Graphic";
+import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+import { renderable, tsx } from "@arcgis/core/widgets/support/widget";
 
 import PlanningScene from "./PlanningScene";
 import Timeline from "./Timeline";

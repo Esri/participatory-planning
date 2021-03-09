@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-import Point from "esri/geometry/Point";
-import Graphic from "esri/Graphic";
+import Point from "@arcgis/core/geometry/Point";
+import Graphic from "@arcgis/core/Graphic";
 
 import DrawWidget from "../DrawWidget";
 import DrawGeometry from "./DrawGeometry";

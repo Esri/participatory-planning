@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-import Accessor from "esri/core/Accessor";
-import { property, subclass } from "esri/core/accessorSupport/decorators";
-import Collection from "esri/core/Collection";
-import PortalItem from "esri/portal/PortalItem";
+import Accessor from "@arcgis/core/core/Accessor";
+import { property, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import Collection from "@arcgis/core/core/Collection";
+import PortalItem from "@arcgis/core/portal/PortalItem";
 
 import { SymbolGroupId } from "../SymbolGallery";
 import SymbolItem from "./SymbolItem";

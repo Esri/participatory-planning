@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-import Accessor from "esri/core/Accessor";
-import { property, subclass } from "esri/core/accessorSupport/decorators";
+import Accessor from "@arcgis/core/core/Accessor";
+import { property, subclass } from "@arcgis/core/core/accessorSupport/decorators";
 import {
   create as createPromise,
   eachAlways,
   reject as rejectPromise
-} from "esri/core/promiseUtils";
+} from "@arcgis/core/core/promiseUtils";
 
 interface BlobZIPEntry {
   name: string;

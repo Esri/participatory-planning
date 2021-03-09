@@ -14,20 +14,20 @@
  * limitations under the License.
  *
  */
-import { property, subclass } from "esri/core/accessorSupport/decorators";
-import Collection from "esri/core/Collection";
-import { whenNotOnce } from "esri/core/watchUtils";
-import Polygon from "esri/geometry/Polygon";
-import SpatialReference from "esri/geometry/SpatialReference";
-import Graphic from "esri/Graphic";
-import GraphicsLayer from "esri/layers/GraphicsLayer";
-import SceneLayer from "esri/layers/SceneLayer";
-import { SimpleRenderer } from "esri/renderers";
-import SceneLayerView from "esri/views/layers/SceneLayerView";
-import FeatureFilter from "esri/views/layers/support/FeatureFilter";
-import SceneView from "esri/views/SceneView";
-import WebScene from "esri/WebScene";
-import { tsx } from "esri/widgets/support/widget";
+import { property, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import Collection from "@arcgis/core/core/Collection";
+import { whenNotOnce } from "@arcgis/core/core/watchUtils";
+import Polygon from "@arcgis/core/geometry/Polygon";
+import SpatialReference from "@arcgis/core/geometry/SpatialReference";
+import Graphic from "@arcgis/core/Graphic";
+import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+import SceneLayer from "@arcgis/core/layers/SceneLayer";
+import { SimpleRenderer } from "@arcgis/core/renderers";
+import SceneLayerView from "@arcgis/core/views/layers/SceneLayerView";
+import FeatureFilter from "@arcgis/core/views/layers/support/FeatureFilter";
+import SceneView from "@arcgis/core/views/SceneView";
+import WebScene from "@arcgis/core/WebScene";
+import { tsx } from "@arcgis/core/widgets/support/widget";
 
 import App from "./App";
 import { computeBoundingPolygon } from "./support/geometry";

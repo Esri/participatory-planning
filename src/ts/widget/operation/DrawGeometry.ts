@@ -14,11 +14,11 @@
  * limitations under the License.
  *
  */
-import Geometry from "esri/geometry/Geometry";
-import geometryEngine = require("esri/geometry/geometryEngine");
-import Point from "esri/geometry/Point";
-import Graphic from "esri/Graphic";
-import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
+import Geometry from "@arcgis/core/geometry/Geometry";
+import geometryEngine = require("@arcgis/core/geometry/geometryEngine");
+import Point from "@arcgis/core/geometry/Point";
+import Graphic from "@arcgis/core/Graphic";
+import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
 
 import PlanningScene from "../../PlanningScene";
 import DrawWidget from "../DrawWidget";

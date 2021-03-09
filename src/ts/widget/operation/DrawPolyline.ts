@@ -15,10 +15,10 @@
  *
  */
 
-import Color from "esri/Color";
-import Polyline from "esri/geometry/Polyline";
-import Graphic from "esri/Graphic";
-import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
+import Color from "@arcgis/core/Color";
+import Polyline from "@arcgis/core/geometry/Polyline";
+import Graphic from "@arcgis/core/Graphic";
+import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
 
 import DrawWidget from "../DrawWidget";
 import DrawGeometry from "./DrawGeometry";

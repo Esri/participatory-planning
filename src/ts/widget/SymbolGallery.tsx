@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-import { property, subclass } from "esri/core/accessorSupport/decorators";
-import Collection from "esri/core/Collection";
-import Portal from "esri/portal/Portal";
-import PortalItem from "esri/portal/PortalItem";
-import PortalQueryParams from "esri/portal/PortalQueryParams";
-import PortalQueryResult from "esri/portal/PortalQueryResult";
-import EsriSymbol from "esri/symbols/Symbol";
-import { renderable, tsx } from "esri/widgets/support/widget";
+import { property, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import Collection from "@arcgis/core/core/Collection";
+import Portal from "@arcgis/core/portal/Portal";
+import PortalItem from "@arcgis/core/portal/PortalItem";
+import PortalQueryParams from "@arcgis/core/portal/PortalQueryParams";
+import PortalQueryResult from "@arcgis/core/portal/PortalQueryResult";
+import EsriSymbol from "@arcgis/core/symbols/Symbol";
+import { renderable, tsx } from "@arcgis/core/widgets/support/widget";
 
 import PlanningScene from "../PlanningScene";
 import DrawWidget from "./DrawWidget";

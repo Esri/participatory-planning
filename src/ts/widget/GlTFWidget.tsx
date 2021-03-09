@@ -18,11 +18,11 @@ import {
   aliasOf,
   property,
   subclass
-} from "esri/core/accessorSupport/decorators";
-import Graphic from "esri/Graphic";
-import ObjectSymbol3DLayer from "esri/symbols/ObjectSymbol3DLayer";
-import PointSymbol3D from "esri/symbols/PointSymbol3D";
-import { renderable, tsx } from "esri/widgets/support/widget";
+} from "@arcgis/core/core/accessorSupport/decorators";
+import Graphic from "@arcgis/core/Graphic";
+import ObjectSymbol3DLayer from "@arcgis/core/symbols/ObjectSymbol3DLayer";
+import PointSymbol3D from "@arcgis/core/symbols/PointSymbol3D";
+import { renderable, tsx } from "@arcgis/core/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
 import GlTFImport from "./support/GlTFImport";
