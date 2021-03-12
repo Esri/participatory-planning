@@ -15,17 +15,20 @@
  *
  */
 
-import Color from "esri/Color";
-import Polygon from "esri/geometry/Polygon";
-import Graphic from "esri/Graphic";
-import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
+import Color from "@arcgis/core/Color";
+import Polygon from "@arcgis/core/geometry/Polygon";
+import Graphic from "@arcgis/core/Graphic";
+import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
 
 import DrawWidget from "../DrawWidget";
 import DrawGeometry from "./DrawGeometry";
 
 export default class DrawPolygon extends DrawGeometry<Polygon> {
-
-  constructor(widget: DrawWidget, graphic: Graphic, protected sketchColor: string) {
+  constructor(
+    widget: DrawWidget,
+    graphic: Graphic,
+    protected sketchColor: string
+  ) {
     super(widget, graphic, "polygon");
   }
 
@@ -35,13 +38,17 @@ export default class DrawPolygon extends DrawGeometry<Polygon> {
     const color = new Color(this.sketchColor);
     color.a = 0.5;
 
-    sketchViewModel.polygonSymbol.color = color;
-    sketchViewModel.polygonSymbol.outline.width = 0;
+    if (sketchViewModel.polygonSymbol.type === "simple-fill") {
+      sketchViewModel.polygonSymbol.color = color;
+      sketchViewModel.polygonSymbol.outline.width = 0;
+    }
 
     sketchViewModel.polylineSymbol.color = color;
 
-    sketchViewModel.pointSymbol.color = color;
-    sketchViewModel.pointSymbol.outline.width = 0;
+    if (sketchViewModel.pointSymbol.type === "simple-marker") {
+      sketchViewModel.pointSymbol.color = color;
+      sketchViewModel.pointSymbol.outline.width = 0;
+    }
 
     return sketchViewModel;
   }
@@ -56,5 +63,4 @@ export default class DrawPolygon extends DrawGeometry<Polygon> {
     const geometry = super.geometryFromSketch(sketchGraphic);
     return geometry ? this.clippedGeometry(geometry) : null;
   }
-
 }

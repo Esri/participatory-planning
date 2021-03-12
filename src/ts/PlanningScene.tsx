@@ -14,22 +14,20 @@
  * limitations under the License.
  *
  */
-import { property, subclass } from "esri/core/accessorSupport/decorators";
-import Collection from "esri/core/Collection";
-import { whenNotOnce } from "esri/core/watchUtils";
-import geometryEngine from "esri/geometry/geometryEngine";
-import Point from "esri/geometry/Point";
-import Polygon from "esri/geometry/Polygon";
-import SpatialReference from "esri/geometry/SpatialReference";
-import Graphic from "esri/Graphic";
-import GraphicsLayer from "esri/layers/GraphicsLayer";
-import SceneLayer from "esri/layers/SceneLayer";
-import { SimpleRenderer } from "esri/renderers";
-import SceneLayerView from "esri/views/layers/SceneLayerView";
-import FeatureFilter from "esri/views/layers/support/FeatureFilter";
-import SceneView from "esri/views/SceneView";
-import WebScene from "esri/WebScene";
-import { tsx } from "esri/widgets/support/widget";
+import { property, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import Collection from "@arcgis/core/core/Collection";
+import { whenNotOnce } from "@arcgis/core/core/watchUtils";
+import Polygon from "@arcgis/core/geometry/Polygon";
+import SpatialReference from "@arcgis/core/geometry/SpatialReference";
+import Graphic from "@arcgis/core/Graphic";
+import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+import SceneLayer from "@arcgis/core/layers/SceneLayer";
+import { SimpleRenderer } from "@arcgis/core/renderers";
+import SceneLayerView from "@arcgis/core/views/layers/SceneLayerView";
+import FeatureFilter from "@arcgis/core/views/layers/support/FeatureFilter";
+import SceneView from "@arcgis/core/views/SceneView";
+import WebScene from "@arcgis/core/WebScene";
+import { tsx } from "@arcgis/core/widgets/support/widget";
 
 import App from "./App";
 import { computeBoundingPolygon } from "./support/geometry";
@@ -40,7 +38,6 @@ export const QUALITY = "medium";
 
 @subclass("app.widgets.webmapview")
 export default class PlanningScene extends WidgetBase {
-
   @property()
   public map: WebScene;
 
@@ -50,8 +47,8 @@ export default class PlanningScene extends WidgetBase {
   @property()
   public sketchLayer = new GraphicsLayer({
     elevationInfo: {
-      mode: "on-the-ground",
-    },
+      mode: "on-the-ground"
+    }
   });
 
   public maskPolygon: Polygon;
@@ -65,18 +62,20 @@ export default class PlanningScene extends WidgetBase {
   private sceneLayerRenderer = new SimpleRenderer({
     symbol: {
       type: "mesh-3d",
-      symbolLayers: [{
-        type: "fill",
-        material: {
-          color: "white",
-        },
-        edges: {
-          type: "solid",
-          color: [150, 150, 150],
-          size: .5,
-        },
-      }],
-    },
+      symbolLayers: [
+        {
+          type: "fill",
+          material: {
+            color: "white"
+          },
+          edges: {
+            type: "solid",
+            color: [150, 150, 150],
+            size: 0.5
+          }
+        }
+      ]
+    }
   } as any);
 
   private boundingPolygonGraphic: Graphic;
@@ -86,29 +85,28 @@ export default class PlanningScene extends WidgetBase {
 
     this.map = new WebScene({
       portalItem: {
-        id: app.settings.webSceneId,
-      },
+        id: app.settings.webSceneId
+      }
     });
 
     this.view = new SceneView({
       map: this.map,
-      qualityProfile: QUALITY,
+      qualityProfile: QUALITY
     } as any);
   }
 
   public postInitialize() {
-
     // Create global view reference
     (window as any).view = this.view;
 
     this.maskPolygon = new Polygon({
       rings: [this.app.settings.planningArea],
-      spatialReference: SpatialReference.WebMercator,
+      spatialReference: SpatialReference.WebMercator
     });
 
     this.sceneLayerFilter = new FeatureFilter({
       spatialRelationship: "disjoint",
-      geometry: this.maskPolygon,
+      geometry: this.maskPolygon
     });
 
     this.boundingPolygonGraphic = new Graphic({
@@ -117,15 +115,17 @@ export default class PlanningScene extends WidgetBase {
         type: "simple-fill",
         color: [0, 0, 0, 0.15],
         outline: {
-          width: 0,
-        },
-      } as any,
+          width: 0
+        }
+      } as any
     });
 
     this.map.when(() => {
       this.map.add(this.sketchLayer);
       this.sketchLayer.add(this.boundingPolygonGraphic);
-      this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
+      this.sceneLayer = this.map.layers.find(
+        layer => layer.type === "scene"
+      ) as SceneLayer;
       this.sceneLayer.renderer = this.sceneLayerRenderer;
       this.sceneLayer.popupEnabled = false;
       this.view.whenLayerView(this.sceneLayer).then((lv: SceneLayerView) => {
@@ -137,13 +137,13 @@ export default class PlanningScene extends WidgetBase {
   public render() {
     return (
       <div>
-        <div id="sceneView" bind={ this } afterCreate={ this.attachSceneView } />
+        <div id="sceneView" bind={this} afterCreate={this.attachSceneView} />
       </div>
     );
   }
 
   public clear() {
-    this.drawLayers().forEach((layer) => layer.removeAll());
+    this.drawLayers().forEach(layer => layer.removeAll());
   }
 
   public showMaskedBuildings(color?: any) {
@@ -151,26 +151,26 @@ export default class PlanningScene extends WidgetBase {
       // Show masked buildings with provided color, all other buildings are white
       this.boundingPolygonGraphic.visible = false;
       this.sceneLayerView.set("filter", null);
-      this.drawLayers().forEach((layer) => layer.visible = false);
+      this.drawLayers().forEach(layer => (layer.visible = false));
     } else {
       this.sceneLayerView.filter = this.sceneLayerFilter;
-      this.drawLayers().forEach((layer) => layer.visible = true);
+      this.drawLayers().forEach(layer => (layer.visible = true));
       this.boundingPolygonGraphic.visible = true;
     }
     this.sceneLayer.visible = true;
   }
 
   public showTexturedBuildings() {
-    this.drawLayers().forEach((layer) => layer.visible = false);
+    this.drawLayers().forEach(layer => (layer.visible = false));
     this.sceneLayer.visible = true;
     this.sceneLayerView.set("filter", null);
     this.boundingPolygonGraphic.symbol = {
-        type: "simple-fill",
-        color: [0, 0, 0, 0],
-        outline: {
-          width: 0,
-        },
-      } as any;
+      type: "simple-fill",
+      color: [0, 0, 0, 0],
+      outline: {
+        width: 0
+      }
+    } as any;
   }
 
   public whenNotUpdating(): Promise<void> {
@@ -178,7 +178,7 @@ export default class PlanningScene extends WidgetBase {
   }
 
   public drawLayers(): Collection<GraphicsLayer> {
-    return this.map.layers.filter((layer) => {
+    return this.map.layers.filter(layer => {
       if (layer instanceof GraphicsLayer) {
         return layer !== this.sketchLayer;
       }
@@ -189,14 +189,4 @@ export default class PlanningScene extends WidgetBase {
   private attachSceneView(sceneViewDiv: HTMLDivElement) {
     this.view.container = sceneViewDiv;
   }
-
-  private getExtrudedHeight(point: Point, graphic: Graphic) {
-    if (graphic.symbol.type === "polygon-3d" && geometryEngine.contains(graphic.geometry, point)) {
-      const layers = graphic.get<any>("symbol.symbolLayers");
-      const extrusion = layers && layers.getItemAt(0).size;
-      return extrusion;
-    }
-    return 0;
-  }
-
 }

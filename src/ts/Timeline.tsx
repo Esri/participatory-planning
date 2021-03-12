@@ -15,19 +15,18 @@
  *
  */
 import anime from "animejs";
-import Color from "esri/Color";
-import { aliasOf, subclass } from "esri/core/accessorSupport/decorators";
-import Collection from "esri/core/Collection";
-import Polyline from "esri/geometry/Polyline";
-import SpatialReference from "esri/geometry/SpatialReference";
-import Graphic from "esri/Graphic";
-import VectorTileLayer from "esri/layers/VectorTileLayer";
-import Viewpoint from "esri/Viewpoint";
-import Slide from "esri/webscene/Slide";
-import { renderable, tsx } from "esri/widgets/support/widget";
+import Color from "@arcgis/core/Color";
+import { aliasOf, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import Collection from "@arcgis/core/core/Collection";
+import Polyline from "@arcgis/core/geometry/Polyline";
+import SpatialReference from "@arcgis/core/geometry/SpatialReference";
+import Graphic from "@arcgis/core/Graphic";
+import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer";
+import Viewpoint from "@arcgis/core/Viewpoint";
+import Slide from "@arcgis/core/webscene/Slide";
+import { renderable, tsx } from "@arcgis/core/widgets/support/widget";
 
 import WidgetBase from "./widget/WidgetBase";
-
 
 export const AREA_ANIMATION_DURATION = 2000;
 export const MASK_ANIMATION_DURATION = 1000;
@@ -37,24 +36,28 @@ const maskPolygonSymbol = (color: Color): any => {
     type: "simple-fill",
     color,
     outline: {
-      width: 0,
-    },
+      width: 0
+    }
   };
 };
 
 const EMPTY_POLYLINE = new Polyline({
-  paths: [[[0, 0], [1, 1]]],
-  spatialReference: SpatialReference.WebMercator,
+  paths: [
+    [
+      [0, 0],
+      [1, 1]
+    ]
+  ],
+  spatialReference: SpatialReference.WebMercator
 });
 
 @subclass("app.widgets.Timeline")
 export default class Timeline extends WidgetBase {
-
   private vectorTileLayer = new VectorTileLayer({
     portalItem: {
-      id: "5cf1abb43c25482e8a9e373953498999",
+      id: "5cf1abb43c25482e8a9e373953498999"
     },
-    visible: false,
+    visible: false
   } as any);
 
   private initialViewpoint: Viewpoint;
@@ -71,29 +74,31 @@ export default class Timeline extends WidgetBase {
     geometry: EMPTY_POLYLINE,
     symbol: {
       type: "line-3d",
-      symbolLayers: [{
-        type: "line",
-        size: 6,
-        material: { color: this.maskColor },
-      }],
-    },
-    } as any);
+      symbolLayers: [
+        {
+          type: "line",
+          size: 6,
+          material: { color: this.maskColor }
+        }
+      ]
+    }
+  } as any);
 
   private maskPolygon: Graphic;
 
   private showIntroDialog = true;
 
   public postInitialize() {
-
     const queryParams = document.location.search.substr(1);
     this.showIntroDialog = queryParams !== "skipTutorial";
 
     const scene = this.app.scene;
     const map = scene.map;
     map.when(() => {
-
       this.initialViewpoint = map.initialViewProperties.viewpoint;
-      this.drawViewpoint = this.slides.length ? this.slides.getItemAt(0).viewpoint : this.initialViewpoint;
+      this.drawViewpoint = this.slides.length
+        ? this.slides.getItemAt(0).viewpoint
+        : this.initialViewpoint;
 
       map.layers.add(this.vectorTileLayer);
 
@@ -101,7 +106,7 @@ export default class Timeline extends WidgetBase {
       color.a = 0;
       this.maskPolygon = new Graphic({
         symbol: maskPolygonSymbol(color),
-        geometry: scene.maskPolygon,
+        geometry: scene.maskPolygon
       } as any);
 
       scene.sketchLayer.add(this.maskPolyline);
@@ -114,26 +119,35 @@ export default class Timeline extends WidgetBase {
   }
 
   public render() {
-
     const slides = this.slides.toArray();
 
     return (
       <div class="timeline">
-        { this.showIntroDialog ? ( <div/ > ) : (
+        {this.showIntroDialog ? (
+          <div />
+        ) : (
           <div class="menu menu-left phone-hide">
             <div class="menu-item">
-              <button class="btn btn-large" onclick={ this.playIntroAnimation.bind(this) }>
+              <button
+                class="btn btn-large"
+                onclick={this.playIntroAnimation.bind(this)}
+              >
                 Intro
               </button>
             </div>
           </div>
         )}
         <div class="menu phone-hide">
-          { slides.map((slide) => (<div class="menu-item" key={ slide.id }>
-              <button class="btn btn-large" onclick={ () => this.goTo(slide.viewpoint) }>
-                { slide.title.text }
+          {slides.map(slide => (
+            <div class="menu-item" key={slide.id}>
+              <button
+                class="btn btn-large"
+                onclick={() => this.goTo(slide.viewpoint)}
+              >
+                {slide.title.text}
               </button>
-            </div>)) }
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -143,22 +157,21 @@ export default class Timeline extends WidgetBase {
     this.toggleLoadingIndicator(true);
     this.app.scene.showMaskedBuildings("white");
     this.app.scene.clear();
-    return this.goTo(this.initialViewpoint)
-      .then(() => {
-        this.toggleBasemap(true);
-        if (this.showIntroDialog) {
-          this.toggleElement("intro", true);
-        } else {
-          this.toggleElement("intro", false);
-          this.toggleLoadingIndicator(false);
-        }
-      });
+    return this.goTo(this.initialViewpoint).then(() => {
+      this.toggleBasemap(true);
+      if (this.showIntroDialog) {
+        this.toggleElement("intro", true);
+      } else {
+        this.toggleElement("intro", false);
+        this.toggleLoadingIndicator(false);
+      }
+    });
   }
 
   public playIntroAnimation(): Promise<void> {
     this.toggleElement("intro", false);
-    return this
-      .app.scene.whenNotUpdating()
+    return this.app.scene
+      .whenNotUpdating()
       .then(() => {
         this.toggleOverlay(false);
         this.toggleLoadingIndicator(false);
@@ -172,37 +185,40 @@ export default class Timeline extends WidgetBase {
 
   public startPlanning() {
     this.toggleElement("intro", false);
-    return this
-      .app.scene.whenNotUpdating()
-      .then(() => {
-        this.toggleOverlay(false);
-        this.toggleLoadingIndicator(false);
-        this.toggleElement("intro", false);
-        this.toggleElement("screenshot", false);
+    return this.app.scene.whenNotUpdating().then(() => {
+      this.toggleOverlay(false);
+      this.toggleLoadingIndicator(false);
+      this.toggleElement("intro", false);
+      this.toggleElement("screenshot", false);
 
-        // Not strickly serial, simply to speed up scene getting ready to edit
-        this.goTo(this.drawViewpoint);
-        this.toggleBasemap(false);
-        this.app.scene.showMaskedBuildings();
-      });
+      // Not strickly serial, simply to speed up scene getting ready to edit
+      this.goTo(this.drawViewpoint);
+      this.toggleBasemap(false);
+      this.app.scene.showMaskedBuildings();
+    });
   }
 
   public takeScreenshot() {
     const view = this.app.scene.view;
-    const width = Math.min(this.app.scene.view.width, this.app.scene.view.height);
-    const options = { format: "png", width: width * 0.8 };
+    const width = Math.min(
+      this.app.scene.view.width,
+      this.app.scene.view.height
+    );
+    const options = { format: "png" as "png", width: width * 0.8 };
     this.toggleLoadingIndicator(true, "Capturing Scene");
 
     setTimeout(() => {
-      this.app.scene.whenNotUpdating()
+      this.app.scene
+        .whenNotUpdating()
         .then(() => view.takeScreenshot(options))
-        .then((after) => {
+        .then(after => {
           this.app.scene.showTexturedBuildings();
           this.toggleBasemap(true);
           setTimeout(() => {
-            this.app.scene.whenNotUpdating()
+            this.app.scene
+              .whenNotUpdating()
               .then(() => view.takeScreenshot(options))
-              .then((before) => {
+              .then(before => {
                 this.showScreenshot(before, after);
 
                 this.app.scene.showMaskedBuildings();
@@ -214,9 +230,10 @@ export default class Timeline extends WidgetBase {
   }
 
   public downloadScreenshot() {
-
     const filename = "ParticipatoryPlanning.png";
-    const canvas = document.getElementById("screenshotCanvas") as HTMLCanvasElement;
+    const canvas = document.getElementById(
+      "screenshotCanvas"
+    ) as HTMLCanvasElement;
     const dataUrl = canvas.toDataURL("image/png");
 
     // Taken from https://developers.arcgis.com/javascript/latest/sample-code/sceneview-screenshot/index.html
@@ -252,13 +269,34 @@ export default class Timeline extends WidgetBase {
   }
 
   private showScreenshot(before: __esri.Screenshot, after: __esri.Screenshot) {
-    const canvas = document.getElementById("screenshotCanvas") as HTMLCanvasElement;
+    const canvas = document.getElementById(
+      "screenshotCanvas"
+    ) as HTMLCanvasElement;
     const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-    const height = canvas.width = canvas.height = Math.min(before.data.width, 2 * before.data.height);
+    const height = (canvas.width = canvas.height = Math.min(
+      before.data.width,
+      2 * before.data.height
+    ));
     const x = -(before.data.width - height) / 2;
     const dirtyY = (before.data.height - height / 2) / 2;
-    context.putImageData(before.data, x, -dirtyY, 0, dirtyY, before.data.width, height / 2);
-    context.putImageData(after.data, x, height / 2 - dirtyY, 0, dirtyY, after.data.width, height / 2);
+    context.putImageData(
+      before.data,
+      x,
+      -dirtyY,
+      0,
+      dirtyY,
+      before.data.width,
+      height / 2
+    );
+    context.putImageData(
+      after.data,
+      x,
+      height / 2 - dirtyY,
+      0,
+      dirtyY,
+      after.data.width,
+      height / 2
+    );
 
     context.font = "bold 50px Helvetica";
     context.fillStyle = "white";
@@ -272,17 +310,18 @@ export default class Timeline extends WidgetBase {
 
   private goTo(target: Viewpoint | Graphic, duration = 800): Promise<void> {
     const view = this.app.scene.view;
-    return view.goTo(target, { duration }).then(() => {
+    return view
+      .goTo(target, { duration })
+      .then(() => {
+        // Wait for all layers to update after applying a new slide
+        return this.app.scene.whenNotUpdating();
 
-      // Wait for all layers to update after applying a new slide
-      return this.app.scene.whenNotUpdating();
-
-      // Catching any exceptions in case animation gets canceled
-    }).catch(console.log);
+        // Catching any exceptions in case animation gets canceled
+      })
+      .catch(console.log);
   }
 
   private animateArea(): Promise<void> {
-
     const planningArea = this.app.settings.planningArea;
     const start = planningArea[0];
     const waypoints = planningArea.slice(1);
@@ -300,14 +339,14 @@ export default class Timeline extends WidgetBase {
     });
 
     durations.forEach((duration, index) => {
-      durations[index] = duration * AREA_ANIMATION_DURATION / totalLength;
+      durations[index] = (duration * AREA_ANIMATION_DURATION) / totalLength;
     });
 
     const paths = [start];
 
     const movingPoint = {
       x: start[0],
-      y: start[1],
+      y: start[1]
     };
 
     let timeline = anime.timeline({
@@ -316,10 +355,10 @@ export default class Timeline extends WidgetBase {
           this.maskPolyline.geometry = {
             type: "polyline",
             paths: [paths.concat([[movingPoint.x, movingPoint.y]])],
-            spatialReference: SpatialReference.WebMercator,
+            spatialReference: SpatialReference.WebMercator
           } as any;
         }
-      },
+      }
     });
     waypoints.forEach((point, index) => {
       timeline = timeline.add({
@@ -330,7 +369,7 @@ export default class Timeline extends WidgetBase {
         easing: "easeInOutCubic",
         complete: () => {
           paths.push([movingPoint.x, movingPoint.y]);
-        },
+        }
       });
     });
     return timeline.finished;
@@ -341,39 +380,42 @@ export default class Timeline extends WidgetBase {
       r: 226,
       g: 119,
       b: 40,
-      a: 0,
+      a: 0
     });
 
     const buildingColor = new Color({
       r: 256,
       g: 256,
-      b: 256,
+      b: 256
     });
 
-    const timeline = anime.timeline({
-      update: () => {
-        this.maskPolygon.symbol = maskPolygonSymbol(color);
-        this.app.scene.showMaskedBuildings(buildingColor);
-      },
-    }).add({
-      targets: [color, buildingColor],
-      r: 226,
-      g: 119,
-      b: 40,
-      a: 0.6,
-      duration: MASK_ANIMATION_DURATION / 2,
-      easing: "easeInOutCubic",
-    }).add({
-      targets: [color, buildingColor],
-      a: 0,
-      delay: 100,
-      duration: MASK_ANIMATION_DURATION / 2,
-      endDelay: 1500,
-      easing: "easeInOutCubic",
-      complete: () => {
-        this.maskPolyline.geometry = EMPTY_POLYLINE;
-      },
-    });
+    const timeline = anime
+      .timeline({
+        update: () => {
+          this.maskPolygon.symbol = maskPolygonSymbol(color);
+          this.app.scene.showMaskedBuildings(buildingColor);
+        }
+      })
+      .add({
+        targets: [color, buildingColor],
+        r: 226,
+        g: 119,
+        b: 40,
+        a: 0.6,
+        duration: MASK_ANIMATION_DURATION / 2,
+        easing: "easeInOutCubic"
+      })
+      .add({
+        targets: [color, buildingColor],
+        a: 0,
+        delay: 100,
+        duration: MASK_ANIMATION_DURATION / 2,
+        endDelay: 1500,
+        easing: "easeInOutCubic",
+        complete: () => {
+          this.maskPolyline.geometry = EMPTY_POLYLINE;
+        }
+      });
     return timeline.finished;
   }
 
@@ -382,5 +424,4 @@ export default class Timeline extends WidgetBase {
     this.vectorTileLayer.visible = !show;
     return this.app.scene.whenNotUpdating();
   }
-
 }

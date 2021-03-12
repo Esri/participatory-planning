@@ -14,15 +14,13 @@
  * limitations under the License.
  *
  */
-import { property, subclass } from "esri/core/accessorSupport/decorators";
-import Widget from "esri/widgets/Widget";
+import { property, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import Widget from "@arcgis/core/widgets/Widget";
 
 import App from "../App";
 
-
 @subclass("app.widgets.WidgetBase")
 export default class WidgetBase extends Widget {
-
   @property()
   public app: App;
 
@@ -57,5 +55,4 @@ export default class WidgetBase extends Widget {
       overlay.style.opacity = opacity.toString();
     }
   }
-
 }

@@ -14,27 +14,25 @@
  * limitations under the License.
  *
  */
-import { property, subclass } from "esri/core/accessorSupport/decorators";
-import Graphic from "esri/Graphic";
-import PolygonSymbol3D from "esri/symbols/PolygonSymbol3D";
-import { renderable, tsx } from "esri/widgets/support/widget";
+import { property, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import Graphic from "@arcgis/core/Graphic";
+import PolygonSymbol3D from "@arcgis/core/symbols/PolygonSymbol3D";
+import { renderable, tsx } from "@arcgis/core/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
-
 
 const BUILDING_COLOR = "#FFFFFF";
 const BUILDING_FLOOR_HEIGHT = 3;
 
 @subclass("app.draw.CreateBuilding")
 export default class CreateBuilding extends DrawWidget {
-
   @renderable()
   @property()
   private stories: number;
 
   public postInitialize() {
     this.layer.elevationInfo = {
-      mode: "on-the-ground",
+      mode: "on-the-ground"
     };
   }
 
@@ -44,13 +42,16 @@ export default class CreateBuilding extends DrawWidget {
     return (
       <div>
         <div class="menu">
-          { [3, 5, 10].map((stories) => (
+          {[3, 5, 10].map(stories => (
             <div class="menu-item">
               <button
                 class={stories === this.stories ? active : inactive}
-                onclick={ this.startDrawing.bind(this, stories) }>{stories}-Story Building</button>
+                onclick={this.startDrawing.bind(this, stories)}
+              >
+                {stories}-Story Building
+              </button>
             </div>
-          )) }
+          ))}
         </div>
       </div>
     );
@@ -61,30 +62,32 @@ export default class CreateBuilding extends DrawWidget {
   }
 
   private startDrawing(stories: number) {
-
     const size = stories * BUILDING_FLOOR_HEIGHT;
     const color = BUILDING_COLOR;
 
     const symbol = new PolygonSymbol3D({
-      symbolLayers: [{
-        type: "extrude",
-        material: {
-          color,
-        },
-        edges: {
-          type: "solid",
-          color: [100, 100, 100],
-        },
-        size,
-      }] as any,
+      symbolLayers: [
+        {
+          type: "extrude",
+          material: {
+            color
+          },
+          edges: {
+            type: "solid",
+            color: [100, 100, 100]
+          },
+          size
+        }
+      ] as any
     });
 
-    this.createPolygonGraphic(symbol, color).finally(() => {
-      this.stories = 0;
-    }).catch(() => {
-      // Ignore
-    });
+    this.createPolygonGraphic(symbol, color)
+      .finally(() => {
+        this.stories = 0;
+      })
+      .catch(() => {
+        // Ignore
+      });
     this.stories = stories;
   }
-
 }

@@ -15,17 +15,20 @@
  *
  */
 
-import Color from "esri/Color";
-import Polyline from "esri/geometry/Polyline";
-import Graphic from "esri/Graphic";
-import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
+import Color from "@arcgis/core/Color";
+import Polyline from "@arcgis/core/geometry/Polyline";
+import Graphic from "@arcgis/core/Graphic";
+import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
 
 import DrawWidget from "../DrawWidget";
 import DrawGeometry from "./DrawGeometry";
 
 export default class DrawPolyline extends DrawGeometry<Polyline> {
-
-  constructor(widget: DrawWidget, graphic: Graphic, protected sketchColor: string) {
+  constructor(
+    widget: DrawWidget,
+    graphic: Graphic,
+    protected sketchColor: string
+  ) {
     super(widget, graphic, "polyline");
   }
 
@@ -37,8 +40,10 @@ export default class DrawPolyline extends DrawGeometry<Polyline> {
 
     sketchViewModel.polylineSymbol.color = color;
 
-    sketchViewModel.pointSymbol.color = color;
-    sketchViewModel.pointSymbol.outline.width = 0;
+    if (sketchViewModel.pointSymbol.type === "simple-marker") {
+      sketchViewModel.pointSymbol.color = color;
+      sketchViewModel.pointSymbol.outline.width = 0;
+    }
 
     return sketchViewModel;
   }
@@ -64,5 +69,4 @@ export default class DrawPolyline extends DrawGeometry<Polyline> {
     //   });
     // }
   }
-
 }

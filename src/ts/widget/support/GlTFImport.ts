@@ -14,10 +14,13 @@
  * limitations under the License.
  *
  */
-import Accessor from "esri/core/Accessor";
-import { property, subclass } from "esri/core/accessorSupport/decorators";
-import { create as createPromise, eachAlways, reject as rejectPromise } from "esri/core/promiseUtils";
-
+import Accessor from "@arcgis/core/core/Accessor";
+import { property, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import {
+  create as createPromise,
+  eachAlways,
+  reject as rejectPromise
+} from "@arcgis/core/core/promiseUtils";
 
 interface BlobZIPEntry {
   name: string;
@@ -35,7 +38,6 @@ const ZIP_PROGRESS_FACTOR = 0.5;
 
 @subclass("app.draw.support.GlTFImport")
 export default class GlTFImport extends Accessor {
-
   @property()
   public progress = 0;
 
@@ -50,97 +52,97 @@ export default class GlTFImport extends Accessor {
     super();
 
     this.reportProgress("start", 0);
-    this.blobUrl = this
-      .downloadAndExtractZip(this.url)
-      .then((entries) => this.zipEntriesToBlob(entries))
-      .then((blobEntries) => this.combineToSingleBlob(blobEntries))
-      .then((gltfBlob) => gltfBlob.url);
+    this.blobUrl = this.downloadAndExtractZip(this.url)
+      .then(entries => this.zipEntriesToBlob(entries))
+      .then(blobEntries => this.combineToSingleBlob(blobEntries))
+      .then(gltfBlob => gltfBlob.url);
   }
 
   private downloadAndExtractZip(url: string): Promise<ZIPEntry[]> {
-    return createPromise(((resolve: (_: ZIPEntry[]) => void, reject: (error?: any) => void) => {
+    return createPromise(((
+      resolve: (_: ZIPEntry[]) => void,
+      reject: (error?: any) => void
+    ) => {
       const reader = new this.zip.HttpProgressReader(url, {
-        onProgress: this.reportDownloadProgress.bind(this),
+        onProgress: this.reportDownloadProgress.bind(this)
       });
       this.zip.createReader(
-          reader,
-          (zipReader: any) => {
-            zipReader.getEntries(resolve);
-          },
-          reject,
+        reader,
+        (zipReader: any) => {
+          zipReader.getEntries(resolve);
+        },
+        reject
       );
     }) as any);
   }
 
   private zipEntriesToBlob(entries: ZIPEntry[]): Promise<BlobZIPEntry[]> {
-
-    entries = entries.filter((entry) => !entry.directory);
+    entries = entries.filter(entry => !entry.directory);
 
     // const progress = (currentIndex, totalIndex)
 
     let completedBlobs = 0;
 
-    const promises = entries.map(
-      (entry) => this
-        .saveEntryToBlob(entry)
-        .then((blob) => {
-          this.reportUnzipProgress(entries.length, ++completedBlobs);
-          return blob;
-        }),
+    const promises = entries.map(entry =>
+      this.saveEntryToBlob(entry).then(blob => {
+        this.reportUnzipProgress(entries.length, ++completedBlobs);
+        return blob;
+      })
     );
 
     return eachAlways(promises).then((results: __esri.EachAlwaysResult[]) => {
-      return results.map((result) => result.value);
+      return results.map(result => result.value);
     });
   }
 
   private saveEntryToBlob(entry: ZIPEntry): Promise<BlobZIPEntry> {
     return createPromise(((resolve: (_: BlobZIPEntry) => void) => {
-      entry.getData(
-          new this.zip.BlobWriter("text/plain"),
-          (data: any) => {
-              const url = window.URL.createObjectURL(data);
-              resolve({
-                name: entry.filename,
-                url,
-                blob: data,
-              });
-          },
-      );
+      entry.getData(new this.zip.BlobWriter("text/plain"), (data: any) => {
+        const url = window.URL.createObjectURL(data);
+        resolve({
+          name: entry.filename,
+          url,
+          blob: data
+        });
+      });
     }) as any);
   }
 
   private combineToSingleBlob(entries: BlobZIPEntry[]): Promise<BlobZIPEntry> {
-
     const rootEntry = entries.reduce(
-      (previous, entry) => !previous && entry.name.match(/\.gltf$/) ? entry : previous,
-      undefined,
+      (previous, entry) =>
+        !previous && entry.name.match(/\.gltf$/) ? entry : previous,
+      undefined
     );
 
     if (!rootEntry) {
       return rejectPromise("Can not find a .gltf file in ZIP archive");
     }
     const assets = entries.reduce((previous, entry) => {
-        previous[entry.name] = entry.url;
-        return previous;
-      },
-      {},
-    );
+      previous[entry.name] = entry.url;
+      return previous;
+    }, {});
     const reader = new FileReader();
 
-    return createPromise(((resolve: (_: BlobZIPEntry) => void, reject: (error?: any) => void) => {
-
+    return createPromise(((
+      resolve: (_: BlobZIPEntry) => void,
+      reject: (error?: any) => void
+    ) => {
       reader.onload = () => {
         try {
           const gltfJson = JSON.parse(reader.result as string);
 
           // Replace original buffers and images by blob URLs
           if (gltfJson.hasOwnProperty("buffers")) {
-            gltfJson.buffers.forEach((buffer: any) => buffer.uri = assets[buffer.uri]);
+            gltfJson.buffers.forEach(
+              (buffer: any) => (buffer.uri = assets[buffer.uri])
+            );
           }
 
           if (gltfJson.hasOwnProperty("images")) {
-            gltfJson.images.forEach((image: any) => image.uri = assets[image.uri]);
+            gltfJson.images.forEach(
+              (image: any) => (image.uri = assets[image.uri])
+            );
           }
 
           const gltfContent = JSON.stringify(gltfJson, null, 2);
@@ -149,7 +151,7 @@ export default class GlTFImport extends Accessor {
           resolve({
             name: rootEntry.name,
             url: gltfUrl,
-            blob: gltfBlob,
+            blob: gltfBlob
           });
         } catch (e) {
           reject(e);
@@ -167,7 +169,8 @@ export default class GlTFImport extends Accessor {
   }
 
   private reportUnzipProgress(total: number, completed: number) {
-    const value = ZIP_PROGRESS_FACTOR + completed / total * ZIP_PROGRESS_FACTOR;
+    const value =
+      ZIP_PROGRESS_FACTOR + (completed / total) * ZIP_PROGRESS_FACTOR;
     this.reportProgress("unzip", value);
   }
 
@@ -178,5 +181,4 @@ export default class GlTFImport extends Accessor {
       this.progress = value;
     }
   }
-
 }
