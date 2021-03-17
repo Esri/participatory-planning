@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import Geometry from "@arcgis/core/geometry/Geometry";
+import { Geometry } from "@arcgis/core/geometry";
 import geometryEngine = require("@arcgis/core/geometry/geometryEngine");
 import Point from "@arcgis/core/geometry/Point";
 import Graphic from "@arcgis/core/Graphic";
@@ -58,7 +58,7 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
     const sketchViewModel = this.createSketchViewModel();
 
-    const keyEventListener = this.scene.view.on("key-down", event => {
+    const keyEventListener = this.scene.view.on("key-down", (event) => {
       const remove = event.key === "Delete" || event.key === "Backspace";
       if (remove || event.key === "Escape") {
         if (remove || create) {
@@ -69,7 +69,7 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
     });
 
     const promise = this.initiate<G>(
-      handle => {
+      (handle) => {
         DrawGeometry.currentHandle = handle;
 
         if (create) {
@@ -77,7 +77,7 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
         }
         this.scene.view.highlightOptions.fillOpacity = 0;
 
-        sketchViewModel.on("create", event => {
+        sketchViewModel.on("create", (event) => {
           this.onSketchViewModelEvent(
             sketchViewModel,
             event,
@@ -86,7 +86,7 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
           );
         });
 
-        sketchViewModel.on("update", event => {
+        sketchViewModel.on("update", (event) => {
           this.onSketchViewModelEvent(
             sketchViewModel,
             event,
@@ -149,7 +149,24 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
     const svm = new SketchViewModel({
       view: this.scene.view,
       layer: this.widget.layer,
-      updateOnGraphicClick: false
+      updateOnGraphicClick: false,
+      snappingOptions: {
+        // Quickly turn on/off snapping in general
+        enabled: true,
+
+        // Turn self snapping on/off
+        selfEnabled: true,
+
+        // Turn feature snapping on/off
+        featureEnabled: true,
+
+        // List of sources for feature snapping
+        // featureSources: [],
+
+        // Maximum distance for snapping in pixels
+        // (was proximityThreshold, see discussion below)
+        distance: 5,
+      },
     });
 
     svm.defaultCreateOptions.hasZ = false;
@@ -191,12 +208,12 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
   protected snapVertices(vertices: number[][]) {
     const spatialReference = this.scene.view.spatialReference;
-    vertices.forEach(point => {
+    vertices.forEach((point) => {
       const snappedPoint = this.snapPoint(
         new Point({
           x: point[0],
           y: point[1],
-          spatialReference
+          spatialReference,
         })
       );
       point[0] = snappedPoint.x;
