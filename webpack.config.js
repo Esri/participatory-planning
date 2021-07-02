@@ -56,7 +56,9 @@ module.exports = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: ["dist/*"]
+    }),
     new HtmlWebpackPlugin({
       title: 'Participatory Planning',
       template: `./src/layout.js`,
