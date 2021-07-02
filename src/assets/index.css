@@ -1,7 +1,3 @@
-$blue: rgb(0, 121, 193);
-$gray: rgb(239, 239, 239);
-$white: rgb(255, 255, 255);
-// Calcite panel tweeks
 html,
 body,
 #scene,
@@ -12,35 +8,22 @@ body,
     width: 100%;
 }
 
-$off-black: #4c4c4c;
-$dark-blue: #005e95;
-
-// Disable selection & highlighting
 body {
-    -webkit-touch-callout: none;
+    /* -webkit-touch-callout: none; */
     /* iOS Safari */
-    -webkit-user-select: none;
+    /* -webkit-user-select: none; */
     /* Safari */
-    -khtml-user-select: none;
+    /* -khtml-user-select: none; */
     /* Konqueror HTML */
-    -moz-user-select: none;
+    /* -moz-user-select: none; */
     /* Firefox */
-    -ms-user-select: none;
+    /* -ms-user-select: none; */
     /* Internet Explorer/Edge */
-    user-select: none;
+    /* user-select: none; */
     /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }
 
-// Disable focus glow
-*:focus {
-    outline: none;
-    border-color: inherit;
-    -webkit-box-shadow: none;
-    box-shadow: none;
-}
-
-// General
 .center {
     position: absolute;
     left: 50%;
@@ -136,17 +119,17 @@ body {
 .menu .btn {
     border: none;
     background-color: rgba(255, 255, 255, 0);
-    color: $off-black;
+    color: #4c4c4c;
 }
 
 .menu .btn:hover {
-    background-color: $white;
+    background-color: rgb(255, 255, 255);
 }
 
 .menu .btn:active,
 .menu .btn.active {
-    background-color: $white;
-    color: $dark-blue;
+    background-color: rgb(255, 255, 255);
+    color: #005e95;
 }
 
 .bottom .btn:not(.btn-large) {
@@ -260,7 +243,7 @@ body {
 }
 
 .gallery-grid-item:hover {
-    background-color: $white;
+    background-color: rgb(255, 255, 255);
 }
 
 .gallery-grid-item img {
@@ -277,7 +260,6 @@ body {
     transform: scale(1.1);
 }
 
-// Screenshot
 #screenshot {
     width: 100%;
     height: 100%;
@@ -301,7 +283,6 @@ body {
     height: 75px;
 }
 
-// Intro
 .card {
     border-radius: 10px;
 }

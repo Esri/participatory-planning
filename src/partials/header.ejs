@@ -1,0 +1,46 @@
+
+<!-- <!DOCTYPE html> -->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <script type="text/javascript" src="js/zip.js/zip.js"></script>
+    <script type="text/javascript" src="js/zip.js/zip-ext.js"></script>
+    <script type="text/javascript" src="js/zip.js/HttpProgressReader.js"></script>
+    <script type="text/javascript" src="https://apps.sketchfab.com/web-importer/sketchfab-importer.js"></script>
+
+    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" /> -->
+
+    <script>
+      zip.workerScriptsPath = 'js/zip.js/';
+    </script>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.20/esri/css/main.css">
+    <link rel="stylesheet" href="https://s3-us-west-1.amazonaws.com/patterns.esri.com/files/calcite-web/1.2.5/css/calcite-web.min.css">
+
+    <% for (var css in htmlWebpackPlugin.files.css) { %>
+    <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet">
+    <% } %>
+
+    <link href="./index.css" rel="stylesheet">
+
+    <meta charset="utf-8" />
+    <title><%= htmlWebpackPlugin.options.title %></title>
+
+    <script>
+      window.dojoConfig = {
+        packages: [
+          {
+            name: "app",
+            location: "/",
+            main: "<%= htmlWebpackPlugin.files.js[0].replace(/\.[^/.]+$/, '') %>"
+          }
+        ]
+      };
+    </script>
+  </head>
+  <body id="app">
+
+    <noscript>JavaScript is required in order to use this app </noscript>

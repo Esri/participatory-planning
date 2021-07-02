@@ -1,31 +1,40 @@
 {
   "compilerOptions": {
-    "module": "amd",
-    "lib": ["dom", "es2018", "es5", "es6"],
     "target": "es5",
-    "noImplicitAny": true,
-    "removeComments": true,
+    "module": "amd",
+    "lib": [
+      "dom",
+      "es5",
+      "es6"
+    ],
+    "noEmitHelpers": true,
+    "noEmitOnError": true,
+    "strictPropertyInitialization": false,
     "jsx": "react",
     "jsxFactory": "tsx",
+    "sourceMap": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": false,
     "moduleResolution": "node",
+    "types": [
+      "arcgis-js-api"
+    ],
     "esModuleInterop": true,
-    "isolatedModules": false,
     "experimentalDecorators": true,
-    "declaration": false,
-    "noLib": false,
+    "inlineSourceMap": false,
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true,
-    "strictNullChecks": true,
-    "outDir": "./dist/",
-    "sourceMap": true,
-    "noEmitOnError": false,
-    "noUnusedLocals": true,
+    "outDir": "dist/js",
     "importHelpers": true,
-    "skipLibCheck": true,
-    "typeRoots" : ["./nodes_modules/@types"],
-    "types": ["arcgis-js-api", "moment"],
   },
   "include": [
-    "src/*"
+    "./src/**/*",
+    "node_modules/arcgis-js-api/**/*"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

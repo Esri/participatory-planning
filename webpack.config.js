@@ -1,28 +1,29 @@
-const CleanWebpackPlugin = require("clean-webpack-plugin");
-const HtmlWebPackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
+const path = require('path');
 
-const path = require("path");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
-    index: ["./src/css/main.scss", "./src/index.ts"]
+    index: [
+      // `./src/css/index.css`,
+      `./src/index.ts`
+    ]
   },
+  node: false,
   output: {
     libraryTarget: "amd",
-    filename: "[name].js",
-    publicPath: ""
+    path: path.join(__dirname, "dist"),
+    filename: "[name]/main.[chunkhash].js",
+    // chunkFilename: 'chunks/[id].js',
+    publicPath: ''
   },
-  optimization: {
-    minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: false
-      })
-    ]
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    compress: true,
+    port: 3001,
   },
   externals: [
     /^esri\/.*/,
@@ -31,68 +32,51 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.ejs$/,
+        loader: 'ejs-loader',
+        options: {
+          esModule: false,
+        }
+      },
+      {
         test: /\.tsx?$/,
         loader: "ts-loader",
         options: {
           transpileOnly: true
-        }
-      },
-      {
-        test: /\.html$/,
-        use: [
-          {
-            loader: "html-loader",
-            options: { minimize: false }
-          }
-        ],
+        },
         exclude: /node_modules/
       },
       {
-        test: /\.scss$/,
+        test: /\.css$/,
         use: [
           MiniCssExtractPlugin.loader,
           "css-loader",
-          {
-            loader: "resolve-url-loader",
-            options: { includeRoot: true }
-          },
-          "sass-loader?sourceMap"
         ]
       },
-      {
-        test: /\.(ico|jpg|jpeg|gif|png|woff|woff2|eot|ttf|svg)$/i,
-        use: 'file-loader?name=assets/[name].[ext]'
-      }
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(["dist/*"]),
-
-    new HtmlWebPackPlugin({
-      title: "ArcGIS Template Application",
-      template: "./src/index.html",
-      filename: "./index.html",
-      favicon: "./src/assets/favicon.ico",
-      chunksSortMode: "none",
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      title: 'Participatory Planning',
+      template: `./src/layout.js`,
+      filename: `index.html`,
+      entry: "index",
+      chunks: ["index"],
+      chunksSortMode: 'none',
       inject: false,
-      hash: false,
-      inlineSource: ".(css)$"
     }),
-
     new MiniCssExtractPlugin({
-      filename: "[name].css",
+      filename: "[name]/style.[chunkhash].css",
       chunkFilename: "[id].css"
     }),
-
-    new CopyWebpackPlugin([{
-      from: './src/assets/images',
-      to: 'images/'
-    }]),
-
-    new CopyWebpackPlugin([{
-      from: './src/assets/js',
-      to: 'js/'
-    }])
+    new CopyWebpackPlugin(
+      {
+        patterns: [{
+          from: './src/assets',
+          to: './'
+        }]
+      })
   ],
   resolve: {
     modules: [
@@ -100,10 +84,5 @@ module.exports = {
       path.resolve(__dirname, "node_modules/")
     ],
     extensions: [".ts", ".tsx", ".js", ".scss", ".css"]
-  },
-  node: {
-    process: false,
-    global: false,
-    fs: "empty"
   }
 };
