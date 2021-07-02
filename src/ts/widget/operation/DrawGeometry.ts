@@ -132,10 +132,22 @@ export default class DrawGeometry<G extends Geometry> extends WidgetOperation {
 
   protected createSketchViewModel(): SketchViewModel {
 
+    const otherLayers = this.scene.map.allLayers.filter(
+      (l) => l.type === "graphics" && l !== this.widget.layer
+    );
+
     const svm = new SketchViewModel({
       view: this.scene.view,
       layer: this.widget.layer,
       updateOnGraphicClick: false,
+      snappingOptions: {
+        enabled: true,
+        selfEnabled: true,
+        featureEnabled: true,
+        featureSources: otherLayers.map((layer) => {
+          return { layer, enabled: true };
+        }),
+      },
     });
 
     svm.defaultCreateOptions.hasZ = false;
