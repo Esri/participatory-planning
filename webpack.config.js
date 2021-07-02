@@ -57,7 +57,9 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ["dist/*"]
+      cleanOnceBeforeBuildPatterns: [
+        '**/*',
+        '!.git/**',]
     }),
     new HtmlWebpackPlugin({
       title: 'Participatory Planning',
