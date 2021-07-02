@@ -17,7 +17,7 @@
 import { aliasOf, property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
-import { renderable, tsx } from "esri/widgets/support/widget";
+import { tsx } from "esri/widgets/support/widget";
 
 import PlanningScene from "./PlanningScene";
 import Timeline from "./Timeline";
@@ -49,11 +49,9 @@ export interface Settings {
 export default class App extends WidgetBase {
 
   @aliasOf("scene.map.portalItem.title")
-  @renderable()
   public title: string;
 
   @property()
-  @renderable()
   public thumbnailUrl: string;
 
   @property()

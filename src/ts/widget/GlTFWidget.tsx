@@ -18,7 +18,7 @@ import { aliasOf, property, subclass } from "esri/core/accessorSupport/decorator
 import Graphic from "esri/Graphic";
 import ObjectSymbol3DLayer from "esri/symbols/ObjectSymbol3DLayer";
 import PointSymbol3D from "esri/symbols/PointSymbol3D";
-import { renderable, tsx } from "esri/widgets/support/widget";
+import { tsx } from "esri/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
 import GlTFImport from "./support/GlTFImport";
@@ -35,7 +35,6 @@ enum GlTFWidgetState {
 export default class GlTFWidget extends DrawWidget {
 
   @property()
-  @renderable()
   public state: GlTFWidgetState = GlTFWidgetState.Idle;
 
   @property()
@@ -43,7 +42,6 @@ export default class GlTFWidget extends DrawWidget {
 
   @property()
   @aliasOf("currentImport.progress")
-  @renderable()
   public progress: number;
 
   public postInitialize() {

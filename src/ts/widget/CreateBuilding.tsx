@@ -17,7 +17,7 @@
 import { property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import PolygonSymbol3D from "esri/symbols/PolygonSymbol3D";
-import { renderable, tsx } from "esri/widgets/support/widget";
+import { tsx } from "esri/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
 
@@ -28,7 +28,6 @@ const BUILDING_FLOOR_HEIGHT = 3;
 @subclass("app.draw.CreateBuilding")
 export default class CreateBuilding extends DrawWidget {
 
-  @renderable()
   @property()
   private stories: number;
 

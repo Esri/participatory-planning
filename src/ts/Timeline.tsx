@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+// @ts-ignore
 import anime from "animejs";
 import Color from "esri/Color";
 import { aliasOf, subclass } from "esri/core/accessorSupport/decorators";
@@ -24,7 +25,7 @@ import Graphic from "esri/Graphic";
 import VectorTileLayer from "esri/layers/VectorTileLayer";
 import Viewpoint from "esri/Viewpoint";
 import Slide from "esri/webscene/Slide";
-import { renderable, tsx } from "esri/widgets/support/widget";
+import { tsx } from "esri/widgets/support/widget";
 
 import WidgetBase from "./widget/WidgetBase";
 
@@ -59,7 +60,6 @@ export default class Timeline extends WidgetBase {
 
   private initialViewpoint: Viewpoint;
 
-  @renderable()
   @aliasOf("app.scene.map.presentation.slides")
   private slides: Collection<Slide>;
 
@@ -190,7 +190,7 @@ export default class Timeline extends WidgetBase {
   public takeScreenshot() {
     const view = this.app.scene.view;
     const width = Math.min(this.app.scene.view.width, this.app.scene.view.height);
-    const options = { format: "png", width: width * 0.8 };
+    const options = { format: "png" as "png", width: width * 0.8 };
     this.toggleLoadingIndicator(true, "Capturing Scene");
 
     setTimeout(() => {

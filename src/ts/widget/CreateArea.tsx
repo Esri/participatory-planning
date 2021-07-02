@@ -17,7 +17,7 @@
 import { property, subclass } from "esri/core/accessorSupport/decorators";
 import Graphic from "esri/Graphic";
 import SimpleFillSymbol from "esri/symbols/SimpleFillSymbol";
-import { renderable, tsx } from "esri/widgets/support/widget";
+import { tsx } from "esri/widgets/support/widget";
 
 import DrawWidget from "./DrawWidget";
 
@@ -30,7 +30,6 @@ interface ColorMenu {
 @subclass("app.draw.CreateArea")
 export default class CreateArea extends DrawWidget {
 
-  @renderable()
   @property()
   private activeColor: string | null = null;
 

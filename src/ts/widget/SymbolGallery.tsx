@@ -21,7 +21,7 @@ import PortalItem from "esri/portal/PortalItem";
 import PortalQueryParams from "esri/portal/PortalQueryParams";
 import PortalQueryResult from "esri/portal/PortalQueryResult";
 import EsriSymbol from "esri/symbols/Symbol";
-import { renderable, tsx } from "esri/widgets/support/widget";
+import { tsx } from "esri/widgets/support/widget";
 
 import PlanningScene from "../PlanningScene";
 import DrawWidget from "./DrawWidget";
@@ -41,7 +41,6 @@ export default class SymbolGallery extends DrawWidget {
 
   @property() public groups = new Collection<SymbolGroup>();
 
-  @renderable()
   @property()
   public selectedGroupId: SymbolGroupId | null;
 
@@ -54,7 +53,6 @@ export default class SymbolGallery extends DrawWidget {
     return this.groups.find((group) => group.category === selectedGroupId);
   }
 
-  @renderable()
   @property()
   public selectedSymbol: SymbolItem | null;
 
