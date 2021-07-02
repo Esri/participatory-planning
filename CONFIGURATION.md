@@ -40,6 +40,11 @@ The live version is deployed using GitHub pages. The `gh-pages` branch represent
 
 ```
 git clone https://github.com/Esri/participatory-planning.git -b gh-pages dist
+
+# OR
+
+git clone git@github.com:Esri/participatory-planning.git -b gh-pages dist
+
 npm run build
 cd dist/
 git add .
