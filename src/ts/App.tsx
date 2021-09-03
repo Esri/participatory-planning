@@ -229,7 +229,7 @@ export default class App extends WidgetBase {
                 <h4 class="trailer-half">Participatory Planning</h4>
                 <p class="font-size--1 trailer-half">
                   <ul>
-                    <li>When creating shapes, either double click or press <code>C</code> to complete.</li>
+                    <li>When creating shapes, either double click or press <code>Enter</code> to complete.</li>
                     <li>Press <code>Del</code> or <code>Backspace</code> to remove a selected object.</li>
                     <li>Press <code>Escape</code> to revert a current editing.</li>
                   </ul>
