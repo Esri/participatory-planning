@@ -15,7 +15,7 @@
  *
  */
 import { property, subclass } from "esri/core/accessorSupport/decorators";
-import { whenOnce } from "esri/core/watchUtils";
+import { whenOnce } from "esri/core/reactiveUtils";
 import Polygon from "esri/geometry/Polygon";
 import Polyline from "esri/geometry/Polyline";
 import Graphic from "esri/Graphic";
@@ -29,7 +29,6 @@ import WidgetBase from "./WidgetBase";
 
 @subclass("app.draw.DrawWidget")
 export default class DrawWidget extends WidgetBase {
-
   @property()
   public layer: GraphicsLayer;
 
@@ -41,7 +40,7 @@ export default class DrawWidget extends WidgetBase {
         mode: "relative-to-scene",
       },
     });
-    whenOnce(this, "app.scene.map", () => this.app.scene.map.add(this.layer));
+    whenOnce(() => this.app?.scene.map).then((map) => map.add(this.layer));
   }
 
   public updateGraphic(graphic: Graphic): Promise<Graphic[]> {
@@ -52,14 +51,20 @@ export default class DrawWidget extends WidgetBase {
     }
   }
 
-  protected createPolylineGraphic(symbol: EsriSymbol, sketchColor: string): Promise<Graphic[]> {
+  protected createPolylineGraphic(
+    symbol: EsriSymbol,
+    sketchColor: string
+  ): Promise<Graphic[]> {
     const graphic = new Graphic({ symbol });
     return new DrawPolyline(this, graphic, sketchColor)
       .create()
       .then((polyline) => this.splitPolyline(polyline, graphic));
   }
 
-  protected createPolygonGraphic(symbol: EsriSymbol, sketchColor: string): Promise<Graphic[]> {
+  protected createPolygonGraphic(
+    symbol: EsriSymbol,
+    sketchColor: string
+  ): Promise<Graphic[]> {
     const graphic = new Graphic({ symbol });
     return new DrawPolygon(this, graphic, sketchColor)
       .create()
@@ -68,14 +73,15 @@ export default class DrawWidget extends WidgetBase {
 
   protected createPointGraphic(symbol: EsriSymbol): Promise<Graphic> {
     const graphic = new Graphic({ symbol });
-    return new DrawPoint(this, graphic)
-      .create()
-      .then(() => {
-        return graphic;
-      });
+    return new DrawPoint(this, graphic).create().then(() => {
+      return graphic;
+    });
   }
 
-  protected updatePolylineGraphic(graphic: Graphic, sketchColor: string): Promise<Graphic[]> {
+  protected updatePolylineGraphic(
+    graphic: Graphic,
+    sketchColor: string
+  ): Promise<Graphic[]> {
     const zIndex = this.zIndexOf(graphic);
     const updatedGraphics = new DrawPolyline(this, graphic, sketchColor)
       .update()
@@ -89,7 +95,10 @@ export default class DrawWidget extends WidgetBase {
     return updatedGraphics;
   }
 
-  protected updatePolygonGraphic(graphic: Graphic, sketchColor: string): Promise<Graphic[]> {
+  protected updatePolygonGraphic(
+    graphic: Graphic,
+    sketchColor: string
+  ): Promise<Graphic[]> {
     const zIndex = this.zIndexOf(graphic);
     const updatedGraphics = new DrawPolygon(this, graphic, sketchColor)
       .update()
@@ -115,7 +124,11 @@ export default class DrawWidget extends WidgetBase {
     this.layer.addMany(graphicsOnTop.map((g) => Graphic.fromJSON(g.toJSON())));
   }
 
-  private revertOrderedGraphic(promise: Promise<any>, originalGraphic: Graphic, zIndex: number) {
+  private revertOrderedGraphic(
+    promise: Promise<any>,
+    originalGraphic: Graphic,
+    zIndex: number
+  ) {
     // The JS API will emit a cancel event if the graphic has not changed, even if it changed the order. We fix this
     // by catching and calling reorderGraphics().
     promise.catch(() => {
@@ -153,5 +166,4 @@ export default class DrawWidget extends WidgetBase {
     }
     return graphics;
   }
-
 }
