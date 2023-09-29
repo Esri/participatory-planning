@@ -16,7 +16,7 @@
  */
 import { property, subclass } from "esri/core/accessorSupport/decorators";
 import Collection from "esri/core/Collection";
-import { whenNotOnce } from "esri/core/watchUtils";
+import { whenOnce } from "esri/core/reactiveUtils";
 import geometryEngine from "esri/geometry/geometryEngine";
 import Point from "esri/geometry/Point";
 import Polygon from "esri/geometry/Polygon";
@@ -26,7 +26,7 @@ import GraphicsLayer from "esri/layers/GraphicsLayer";
 import SceneLayer from "esri/layers/SceneLayer";
 import { SimpleRenderer } from "esri/renderers";
 import SceneLayerView from "esri/views/layers/SceneLayerView";
-import FeatureFilter from "esri/views/layers/support/FeatureFilter";
+import FeatureFilter from "esri/layers/support/FeatureFilter";
 import SceneView from "esri/views/SceneView";
 import WebScene from "esri/WebScene";
 import { tsx } from "esri/widgets/support/widget";
@@ -40,7 +40,6 @@ export const QUALITY = "medium";
 
 @subclass("app.widgets.webmapview")
 export default class PlanningScene extends WidgetBase {
-
   @property()
   public map: WebScene;
 
@@ -65,17 +64,19 @@ export default class PlanningScene extends WidgetBase {
   private sceneLayerRenderer = new SimpleRenderer({
     symbol: {
       type: "mesh-3d",
-      symbolLayers: [{
-        type: "fill",
-        material: {
-          color: "white",
+      symbolLayers: [
+        {
+          type: "fill",
+          material: {
+            color: "white",
+          },
+          edges: {
+            type: "solid",
+            color: [150, 150, 150],
+            size: 0.5,
+          },
         },
-        edges: {
-          type: "solid",
-          color: [150, 150, 150],
-          size: .5,
-        },
-      }],
+      ],
     },
   } as any);
 
@@ -97,7 +98,6 @@ export default class PlanningScene extends WidgetBase {
   }
 
   public postInitialize() {
-
     // Create global view reference
     (window as any).view = this.view;
 
@@ -125,7 +125,9 @@ export default class PlanningScene extends WidgetBase {
     this.map.when(() => {
       this.map.add(this.sketchLayer);
       this.sketchLayer.add(this.boundingPolygonGraphic);
-      this.sceneLayer = this.map.layers.find((layer) => layer.type === "scene") as SceneLayer;
+      this.sceneLayer = this.map.layers.find(
+        (layer) => layer.type === "scene"
+      ) as SceneLayer;
       this.sceneLayer.renderer = this.sceneLayerRenderer;
       this.sceneLayer.popupEnabled = false;
       this.view.whenLayerView(this.sceneLayer).then((lv: SceneLayerView) => {
@@ -137,7 +139,7 @@ export default class PlanningScene extends WidgetBase {
   public render() {
     return (
       <div>
-        <div id="sceneView" bind={ this } afterCreate={ this.attachSceneView } />
+        <div id="sceneView" bind={this} afterCreate={this.attachSceneView} />
       </div>
     );
   }
@@ -151,30 +153,30 @@ export default class PlanningScene extends WidgetBase {
       // Show masked buildings with provided color, all other buildings are white
       this.boundingPolygonGraphic.visible = false;
       this.sceneLayerView.set("filter", null);
-      this.drawLayers().forEach((layer) => layer.visible = false);
+      this.drawLayers().forEach((layer) => (layer.visible = false));
     } else {
       this.sceneLayerView.filter = this.sceneLayerFilter;
-      this.drawLayers().forEach((layer) => layer.visible = true);
+      this.drawLayers().forEach((layer) => (layer.visible = true));
       this.boundingPolygonGraphic.visible = true;
     }
     this.sceneLayer.visible = true;
   }
 
   public showTexturedBuildings() {
-    this.drawLayers().forEach((layer) => layer.visible = false);
+    this.drawLayers().forEach((layer) => (layer.visible = false));
     this.sceneLayer.visible = true;
     this.sceneLayerView.set("filter", null);
     this.boundingPolygonGraphic.symbol = {
-        type: "simple-fill",
-        color: [0, 0, 0, 0],
-        outline: {
-          width: 0,
-        },
-      } as any;
+      type: "simple-fill",
+      color: [0, 0, 0, 0],
+      outline: {
+        width: 0,
+      },
+    } as any;
   }
 
-  public whenNotUpdating(): Promise<void> {
-    return whenNotOnce(this.view, "updating");
+  public async whenNotUpdating(): Promise<void> {
+    await whenOnce(() => !this.view.updating);
   }
 
   public drawLayers(): Collection<GraphicsLayer> {
@@ -191,12 +193,14 @@ export default class PlanningScene extends WidgetBase {
   }
 
   private getExtrudedHeight(point: Point, graphic: Graphic) {
-    if (graphic.symbol.type === "polygon-3d" && geometryEngine.contains(graphic.geometry, point)) {
+    if (
+      graphic.symbol.type === "polygon-3d" &&
+      geometryEngine.contains(graphic.geometry, point)
+    ) {
       const layers = graphic.get<any>("symbol.symbolLayers");
       const extrusion = layers && layers.getItemAt(0).size;
       return extrusion;
     }
     return 0;
   }
-
 }
