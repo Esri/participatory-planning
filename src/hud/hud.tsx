@@ -2,7 +2,7 @@ import { Outlet, useMatch, useNavigate } from "react-router-dom";
 
 import { routes } from "../main";
 import { HUDSubBar } from "./hud-sub-bar";
-import { NewPlan } from "./routes/new-plan";
+import { NewPlanModal } from "./routes/new-plan";
 
 import './hud-styles.css';
 import { Submission } from "./routes/submission";
@@ -25,6 +25,7 @@ function RouteButton(props: { route: typeof routes[number] }) {
     >
       <span >{props.route.icon}</span>
       <span className="text-xs">{props.route.name}</span>
+      {props.route.preloadElement}
     </HUDLink>
   )
 }
@@ -41,7 +42,7 @@ export function HUD() {
       <Outlet />
 
       <div className="bg-white/80 w-fit flex rounded-lg justify-between gap-8 p-4 px-12">
-        <NewPlan />
+        <NewPlanModal />
         {routes.map(route => (
           <RouteButton key={route.path} route={route} />
         ))}
