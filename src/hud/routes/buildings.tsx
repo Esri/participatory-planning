@@ -1,12 +1,13 @@
-import { HudSubBar } from "../hud-sub-bar";
+import { HUDButton } from "../hud-button";
+import { HUDSubBar } from "../hud-sub-bar";
 
 export function Buildings() {
 
   return (
-    <HudSubBar>
-      <button>3-Story Building</button>
-      <button>5-Story Building</button>
-      <button>10-Story Building</button>
-    </HudSubBar>
+    <HUDSubBar>
+      <HUDButton>3-Story Building</HUDButton>
+      <HUDButton>5-Story Building</HUDButton>
+      <HUDButton>10-Story Building</HUDButton>
+    </HUDSubBar>
   )
 }

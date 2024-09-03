@@ -1,8 +1,8 @@
-import { ComponentProps, StrictMode } from 'react'
+import { ComponentProps, ReactNode, StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { createHashRouter, LoaderFunctionArgs, RouterProvider } from 'react-router-dom'
+import { createHashRouter, RouteObject, RouterProvider } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import * as FA from '@fortawesome/free-solid-svg-icons'
 import { Ground } from './hud/routes/ground.tsx'
@@ -16,70 +16,101 @@ function Icon(props: ComponentProps<typeof FontAwesomeIcon>) {
   return <FontAwesomeIcon {...props} className='h-[25px] aspect-square' />
 }
 
-export const routes = [
-  {
-    name: 'New plan',
-    path: '/',
-    element: <div>route</div>,
-  },
+export const planRoutes: (RouteObject & { name: string; icon?: ReactNode })[] = [
   {
     name: 'Ground',
-    path: '/ground',
+    path: '/plan/ground',
     icon: <Icon icon={FA.faLayerGroup} />,
     element: <Ground />,
   },
   {
     name: 'Paths',
-    path: '/paths',
+    path: '/plan/paths',
     icon: <Icon icon={FA.faRoad} />,
     element: <Paths />,
   },
   {
     name: 'Buildings',
-    path: '/buildings',
+    path: '/plan/buildings',
     icon: <Icon icon={FA.faBuilding} />,
     element: <Buildings />,
   },
   {
     name: 'Icons',
-    path: '/icons',
+    path: '/plan/icons',
     icon: <Icon icon={FA.faMapMarkerAlt} />,
     element: <Icons />,
   },
   {
     name: 'Trees',
-    path: '/trees',
+    path: '/plan/trees',
     icon: <Icon icon={FA.faTree} />,
     element: <Trees />,
   },
   {
     name: 'Vehicles',
-    path: '/vehicles',
+    path: '/plan/vehicles',
     icon: <Icon icon={FA.faCar} />,
     element: <Vehicles />,
   },
   {
     name: 'glTF',
-    path: '/gltf',
+    path: '/plan/gltf',
     icon: <Icon icon={FA.faCloudDownloadAlt} />,
     element: <div>route</div>,
   },
+]
+
+export const routes: (RouteObject & { name: string; icon?: ReactNode })[] = [
   {
-    name: 'Submit plan',
-    path: '/plan',
+    name: 'Ground',
+    path: '/plan/ground',
+    icon: <Icon icon={FA.faLayerGroup} />,
+    element: <Ground />,
+  },
+  {
+    name: 'Paths',
+    path: '/plan/paths',
+    icon: <Icon icon={FA.faRoad} />,
+    element: <Paths />,
+  },
+  {
+    name: 'Buildings',
+    path: '/plan/buildings',
+    icon: <Icon icon={FA.faBuilding} />,
+    element: <Buildings />,
+  },
+  {
+    name: 'Icons',
+    path: '/plan/icons',
+    icon: <Icon icon={FA.faMapMarkerAlt} />,
+    element: <Icons />,
+  },
+  {
+    name: 'Trees',
+    path: '/plan/trees',
+    icon: <Icon icon={FA.faTree} />,
+    element: <Trees />,
+  },
+  {
+    name: 'Vehicles',
+    path: '/plan/vehicles',
+    icon: <Icon icon={FA.faCar} />,
+    element: <Vehicles />,
+  },
+  {
+    name: 'glTF',
+    path: '/plan/gltf',
+    icon: <Icon icon={FA.faCloudDownloadAlt} />,
     element: <div>route</div>,
-    loader: async (_args: LoaderFunctionArgs) => {
-      console.log('plan')
-      return null;
-    }
-  }
+  },
 ]
 
 const router = createHashRouter(
   [{
     path: '/',
     element: <App />,
-    children: routes.slice(1),
+    children: routes,
   }],
 );
 

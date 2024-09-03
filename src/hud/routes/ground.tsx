@@ -1,13 +1,14 @@
-import { HudSubBar } from "../hud-sub-bar";
+import { HUDButton } from "../hud-button";
+import { HUDSubBar } from "../hud-sub-bar";
 
 export function Ground() {
 
   return (
-    <HudSubBar>
-      <button>Create Ground</button>
-      <button>Create Lawn</button>
-      <button>Create Beach</button>
-      <button>Create Water</button>
-    </HudSubBar>
+    <HUDSubBar>
+      <HUDButton>Create Ground</HUDButton>
+      <HUDButton>Create Lawn</HUDButton>
+      <HUDButton>Create Beach</HUDButton>
+      <HUDButton>Create Water</HUDButton>
+    </HUDSubBar>
   )
 }

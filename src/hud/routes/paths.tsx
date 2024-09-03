@@ -1,11 +1,12 @@
-import { HudSubBar } from "../hud-sub-bar";
+import { HUDButton } from "../hud-button";
+import { HUDSubBar } from "../hud-sub-bar";
 
 export function Paths() {
 
   return (
-    <HudSubBar>
-      <button>Create street</button>
-      <button>Create walking path</button>
-    </HudSubBar>
+    <HUDSubBar>
+      <HUDButton>Create street</HUDButton>
+      <HUDButton>Create walking path</HUDButton>
+    </HUDSubBar>
   )
 }

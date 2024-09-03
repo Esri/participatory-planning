@@ -12,15 +12,13 @@ function SceneView() {
   return <div className="bg-red-500 w-full h-full" ref={ref} />
 }
 
-
-
 function App() {
   return (
     <>
       <div className="absolute inset-0">
         <SceneView />
       </div>
-      <div className="py-8 px-32 flex flex-col flex-1 justify-end">
+      <div className="py-8 px-32 flex flex-col flex-1">
         <HUD />
       </div>
     </>
