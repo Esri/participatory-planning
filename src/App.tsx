@@ -41,7 +41,7 @@ function App() {
           <div className="absolute inset-0">
             <SceneView />
           </div>
-          <div className="py-8 px-32 flex flex-col flex-1">
+          <div className="py-8 px-32 flex flex-col flex-1 pointer-events-none">
             <HUD />
           </div>
         </Scene>

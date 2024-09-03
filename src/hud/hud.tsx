@@ -32,7 +32,7 @@ function RouteButton(props: { route: typeof routes[number] }) {
 
 export function HUD() {
   return (
-    <div className="flex flex-col gap-4 items-center justify-center flex-1">
+    <div className="flex flex-col gap-4 items-center justify-center flex-1 pointer-events-none">
       <HUDSubBar>
         <HUDButton>Shore</HUDButton>
         <HUDButton>Bridge</HUDButton>
@@ -41,7 +41,7 @@ export function HUD() {
       <div className="flex-grow"></div>
       <Outlet />
 
-      <div className="bg-white/80 w-fit flex rounded-lg justify-between gap-8 p-4 px-12">
+      <div className="bg-white/80 w-fit flex rounded-lg justify-between gap-8 p-4 px-12 pointer-events-auto">
         <NewPlanModal />
         {routes.map(route => (
           <RouteButton key={route.path} route={route} />
