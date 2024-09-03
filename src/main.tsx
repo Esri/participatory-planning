@@ -2,7 +2,7 @@ import { ComponentProps, StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { createBrowserRouter, LoaderFunctionArgs, RouterProvider } from 'react-router-dom'
+import { createHashRouter, LoaderFunctionArgs, RouterProvider } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import * as FA from '@fortawesome/free-solid-svg-icons'
 import { Ground } from './hud/routes/ground.tsx'
@@ -75,12 +75,13 @@ export const routes = [
   }
 ]
 
-
-const router = createBrowserRouter([{
-  path: '/',
-  element: <App />,
-  children: routes.slice(1)
-}]);
+const router = createHashRouter(
+  [{
+    path: '/',
+    element: <App />,
+    children: routes.slice(1),
+  }],
+);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
