@@ -11,5 +11,13 @@ export default defineConfig(({ mode }) => ({
       "@arcgis/core",
     ],
   },
-  plugins: [react()],
+  plugins: [
+    react({
+      babel: {
+        parserOpts: {
+          plugins: ["decorators-legacy"],
+        },
+      },
+    }),
+  ],
 }));
