@@ -18,6 +18,12 @@ function Icon(props: ComponentProps<typeof FontAwesomeIcon>) {
 
 export const routes: (RouteObject & { name: string; icon?: ReactNode, preloadElement?: ReactNode })[] = [
   {
+    name: 'index',
+    index: true,
+    path: '/plan',
+    element: null
+  },
+  {
     name: 'Ground',
     path: '/plan/ground',
     icon: <Icon icon={FA.faLayerGroup} />,

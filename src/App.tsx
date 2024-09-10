@@ -1,9 +1,9 @@
 import { HUD } from "./hud/hud";
-import { SceneView } from "./arcgis/components/scene-view";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Suspense, useLayoutEffect, useState } from "react";
+import { PropsWithChildren, Suspense, useLayoutEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Scene } from "./scene/scene";
+import { Scene, View } from "./scene/scene";
+import { createPortal } from "react-dom";
 
 function useRedirectToHashRoot() {
   const navigate = useNavigate();
@@ -13,7 +13,11 @@ function useRedirectToHashRoot() {
     function loop() {
       frame = requestAnimationFrame(() => {
         if (window.location.hash === "") {
-          navigate("/");
+          navigate("/", {
+            state: {
+              previousLocationPathname: location.pathname
+            }
+          });
           if (window.location.search) {
             const search = window.location.search;
             setParams(search);
@@ -33,17 +37,20 @@ function App() {
 
   useRedirectToHashRoot();
 
-
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense>
         <Scene>
           <div className="absolute inset-0">
-            <SceneView />
+            <View>
+              <RootOverlayPortal>
+                <div className="py-8 px-32 flex flex-col flex-1 pointer-events-none">
+                  <HUD />
+                </div>
+              </RootOverlayPortal>
+            </View>
           </div>
-          <div className="py-8 px-32 flex flex-col flex-1 pointer-events-none">
-            <HUD />
-          </div>
+          <div id="root-overlay" className="contents" />
         </Scene>
       </Suspense>
     </QueryClientProvider>
@@ -51,3 +58,14 @@ function App() {
 }
 
 export default App
+
+function RootOverlayPortal({ children }: PropsWithChildren) {
+  const [rootOverlayElement, setElement] = useState<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    setElement(document.getElementById("root-overlay"));
+  }, [])
+
+  if (rootOverlayElement == null) return null;
+
+  return createPortal(children, rootOverlayElement)
+}

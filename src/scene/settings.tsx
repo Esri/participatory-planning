@@ -3,7 +3,7 @@ import defaultSettings from '../assets/settings.json?url';
 import { useSearchParams } from "react-router-dom";
 
 interface Settings {
-  planningArea: number[][],
+  planningArea: [x: number, y: number][],
   planningAreaName: string;
   webSceneId: string;
 }
