@@ -1,29 +1,25 @@
 import { HUD } from "./hud/hud";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PropsWithChildren, Suspense, useLayoutEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Scene, View } from "./scene/scene";
 import { createPortal } from "react-dom";
 
 function useRedirectToHashRoot() {
   const navigate = useNavigate();
-  const [, setParams] = useSearchParams()
+
   useLayoutEffect(() => {
     let frame = -1;
     function loop() {
       frame = requestAnimationFrame(() => {
         if (window.location.hash === "") {
-          navigate("/", {
-            state: {
-              previousLocationPathname: location.pathname
-            }
+          navigate({
+            pathname: '/',
+            search: window.location.search
           });
-          if (window.location.search) {
-            const search = window.location.search;
-            setParams(search);
-            window.location.search = ""
-          }
-          loop()
+
+          window.location.search = ""
+          loop();
         }
       })
     }
@@ -43,11 +39,11 @@ function App() {
         <Scene>
           <div className="absolute inset-0">
             <View>
-              <RootOverlayPortal>
-                <div className="py-8 px-32 flex flex-col flex-1 pointer-events-none">
-                  <HUD />
-                </div>
-              </RootOverlayPortal>
+                  <RootOverlayPortal>
+                    <div className="py-8 px-32 flex flex-col flex-1 pointer-events-none">
+                      <HUD />
+                    </div>
+                  </RootOverlayPortal>
             </View>
           </div>
           <div id="root-overlay" className="contents" />

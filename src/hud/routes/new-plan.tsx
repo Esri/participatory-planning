@@ -1,6 +1,6 @@
 import { Button, Heading } from "react-aria-components"
 import { HUDModal } from "../hud-modal";
-import { useMatch, useNavigate, useSearchParams } from "react-router-dom";
+import { useMatch, useSearchParams } from "react-router-dom";
 import { HUDEndButton } from "../hud-button";
 import { PropsWithChildren } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { SettingsValidationError, useSettingsQueryOptions } from "../../scene/se
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { useWebScene } from "../../arcgis/components/web-scene";
 import { useAccessorValue } from "../../arcgis/hooks/useAccessorValue";
+import { useSearchPreservingNavigate } from "../../utilities/hooks";
 
 function InvalidSettinsgBoundary(props: FallbackProps) {
   const [, setParams] = useSearchParams();
@@ -36,7 +37,7 @@ function InvalidSettinsgBoundary(props: FallbackProps) {
 }
 
 export function NewPlanModal() {
-  const navigate = useNavigate();
+  const navigate = useSearchPreservingNavigate();
   const isOnRootRoute = useMatch("/") != null;
 
   return (
@@ -45,7 +46,9 @@ export function NewPlanModal() {
       defaultOpen={isOnRootRoute}
       onOpenChange={isOpen => {
         if (isOpen) {
-          navigate("/")
+          navigate({
+            pathname: "/",
+          })
         }
       }}
       trigger={
@@ -70,7 +73,7 @@ function NewPlan(props: { onStart: () => void; onSkip: () => void }) {
 
   const thumbnailUrl = useAccessorValue(() => (scene.portalItem.thumbnailUrl, scene.portalItem.getThumbnailUrl(400)));
 
-  const navigate = useNavigate();
+  const navigate = useSearchPreservingNavigate();
 
   return (
     <div className="flex gap-6">
