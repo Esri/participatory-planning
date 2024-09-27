@@ -6,6 +6,7 @@ import { SceneView } from "../arcgis/components/scene-view";
 import { useLocation, useMatch } from "react-router-dom";
 import { useAccessorValue } from "../arcgis/hooks/useAccessorValue";
 import ArcgisSceneView from '@arcgis/core/views/SceneView';
+import SceneLayerView from '@arcgis/core/views/layers/SceneLayerView';
 import { VectorTileLayer } from "../arcgis/components/vector-tile-layer";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference";
@@ -13,6 +14,7 @@ import { GraphicsLayer } from "../arcgis/components/graphics-layer";
 import { PerimeterGraphic } from "./perimeter-graphic";
 import { SurfaceGraphic } from "./surface-graphic";
 import { FocusAreaGraphic } from "./focus-area-graphic";
+import FeatureFilter from "@arcgis/core/layers/support/FeatureFilter.js";
 
 export function Scene({ children }: PropsWithChildren) {
   const { data: settings } = useSuspenseQuery(useSettingsQueryOptions());
@@ -77,6 +79,24 @@ export function View({ children }: PropsWithChildren) {
     }
   }, [introStateConfig.viewpoint, cameFromDeepLink, drawViewpoint, initialViewpoint, polygon]);
 
+  const buildingLayerView = useAccessorValue(() => view.current?.allLayerViews.find(lv => lv.layer.type === 'scene') as SceneLayerView | undefined);
+
+  useEffect(() => {
+    if (buildingLayerView == null) return;
+
+    if (introState > 3) {
+      const filter = new FeatureFilter({
+        geometry: polygon,
+        spatialRelationship: 'disjoint'
+      })
+      buildingLayerView.filter = filter;
+
+      return () => {
+        if (buildingLayerView.filter === filter) buildingLayerView.filter = null!
+      }
+    }
+  }, [buildingLayerView, introState, polygon])
+
   return (
     <SceneView ref={view}>
       <VectorTileLayer hidden={introStateConfig.basemap} itemId="5cf1abb43c25482e8a9e373953498999" />
@@ -91,9 +111,11 @@ export function View({ children }: PropsWithChildren) {
           isActive={introStateConfig.surface}
           onComplete={() => setIntroState(state => state + 1 as IntroStep)}
         />
-        <FocusAreaGraphic surface={settings.planningArea} isActive={introStateConfig.focusArea} />
       </GraphicsLayer>
       {children}
+      <GraphicsLayer elevationMode="on-the-ground">
+        <FocusAreaGraphic surface={settings.planningArea} isActive={introStateConfig.focusArea} />
+      </GraphicsLayer>
     </SceneView>
   )
 }
