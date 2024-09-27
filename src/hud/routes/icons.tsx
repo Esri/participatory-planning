@@ -1,20 +1,22 @@
 import { useSuspenseQuery, useSuspenseQueries, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Suspense, useEffect } from "react";
-import { webStyleGroupListQueryOptions, styleNameMatchesGroup, getStyleName, webStyleGroupItemsQueryOptions } from "../../scene/web-styles";
+import { webStyleGroupListQueryOptions, styleNameMatchesGroup, getStyleName, webStyleGroupItemsQueryOptions, WebStyleSymbolItem } from "../../scene/web-styles";
 import { HUDGridButton } from "../hud-button";
 import { HUDSubGrid } from "../hud-sub-grid";
+import { useDrawingTool } from "../../drawing/drawing-tool";
+import { tools } from "../tool-config";
 
 export function Icons() {
   return (
     <HUDSubGrid>
       <Suspense fallback={<div>loading...</div>}>
-        <IconItem />
+        <IconItems />
       </Suspense>
     </HUDSubGrid>
   )
 }
 
-function IconItem() {
+function IconItems() {
   const { data } = useSuspenseQuery(webStyleGroupListQueryOptions())
 
   const icons = data.filter(item => styleNameMatchesGroup("icons", getStyleName(item)))
@@ -24,12 +26,24 @@ function IconItem() {
 
   const items = itemsQueries.flatMap(item => item.data);
 
-  return items.map((item) => (
-    <HUDGridButton key={item.webSymbol.name}>
-      <img src={item.thumbnail} />
-    </HUDGridButton>
-  ));
+  return items.map((item) => (<IconItem key={item.webSymbol.name} item={item} />));
 }
+
+function IconItem(props: { item: WebStyleSymbolItem }) {
+  const tool = useDrawingTool(props.item.symbol, tools.icons.name);
+
+  return (
+    <HUDGridButton onPress={create}>
+      <img src={props.item.thumbnail} />
+    </HUDGridButton>
+  )
+
+  async function create() {
+    await tool.create();
+    create();
+  }
+}
+
 
 export function PrefetchIcons() {
   const { data } = useQuery(webStyleGroupListQueryOptions())

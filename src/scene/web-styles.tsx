@@ -2,6 +2,7 @@ import Portal from "@arcgis/core/portal/Portal";
 import PortalItem from "@arcgis/core/portal/PortalItem";
 import PortalQueryParams from "@arcgis/core/portal/PortalQueryParams";
 import PortalQueryResult from "@arcgis/core/portal/PortalQueryResult";
+import Symbol from "@arcgis/core/symbols/Symbol";
 import WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
 import { queryOptions } from "@tanstack/react-query";
 
@@ -27,17 +28,30 @@ export const webStyleGroupItemsQueryOptions = (portalItem: PortalItem) => queryO
   queryKey: [portalItem.portal.url, 'webstyles', 'group', portalItem.id, 'items'],
   queryFn: async ({ signal }) => {
     const data = await portalItem.fetchData("json", { signal });
-    return data.items;
+    const items = data.items;
+
+    const webStyles: WebStyleSymbol[] = items.map((item: any) => new WebStyleSymbol({
+      name: item.name,
+      styleName: getStyleName(portalItem),
+    }));
+
+    const symbols = await Promise.all(webStyles.map(style => style.fetchSymbol()));
+
+    return webStyles.map((style, index) => ({
+      webSymbol: style,
+      symbol: symbols[index],
+      thumbnail: items[index].thumbnail.href as string
+    }));
   },
-  select: (items): WebStyleSymbolItem[] => {
-    return items.map((item: any) => ({
-      webSymbol: new WebStyleSymbol({
-        name: item.name,
-        styleName: getStyleName(portalItem),
-      }),
-      thumbnail: item.thumbnail.href as string,
-    }))
-  }
+  // select: (items): WebStyleSymbolItem[] => {
+  //   return items.map((item: any) => ({
+  //     webSymbol: new WebStyleSymbol({
+  //       name: item.name,
+  //       styleName: getStyleName(portalItem),
+  //     }),
+  //     thumbnail: item.thumbnail.href as string,
+  //   }))
+  // }
 });
 
 export function getStyleName(item: PortalItem): string {
@@ -60,4 +74,4 @@ export function styleNameMatchesGroup(category: "icons" | "trees" | "vehicles", 
   }
 }
 
-export type WebStyleSymbolItem = { webSymbol: WebStyleSymbol; thumbnail: string }
+export type WebStyleSymbolItem = { webSymbol: WebStyleSymbol; symbol: Symbol; thumbnail: string }

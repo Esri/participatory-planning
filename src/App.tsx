@@ -39,11 +39,11 @@ function App() {
         <Scene>
           <div className="absolute inset-0">
             <View>
-                  <RootOverlayPortal>
-                    <div className="py-8 px-32 flex flex-col flex-1 pointer-events-none">
-                      <HUD />
-                    </div>
-                  </RootOverlayPortal>
+              <RootOverlayPortal>
+                <div className="py-8 px-32 flex flex-col flex-1 pointer-events-none">
+                  <HUD />
+                </div>
+              </RootOverlayPortal>
             </View>
           </div>
           <div id="root-overlay" className="contents" />
@@ -65,3 +65,5 @@ function RootOverlayPortal({ children }: PropsWithChildren) {
 
   return createPortal(children, rootOverlayElement)
 }
+
+// distinguishes

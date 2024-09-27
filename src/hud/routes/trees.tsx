@@ -3,6 +3,8 @@ import { HUDGridButton } from "../hud-button";
 import { HUDSubGrid } from "../hud-sub-grid";
 import { useQuery, useQueryClient, useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
 import { getStyleName, styleNameMatchesGroup, webStyleGroupItemsQueryOptions, webStyleGroupListQueryOptions, WebStyleSymbolItem } from "../../scene/web-styles";
+import { useDrawingTool } from "../../drawing/drawing-tool";
+import { tools } from "../tool-config";
 
 
 export function Trees() {
@@ -31,11 +33,18 @@ function TreeItems() {
 }
 
 function TreeItem(props: { item: WebStyleSymbolItem }) {
+  const tool = useDrawingTool(props.item.symbol, tools.trees.name);
+
   return (
-    <HUDGridButton>
+    <HUDGridButton onPress={create}>
       <img src={props.item.thumbnail} />
     </HUDGridButton>
   )
+
+  async function create() {
+    await tool.create();
+    create();
+  }
 }
 
 export function PrefetchTrees() {

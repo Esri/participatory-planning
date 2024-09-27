@@ -1,24 +1,18 @@
-import { ComponentProps } from "react";
+import { forwardRef } from "react";
 import { Button, ButtonProps } from "react-aria-components";
-import { NavLink, useSearchParams } from "react-router-dom";
 
-export function HUDLink(props: ComponentProps<typeof NavLink>) {
-  const search = useSearchParams();
-  const to = typeof props.to === 'string'
-    ? { pathname: props.to, search: search.toString() }
-    : { search: search.toString(), ...props.to }
-
+export const HUDLink = forwardRef<HTMLButtonElement, ButtonProps>(function HUDLink(props, ref) {
   return (
-    <NavLink
+    <Button
+      ref={ref}
       {...props}
-      to={to}
       className={
         "flex justify-center items-center whitespace-nowrap rounded-lg p-2 -m-2 aspect-square h-[65px] self-center hover:bg-white/20 focus-visible:bg-white/20 aria-[current=page]:bg-white/30 aria-[current=page]:text-sky-700 "
         + props.className
       }
     />
   )
-}
+})
 
 export function HUDButton(props: ButtonProps) {
   return (

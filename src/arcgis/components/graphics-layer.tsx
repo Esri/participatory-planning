@@ -1,14 +1,15 @@
-import { createContext, PropsWithChildren, useContext, useLayoutEffect, useState } from "react";
+import { createContext, forwardRef, PropsWithChildren, useContext, useEffect, useLayoutEffect, useState } from "react";
 import ArcgisGraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 import { useWebScene } from "./web-scene";
 import ArcgisGraphic from "@arcgis/core/Graphic";
 import ArcgisSymbol from "@arcgis/core/symbols/Symbol";
 import ArcgisGeometry from "@arcgis/core/geometry/Geometry";
 
-export function GraphicsLayer(props: PropsWithChildren<{
+type GraphicsLayerProps = PropsWithChildren<{
   hidden?: boolean;
   elevationMode?: ArcgisGraphicsLayer['elevationInfo']['mode']
-}>) {
+}>
+export const GraphicsLayer = forwardRef<ArcgisGraphicsLayer, GraphicsLayerProps>(function GraphicsLayer(props, ref) {
   const scene = useWebScene();
   const [layer] = useState(() => new ArcgisGraphicsLayer());
 
@@ -18,6 +19,9 @@ export function GraphicsLayer(props: PropsWithChildren<{
     const elevationMode = props.elevationMode ?? "absolute-height";
     layer.elevationInfo ??= { mode: elevationMode }
     layer.elevationInfo.mode = elevationMode;
+
+    if (elevationMode === 'relative-to-scene') layer.title = 'points'
+    if (elevationMode !== 'relative-to-scene') layer.title = 'shapes'
   }, [layer, props.elevationMode, props.hidden])
 
   useLayoutEffect(() => {
@@ -27,12 +31,19 @@ export function GraphicsLayer(props: PropsWithChildren<{
     }
   }, [layer, scene.layers])
 
+  useEffect(() => {
+    if (ref == null) return;
+
+    if (typeof ref === 'function') ref(layer);
+    else ref.current = layer;
+  }, [layer, ref]);
+
   return (
     <GraphicsContext.Provider value={layer}>
       {props.children}
     </GraphicsContext.Provider>
   );
-}
+})
 
 const GraphicsContext = createContext<ArcgisGraphicsLayer | undefined>(null!)
 
