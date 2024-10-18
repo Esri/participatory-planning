@@ -1,89 +1,202 @@
-import { ReactNode, ComponentProps } from "react";
-import { Buildings } from "./routes/buildings";
-import { Ground } from "./routes/ground";
-import { Icons, PrefetchIcons } from "./routes/icons";
-import { Paths } from "./routes/paths";
-import { Trees, PrefetchTrees } from "./routes/trees";
-import { Vehicles, PrefetchVehicles } from "./routes/vehicles";
-import { GraphicsLayer } from "../arcgis/components/graphics-layer";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as FA from '@fortawesome/free-solid-svg-icons'
+import PolygonSymbol3D from "@arcgis/core/symbols/PolygonSymbol3D";
+import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
+import WaterSymbol3DLayer from "@arcgis/core/symbols/WaterSymbol3DLayer.js";
+import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
+import { Symbol } from "@arcgis/core/symbols";
+import SolidEdges3D from "@arcgis/core/symbols/edges/SolidEdges3D.js";
 
-function Icon(props: ComponentProps<typeof FontAwesomeIcon>) {
-  return <FontAwesomeIcon {...props} className='h-[25px] aspect-square' />
+export type ToolkitConfig = {
+  id: string;
+  name: string;
+  elevationMode: GraphicsLayer['elevationInfo']['mode'];
+  closeWhenActive: boolean,
+  icon: FA.IconDefinition,
+  tools?: EditorToolConfig[],
+  drawingMode: 'single' | 'continuous';
 }
 
-export const tools: Record<string, ToolConfig> = {
-  ground: {
+const BUILDING_FLOOR_HEIGHT = 3;
+export const Toolkits: ToolkitConfig[] = [
+  {
+    id: "ground",
     name: 'Ground',
     elevationMode: 'on-the-ground',
-    icon: <Icon icon={FA.faLayerGroup} />,
-    element: (
-      <Ground />
-    ),
+    closeWhenActive: false,
+    icon: FA.faLayerGroup,
+    drawingMode: 'single',
+    tools: [
+      {
+        id: 'ground',
+        label: 'Create ground',
+        symbol: new SimpleFillSymbol({
+          color: "#f0f0f0",
+          outline: {
+            width: 0
+          }
+        })
+      },
+      {
+        id: 'lawn',
+        label: 'Create lawn',
+        symbol: new SimpleFillSymbol({
+          color: "#bdce8a",
+          outline: {
+            width: 0
+          }
+        })
+      },
+      {
+        id: 'beach',
+        label: 'Create beach',
+        symbol: new SimpleFillSymbol({
+          color: "#dfca8f",
+          outline: {
+            width: 0
+          }
+        })
+      },
+      {
+        id: 'water',
+        label: 'Create water',
+        symbol: new PolygonSymbol3D({
+          symbolLayers: [
+            new WaterSymbol3DLayer({
+              waveDirection: 180,
+              color: "#a0b4cf",
+              waveStrength: "slight",
+              waterbodySize: "small"
+            })
+          ],
+          color: "#a0b4cf",
+        })
+      }
+    ]
   },
-  paths: {
+  {
+    id: "paths",
     name: 'Paths',
     elevationMode: 'on-the-ground',
-    icon: <Icon icon={FA.faRoad} />,
-    element: (
-      <Paths />
-    )
+    closeWhenActive: false,
+    icon: FA.faRoad,
+    drawingMode: 'single',
+    tools: [
+      {
+        id: 'street',
+        label: 'Create street',
+        symbol: new SimpleLineSymbol({
+          color: "#cbcbcb",
+          width: 20
+        })
+      },
+      {
+        id: 'walkingPath',
+        label: 'Create walking path',
+        symbol: new SimpleLineSymbol({
+          color: "#b2b2b2",
+          width: 3
+        })
+      }
+    ]
   },
-  buildings: {
+  {
+    id: "buildings",
     name: 'Buildings',
     elevationMode: 'on-the-ground',
-    icon: <Icon icon={FA.faBuilding} />,
-    element: (
-      <Buildings />
-    )
+    closeWhenActive: false,
+    icon: FA.faBuilding,
+    drawingMode: 'single',
+    tools: [
+      {
+        id: 'threeFloors',
+        label: "3-Story building",
+        symbol: new PolygonSymbol3D({
+          symbolLayers: [{
+            type: "extrude",
+            material: {
+              color: '#ffffff',
+            },
+            edges: new SolidEdges3D({
+              color: [100, 100, 100],
+            }),
+            size: 3 * BUILDING_FLOOR_HEIGHT,
+          }],
+        })
+      },
+      {
+        id: 'fiveFloors',
+        label: "5-Story building",
+        symbol: new PolygonSymbol3D({
+          symbolLayers: [{
+            type: "extrude",
+            material: {
+              color: '#ffffff',
+            },
+            edges: new SolidEdges3D({
+              color: [100, 100, 100],
+            }),
+            size: 5 * BUILDING_FLOOR_HEIGHT,
+          }],
+        })
+      },
+      {
+        id: 'tenFloors',
+        label: "10-Story building",
+        symbol: new PolygonSymbol3D({
+          symbolLayers: [{
+            type: "extrude",
+            material: {
+              color: '#ffffff',
+            },
+            edges: new SolidEdges3D({
+              color: [100, 100, 100],
+            }),
+            size: 10 * BUILDING_FLOOR_HEIGHT,
+          }],
+        })
+      }
+    ]
   },
-  icons: {
+  {
+    id: "icons",
     name: 'Icons',
     elevationMode: 'relative-to-scene',
     closeWhenActive: true,
-    icon: <Icon icon={FA.faMapMarkerAlt} />,
-    element: (
-      <Icons />
-    ),
-    preloadElement: <PrefetchIcons />
+    icon: FA.faMapMarkerAlt,
+    drawingMode: 'continuous'
   },
-  trees: {
+  {
+    id: "trees",
     name: 'Trees',
     elevationMode: 'relative-to-scene',
     closeWhenActive: true,
-    icon: <Icon icon={FA.faTree} />,
-    element: (
-      <Trees />
-    ),
-    preloadElement: <PrefetchTrees />
-
+    icon: FA.faTree,
+    drawingMode: 'continuous'
   },
-  vehicles: {
+  {
+    id: "vehicles",
     name: 'Vehicles',
     elevationMode: 'relative-to-scene',
     closeWhenActive: true,
-    icon: <Icon icon={FA.faCar} />,
-    element: (
-      <Vehicles />
-    ),
-    preloadElement: <PrefetchVehicles />
-
+    icon: FA.faCar,
+    drawingMode: 'continuous'
   },
-  glTF: {
+  {
+    id: 'gltf',
     name: 'glTF',
-    icon: <Icon icon={FA.faCloudDownloadAlt} />,
-    element: <div>route</div>,
-  },
-};
+    icon: FA.faCloudDownloadAlt,
+    elevationMode: 'relative-to-scene',
+    closeWhenActive: true,
+    drawingMode: 'single'
+  }
+]
 
-export const toolEntries = Object.entries(tools);
-
-type ToolConfig = {
-  name: string;
-  icon: ReactNode,
-  element?: ReactNode
-  preloadElement?: ReactNode
-  elevationMode?: ComponentProps<typeof GraphicsLayer>['elevationMode']
-  closeWhenActive?: boolean
+export type EditorToolConfig = {
+  id: string;
+  label: string;
+  symbol: Symbol;
+  thumbnail?: string;
+  createOperation?: (sketch: SketchViewModel) => void;
 }

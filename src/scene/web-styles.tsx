@@ -21,7 +21,8 @@ export const webStyleGroupListQueryOptions = (portal = Portal.getDefault()) => q
     const results: PortalQueryResult = await groups.results[0].queryItems(queryParams);
 
     return results.results as PortalItem[];
-  }
+  },
+  staleTime: Infinity
 });
 
 export const webStyleGroupItemsQueryOptions = (portalItem: PortalItem) => queryOptions({
@@ -30,6 +31,7 @@ export const webStyleGroupItemsQueryOptions = (portalItem: PortalItem) => queryO
     const data = await portalItem.fetchData("json", { signal });
     const items = data.items;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const webStyles: WebStyleSymbol[] = items.map((item: any) => new WebStyleSymbol({
       name: item.name,
       styleName: getStyleName(portalItem),
@@ -43,15 +45,7 @@ export const webStyleGroupItemsQueryOptions = (portalItem: PortalItem) => queryO
       thumbnail: items[index].thumbnail.href as string
     }));
   },
-  // select: (items): WebStyleSymbolItem[] => {
-  //   return items.map((item: any) => ({
-  //     webSymbol: new WebStyleSymbol({
-  //       name: item.name,
-  //       styleName: getStyleName(portalItem),
-  //     }),
-  //     thumbnail: item.thumbnail.href as string,
-  //   }))
-  // }
+  staleTime: Infinity
 });
 
 export function getStyleName(item: PortalItem): string {
@@ -63,7 +57,7 @@ export function getStyleName(item: PortalItem): string {
   return "";
 }
 
-export function styleNameMatchesGroup(category: "icons" | "trees" | "vehicles", styleName: string): boolean {
+export function styleNameMatchesGroup(category: string, styleName: string): boolean {
   switch (category) {
     case "icons":
       return styleName === "EsriIconsStyle";
@@ -71,6 +65,8 @@ export function styleNameMatchesGroup(category: "icons" | "trees" | "vehicles", 
       return styleName === "EsriRealisticTreesStyle";
     case "vehicles":
       return styleName === "EsriRealisticTransportationStyle";
+    default:
+      return false;
   }
 }
 

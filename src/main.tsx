@@ -14,6 +14,10 @@ const router = createHashRouter(
         path: '/plan',
         element: null
       },
+      {
+        path: '/submission',
+        element: null,
+      }
     ],
     errorElement: <div>Unknown error occurred...</div>
   }],
@@ -24,3 +28,9 @@ createRoot(document.getElementById('root')!).render(
     <RouterProvider router={router} />
   </StrictMode>,
 )
+
+declare module 'react' {
+  interface CSSProperties {
+    [key: `--${string}`]: string | number
+  }
+}

@@ -4,6 +4,7 @@ import { useWebScene } from "./web-scene";
 import ArcgisGraphic from "@arcgis/core/Graphic";
 import ArcgisSymbol from "@arcgis/core/symbols/Symbol";
 import ArcgisGeometry from "@arcgis/core/geometry/Geometry";
+import { useEditor } from "../../editor/editor";
 
 type GraphicsLayerProps = PropsWithChildren<{
   hidden?: boolean;
@@ -38,6 +39,19 @@ export const GraphicsLayer = forwardRef<ArcgisGraphicsLayer, GraphicsLayerProps>
     else ref.current = layer;
   }, [layer, ref]);
 
+  // ==== //
+  const editor = useEditor();
+  useEffect(() => {
+    if (editor != null) {
+      editor.layers.add(layer);
+
+      return () => {
+        editor.layers.remove(layer);
+      }
+    }
+  }, [editor, editor?.layers, layer])
+  // ==== //
+
   return (
     <GraphicsContext.Provider value={layer}>
       {props.children}
@@ -45,7 +59,7 @@ export const GraphicsLayer = forwardRef<ArcgisGraphicsLayer, GraphicsLayerProps>
   );
 })
 
-const GraphicsContext = createContext<ArcgisGraphicsLayer | undefined>(null!)
+const GraphicsContext = createContext<ArcgisGraphicsLayer>(null!)
 
 export function useGraphicsContext() {
   const layer = useContext(GraphicsContext);

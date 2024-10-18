@@ -1,9 +1,9 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useSettingsQueryOptions } from "./settings";
 import { useWebScene, WebScene } from "../arcgis/components/web-scene";
-import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
+import { PropsWithChildren, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { SceneView } from "../arcgis/components/scene-view";
-import { useLocation, useMatch } from "react-router-dom";
+import { useMatch } from "react-router-dom";
 import { useAccessorValue } from "../arcgis/hooks/useAccessorValue";
 import ArcgisSceneView from '@arcgis/core/views/SceneView';
 import SceneLayerView from '@arcgis/core/views/layers/SceneLayerView';
@@ -15,6 +15,8 @@ import { PerimeterGraphic } from "./perimeter-graphic";
 import { SurfaceGraphic } from "./surface-graphic";
 import { FocusAreaGraphic } from "./focus-area-graphic";
 import FeatureFilter from "@arcgis/core/layers/support/FeatureFilter.js";
+import { useSceneSettings } from "./scene-store";
+import { useLocationState } from "../utilities/hooks";
 
 export function Scene({ children }: PropsWithChildren) {
   const { data: settings } = useSuspenseQuery(useSettingsQueryOptions());
@@ -25,144 +27,108 @@ export function Scene({ children }: PropsWithChildren) {
 }
 
 export function View({ children }: PropsWithChildren) {
+  const sceneSettings = useSceneSettings();
+
+  const showBasemap = useAccessorValue(() => sceneSettings.basemap);
+  const showPerimeter = useAccessorValue(() => sceneSettings.perimeter);
+  const showSurface = useAccessorValue(() => sceneSettings.surface);
+  const showFocusArea = useAccessorValue(() => sceneSettings.focusArea);
+  const showBuildings = useAccessorValue(() => sceneSettings.buildings);
+  const vp = useAccessorValue(() => sceneSettings.viewpoint);
+
   const scene = useWebScene();
   const view = useRef<ArcgisSceneView>(null);
-  const { data: settings } = useSuspenseQuery(useSettingsQueryOptions());
-
-  const initialViewpoint = useAccessorValue(() => scene.initialViewProperties.viewpoint);
-  const drawViewpoint = useAccessorValue(() => scene.presentation.slides.getItemAt(0)?.viewpoint);
-  const polygon = useMemo(() => new Polygon({
+  const { data: settings } = useSuspenseQuery(useSettingsQueryOptions()); const polygon = useMemo(() => new Polygon({
     rings: [settings.planningArea],
     spatialReference: SpatialReference.WebMercator
   }), [settings.planningArea])
 
+  const initialViewpoint = useAccessorValue(() => scene.initialViewProperties.viewpoint);
+  const drawViewpoint = useAccessorValue(() => scene.presentation.slides.getItemAt(0)?.viewpoint);
+
+
   const isRootRoute = useMatch("/") != null;
-  const { state } = useLocation();
+  const state = useLocationState();
 
   const cameFromDeepLink = !isRootRoute && state?.previousLocationPathname == null;
   const playIntro = state?.playIntro && !cameFromDeepLink;
 
-  const [introState, setIntroState] = useState<IntroStep>(cameFromDeepLink ? 5 : 0);
-  const introStateConfig = SceneAnimationStateConfig[introState];
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isRootRoute)
-      setIntroState(0);
-    else if (playIntro) setIntroState(1)
-    else setIntroState(5)
-  }, [cameFromDeepLink, isRootRoute, playIntro])
-
-  useEffect(() => {
-    if (introStateConfig.basemap) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      scene.basemap = 'satellite' as any;
-    } else {
-      scene.basemap = null!
+      sceneSettings.setConfig('new-plan');
+    else if (!isRootRoute) {
+      if (cameFromDeepLink && view.current && drawViewpoint) {
+        view.current.viewpoint = drawViewpoint
+        sceneSettings.setConfig("drawing")
+      } else if (!playIntro) sceneSettings.setConfig('drawing-overview');
+      if (playIntro) sceneSettings.setConfig('perimeter-overview');
     }
-  }, [introStateConfig.basemap, scene])
+  }, [cameFromDeepLink, drawViewpoint, isRootRoute, playIntro, sceneSettings])
 
   useEffect(() => {
-    switch (introStateConfig.viewpoint) {
+    switch (vp) {
       case 'initial':
-        view.current?.goTo(initialViewpoint, { duration: 1500 });
+        view.current?.goTo(initialViewpoint, { duration: 1500 })
         break;
       case 'perimeter':
         view.current?.goTo(polygon, { duration: 1500 })
-          .finally(() => setIntroState(2))
+          .finally(() => sceneSettings.setConfig("perimeter-intro"))
         break;
       case 'drawing':
-        if (!cameFromDeepLink) {
-          view.current?.goTo(drawViewpoint, { duration: 1500 })
-        } else if (view.current) {
-          view.current.viewpoint = drawViewpoint ?? view.current.viewpoint;
-        }
+        view.current?.goTo(drawViewpoint, { duration: 1500 })
+          .finally(() => sceneSettings.setConfig("drawing"))
     }
-  }, [introStateConfig.viewpoint, cameFromDeepLink, drawViewpoint, initialViewpoint, polygon]);
+  }, [cameFromDeepLink, drawViewpoint, initialViewpoint, polygon, sceneSettings, vp]);
 
   const buildingLayerView = useAccessorValue(() => view.current?.allLayerViews.find(lv => lv.layer.type === 'scene') as SceneLayerView | undefined);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (buildingLayerView == null) return;
 
-    if (introState > 3) {
+    if (!showBuildings) {
       const filter = new FeatureFilter({
         geometry: polygon,
         spatialRelationship: 'disjoint'
       })
       buildingLayerView.filter = filter;
-
-      return () => {
-        if (buildingLayerView.filter === filter) buildingLayerView.filter = null!
-      }
+    } else {
+      buildingLayerView.filter = null!;
     }
-  }, [buildingLayerView, introState, polygon])
+  }, [buildingLayerView, polygon, showBuildings])
 
   return (
     <SceneView ref={view}>
-      <VectorTileLayer hidden={introStateConfig.basemap} itemId="5cf1abb43c25482e8a9e373953498999" />
+      <VectorTileLayer
+        itemId="5cf1abb43c25482e8a9e373953498999"
+        hidden={showBasemap}
+      />
       <GraphicsLayer elevationMode="on-the-ground">
-        <PerimeterGraphic
-          perimeter={settings.planningArea}
-          onComplete={() => setIntroState(state => state + 1 as IntroStep)}
-          isActive={introStateConfig.perimeter}
-        />
-        <SurfaceGraphic
-          surface={settings.planningArea}
-          isActive={introStateConfig.surface}
-          onComplete={() => setIntroState(state => state + 1 as IntroStep)}
-        />
+        {
+          showPerimeter ? (
+            <PerimeterGraphic
+              perimeter={settings.planningArea}
+              onComplete={() => sceneSettings.setConfig('surface-intro')}
+              isActive={showPerimeter}
+            />
+          ) : null
+        }
+        {showSurface ? (
+          <SurfaceGraphic
+            surface={settings.planningArea}
+            isActive={showSurface}
+            onComplete={() => sceneSettings.setConfig('drawing-overview')}
+          />
+        ) : null}
       </GraphicsLayer>
       {children}
       <GraphicsLayer elevationMode="on-the-ground">
-        <FocusAreaGraphic surface={settings.planningArea} isActive={introStateConfig.focusArea} />
+        {showFocusArea ? (
+          <FocusAreaGraphic
+            surface={settings.planningArea}
+            isActive={showFocusArea}
+          />
+        ) : null}
       </GraphicsLayer>
     </SceneView>
   )
 }
-
-export type IntroStep = 0 | 1 | 2 | 3 | 4 | 5;
-
-const SceneAnimationStateConfig = {
-  0: {
-    perimeter: false,
-    surface: false,
-    focusArea: false,
-    basemap: true,
-    viewpoint: 'initial'
-  },
-  1: {
-    perimeter: false,
-    surface: false,
-    focusArea: false,
-    basemap: true,
-    viewpoint: 'perimeter'
-  },
-  2: {
-    perimeter: true,
-    surface: false,
-    focusArea: true,
-    basemap: true,
-    viewpoint: 'perimeter'
-  },
-  3: {
-    perimeter: true,
-    surface: true,
-    focusArea: true,
-    basemap: true,
-    viewpoint: 'perimeter'
-  },
-  4: {
-    perimeter: false,
-    surface: false,
-    focusArea: true,
-    basemap: false,
-    viewpoint: 'drawing'
-  },
-  5: {
-    perimeter: false,
-    surface: false,
-    focusArea: true,
-    basemap: false,
-    viewpoint: 'drawing'
-  },
-} as const satisfies Record<IntroStep, Record<string, unknown>>

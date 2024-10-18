@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { useNavigate as useRouterNavigate, NavigateFunction, useSearchParams } from "react-router-dom";
+import { useCallback, useMemo } from "react";
+import { useNavigate as useRouterNavigate, NavigateFunction, useSearchParams, useLocation } from "react-router-dom";
 
 export function useSearchPreservingNavigate() {
   const [params] = useSearchParams();
@@ -26,4 +26,25 @@ export function useSearchPreservingNavigate() {
       )
     }
   }, [navigate, params]) as NavigateFunction
+}
+
+export type LocationState = {
+  playIntro?: boolean;
+  previousLocationPathname?: string;
+}
+export function useLocationState() {
+  const { state } = useLocation();
+
+  const playIntro = state?.playIntro;
+  const previousLocationPathname = state?.previousLocationPathname;
+
+  const memoizedState = useMemo(() => ({
+    playIntro,
+    previousLocationPathname,
+  }), [
+    playIntro,
+    previousLocationPathname,
+  ])
+
+  return memoizedState;
 }

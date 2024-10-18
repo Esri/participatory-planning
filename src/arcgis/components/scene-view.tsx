@@ -5,7 +5,9 @@ import '@arcgis/core/assets/esri/themes/dark/main.css'
 import { useWebScene } from "./web-scene";
 
 export const SceneView = forwardRef<ArcgisSceneView, PropsWithChildren>(function SceneView(props, ref) {
-  const [view] = useState(() => new ArcgisSceneView());
+  const [view] = useState(() => new ArcgisSceneView({
+    popupEnabled: false
+  }));
   const scene = useWebScene();
 
   useEffect(() => {
