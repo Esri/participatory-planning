@@ -162,6 +162,27 @@ class Operation {
   }
 }
 
+function createSketchViewModel({
+  view, layer
+}: {
+  view: SceneView,
+  layer: GraphicsLayer,
+}) {
+  const sketch = new SketchViewModel({
+    view,
+    layer,
+    snappingOptions: {
+      enabled: true,
+      featureSources: view.map.layers.filter(layer => layer.type === 'graphics').map((layer) => ({
+        enabled: true,
+        layer: layer as GraphicsLayer
+      }))
+    }
+  });
+
+  return sketch;
+}
+
 function createPoint({
   view, layer, symbol, boundary
 }: {
@@ -171,9 +192,9 @@ function createPoint({
   boundary?: Polygon,
 }) {
   const operation = new Operation((complete, cancel) => {
-    const sketch = new SketchViewModel({
+    const sketch = createSketchViewModel({
       view,
-      layer
+      layer,
     });
 
     sketch.addHandles([
@@ -211,9 +232,9 @@ function createPolygon({
   symbol: SketchViewModel['polygonSymbol'],
 }) {
   const operation = new Operation((complete, cancel) => {
-    const sketch = new SketchViewModel({
+    const sketch = createSketchViewModel({
       view,
-      layer
+      layer,
     });
 
     sketch.on("create", (event) => {
@@ -239,9 +260,9 @@ function createPolyline({
   symbol: SketchViewModel['polylineSymbol'],
 }) {
   const operation = new Operation((complete, cancel) => {
-    const sketch = new SketchViewModel({
+    const sketch = createSketchViewModel({
       view,
-      layer
+      layer,
     });
 
     sketch.on("create", (event) => {
@@ -296,9 +317,9 @@ export function placeMesh({
   boundary?: Polygon,
 }) {
   const operation = new Operation((complete, cancel) => {
-    const sketch = new SketchViewModel({
+    const sketch = createSketchViewModel({
       view,
-      layer
+      layer,
     });
 
     sketch.addHandles(
