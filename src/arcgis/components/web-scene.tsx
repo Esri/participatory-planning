@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useContext, useLayoutEffect, useState } from "react"
+import { createContext, PropsWithChildren, useContext, useEffect, useLayoutEffect, useState } from "react"
 import ArcgisWebScene from '@arcgis/core/WebScene';
 import PortalItem from '@arcgis/core/portal/PortalItem';
 
@@ -25,6 +25,10 @@ export function useWebScene() {
 const WebSceneContext = createContext<ArcgisWebScene>(null!);
 
 function WebSceneProvider({ scene, children }: PropsWithChildren<{ scene: ArcgisWebScene }>) {
+  useEffect(() => {
+    scene.portalItem.load();
+  }, [scene])
+
   return (
     <WebSceneContext.Provider value={scene}>
       {children}
