@@ -3,7 +3,7 @@ import {
   useSpring,
   animate,
   MotionValueSegmentWithTransition,
-} from "framer-motion";
+} from "motion/react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference";
 import Graphic from "@arcgis/core/Graphic";

@@ -6,7 +6,7 @@ import {
   animate,
   MotionValueSegmentWithTransition,
   cubicBezier
-} from "framer-motion";
+} from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Polyline from "@arcgis/core/geometry/Polyline";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference";

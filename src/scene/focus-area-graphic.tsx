@@ -1,8 +1,4 @@
-import {
-  animate,
-  useMotionValueEvent,
-  useSpring,
-} from "framer-motion";
+import { animate, useMotionValueEvent, useSpring } from 'motion/react'
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference";
 import Graphic from "@arcgis/core/Graphic";
