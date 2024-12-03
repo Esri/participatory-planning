@@ -31,10 +31,8 @@ The following external libraries, APIs, open datasets and specifications were us
 
 - [ArcGIS API for JavaScript](https://developers.arcgis.com/javascript/)
 - Icons from [Font Awesome](https://fontawesome.com/)
-- [Framer motion](https://www.framer.com/motion/) for animations
+- [Motion](https://motion.dev/) for animations
 - [Sketchfab widget](https://sketchfab.com/developers/download-api/downloading-models/javascript) for downloading glTF models
-- [3D building model](http://www1.nyc.gov/site/doitt/initiatives/3d-building.page) published on the Open Data portal of [DoITT](http://www1.nyc.gov/site/doitt/index.page) under these [Terms of use](http://www1.nyc.gov/home/terms-of-use.page)
-- [Manhattan neighborhoods](http://catalog.opendata.city/dataset/pediacities-nyc-neighborhoods/resource/91778048-3c58-449c-a3f9-365ed203e914) provided by [Catalog Opendata City](http://catalog.opendata.city/) under a [Open Data Commons Attribution License](http://opendefinition.org/licenses/odc-by/)
 
 ## Disclaimer
 
