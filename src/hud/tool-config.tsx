@@ -70,7 +70,6 @@ export const Toolkits: ToolkitConfig[] = [
               waterbodySize: "small"
             })
           ],
-          color: "#a0b4cf",
         })
       }
     ]
