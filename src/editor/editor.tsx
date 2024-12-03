@@ -96,10 +96,10 @@ class Editor extends Accessor {
               const graphic = result.graphic;
               const index = (graphic.layer as GraphicsLayer).graphics.indexOf(graphic);
 
-              const sketch = new SketchViewModel({
+              const sketch = createSketchViewModel({
                 view,
-                layer: result.graphic.layer
-              });
+                layer: result.graphic.layer as GraphicsLayer,
+              })
 
               sketch.on("update", (event) => {
                 if (event.state === 'complete') complete({
@@ -108,7 +108,6 @@ class Editor extends Accessor {
               })
 
               sketch.update(graphic);
-
               return sketch;
             })
 
