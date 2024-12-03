@@ -46,7 +46,6 @@ export function View({ children }: PropsWithChildren) {
   const initialViewpoint = useAccessorValue(() => scene.initialViewProperties.viewpoint);
   const drawViewpoint = useAccessorValue(() => scene.presentation.slides.getItemAt(0)?.viewpoint);
 
-
   const isRootRoute = useMatch("/") != null;
   const state = useLocationState();
 
@@ -94,7 +93,7 @@ export function View({ children }: PropsWithChildren) {
     } else {
       buildingLayerView.filter = null!;
     }
-  }, [buildingLayerView, polygon, showBuildings])
+  }, [buildingLayerView, polygon, showBuildings]);
 
   return (
     <SceneView ref={view}>
