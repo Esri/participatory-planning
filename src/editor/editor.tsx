@@ -341,9 +341,11 @@ export function placeMesh({
     Mesh.createFromGLTF(view.center, url)
       .then((mesh) => {
         sketch.place(mesh);
-        document.body.style.cursor = '';
       })
-      .catch(cancel);
+      .catch(cancel)
+      .finally(() => {
+        document.body.style.cursor = '';
+      });
 
     return sketch;
   })
