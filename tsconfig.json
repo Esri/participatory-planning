@@ -1,41 +1,7 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "amd",
-    "lib": [
-      "dom",
-      "es5",
-      "es6",
-      "ES2018"
-    ],
-    "noEmitHelpers": true,
-    "noEmitOnError": true,
-    "strictPropertyInitialization": false,
-    "jsx": "react",
-    "jsxFactory": "tsx",
-    "sourceMap": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "noUnusedLocals": false,
-    "moduleResolution": "node",
-    "types": [
-      "arcgis-js-api"
-    ],
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "inlineSourceMap": false,
-    "preserveConstEnums": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "outDir": "dist/js",
-    "importHelpers": true,
-  },
-  "include": [
-    "./src/**/*",
-    "node_modules/arcgis-js-api/**/*"
-  ],
-  "exclude": [
-    "node_modules"
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
   ]
 }

@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  position: relative;
+  box-sizing: border-box;
+}
+
+#root {
+  display: flex;
+  flex-direction: column-reverse;
+}
