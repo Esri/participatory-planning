@@ -23,7 +23,7 @@ import SceneView from "@arcgis/core/views/SceneView";
 import { useSceneView } from "../../arcgis/components/scene-view";
 import { useEffect, useState } from "react";
 
-export function Submission() {
+export function Submission(props: { onOpen?: () => void; }) {
   const view = useSceneView()
   const mutation = useScreenshotPreviewMutation();
   const download = useDownloadScreenshotMutation();
@@ -42,7 +42,10 @@ export function Submission() {
       // overlayOpacity={0}
       isOpen={open}
       isDismissisable={!mutation.isPending}
-      onOpenChange={isOpen => setOpen(isOpen)}
+      onOpenChange={isOpen => {
+        setOpen(isOpen)
+        if (isOpen) props.onOpen?.();
+      }}
       trigger={
         <HUDEndButton onPress={() => {
           mutation.mutate({ view });

@@ -121,9 +121,7 @@ export function Toolbar(props: { identityDialog: boolean, selectedToolkit: strin
               closeWhenActive={toolkit.closeWhenActive}
             >
               <HUDSubGrid>
-                <Suspense fallback={
-                  <GridButton onPress={() => { }} isActive />
-                }>
+                <Suspense>
                   {
                     styleGroup.map(style => (
                       <DynamicTools key={style.id} item={style} toolkit={toolkit} />
@@ -141,7 +139,11 @@ export function Toolbar(props: { identityDialog: boolean, selectedToolkit: strin
         </ToolkitButton>
       </GraphicsLayer>
 
-      <Submission />
+      <Submission
+        onOpen={() => {
+          if (props.selectedToolkit) props.toggleToolkit(props.selectedToolkit);
+        }}
+      />
     </div>
   )
 }
