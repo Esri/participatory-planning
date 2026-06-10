@@ -15,11 +15,12 @@
 
 import { useRef, useEffect } from "react";
 import * as ru from "@arcgis/core/core/reactiveUtils";
+import type { ReactiveWatchOptions } from "@arcgis/core/core/reactiveUtils";
 
 export function useEffectWhen<Value>(
   getValue: () => Value,
   callback: (next: Value, previous?: Value | null) => void,
-  options?: __esri.ReactiveWatchOptions,
+  options?: ReactiveWatchOptions,
 ) {
   // this allows us to keep the `getValue` callback out of the `subscribe` methods dependency array
   // this way, the handle will not be removed any time getValue changes,

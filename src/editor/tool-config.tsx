@@ -14,7 +14,7 @@
  */
 
 import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
-import { Symbol } from "@arcgis/core/symbols";
+import Symbol from "@arcgis/core/symbols/Symbol";
 
 export type EditorToolConfig = {
   id: string;

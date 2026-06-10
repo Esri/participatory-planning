@@ -16,12 +16,18 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useSettingsQueryOptions } from "./settings";
 import { useWebScene, WebScene } from "../arcgis/components/web-scene";
-import { PropsWithChildren, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import {
+  PropsWithChildren,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { SceneView } from "../arcgis/components/scene-view";
 import { useMatch } from "react-router-dom";
 import { useAccessorValue } from "../arcgis/hooks/useAccessorValue";
-import ArcgisSceneView from '@arcgis/core/views/SceneView';
-import SceneLayerView from '@arcgis/core/views/layers/SceneLayerView';
+import ArcgisSceneView from "@arcgis/core/views/SceneView";
+import SceneLayerView from "@arcgis/core/views/layers/SceneLayerView";
 import { VectorTileLayer } from "../arcgis/components/vector-tile-layer";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference";
@@ -36,9 +42,7 @@ import { useLocationState } from "../utilities/hooks";
 export function Scene({ children }: PropsWithChildren) {
   const { data: settings } = useSuspenseQuery(useSettingsQueryOptions());
 
-  return (
-    <WebScene websceneId={settings.webSceneId}>{children}</WebScene>
-  )
+  return <WebScene websceneId={settings.webSceneId}>{children}</WebScene>;
 }
 
 export function View({ children }: PropsWithChildren) {
@@ -53,48 +57,71 @@ export function View({ children }: PropsWithChildren) {
 
   const scene = useWebScene();
   const view = useRef<ArcgisSceneView>(null);
-  const { data: settings } = useSuspenseQuery(useSettingsQueryOptions()); const polygon = useMemo(() => new Polygon({
-    rings: [settings.planningArea],
-    spatialReference: SpatialReference.WebMercator
-  }), [settings.planningArea])
+  const { data: settings } = useSuspenseQuery(useSettingsQueryOptions());
+  const polygon = useMemo(
+    () =>
+      new Polygon({
+        rings: [settings.planningArea],
+        spatialReference: SpatialReference.WebMercator,
+      }),
+    [settings.planningArea],
+  );
 
-  const initialViewpoint = useAccessorValue(() => scene.initialViewProperties.viewpoint);
-  const drawViewpoint = useAccessorValue(() => scene.presentation.slides.getItemAt(0)?.viewpoint);
+  const initialViewpoint = useAccessorValue(
+    () => scene.initialViewProperties.viewpoint,
+  );
+  const drawViewpoint = useAccessorValue(
+    () => scene.presentation.slides.getItemAt(0)?.viewpoint,
+  );
 
   const isRootRoute = useMatch("/") != null;
   const state = useLocationState();
 
-  const cameFromDeepLink = !isRootRoute && state?.previousLocationPathname == null;
+  const cameFromDeepLink =
+    !isRootRoute && state?.previousLocationPathname == null;
   const playIntro = state?.playIntro && !cameFromDeepLink;
 
   useLayoutEffect(() => {
-    if (isRootRoute)
-      sceneSettings.setConfig('new-plan');
+    if (isRootRoute) sceneSettings.setConfig("new-plan");
     else if (!isRootRoute) {
       if (cameFromDeepLink && view.current && drawViewpoint) {
-        view.current.viewpoint = drawViewpoint
-        sceneSettings.setConfig("drawing")
-      } else if (!playIntro) sceneSettings.setConfig('drawing-overview');
-      if (playIntro) sceneSettings.setConfig('perimeter-overview');
+        view.current.viewpoint = drawViewpoint;
+        sceneSettings.setConfig("drawing");
+      } else if (!playIntro) sceneSettings.setConfig("drawing-overview");
+      if (playIntro) sceneSettings.setConfig("perimeter-overview");
     }
-  }, [cameFromDeepLink, drawViewpoint, isRootRoute, playIntro, sceneSettings])
+  }, [cameFromDeepLink, drawViewpoint, isRootRoute, playIntro, sceneSettings]);
 
   useEffect(() => {
     switch (vp) {
-      case 'initial':
-        view.current?.goTo(initialViewpoint, { duration: 1500 })
+      case "initial":
+        view.current?.goTo(initialViewpoint, { duration: 1500 });
         break;
-      case 'perimeter':
-        view.current?.goTo(polygon, { duration: 1500 })
-          .finally(() => sceneSettings.setConfig("perimeter-intro"))
+      case "perimeter":
+        view.current
+          ?.goTo(polygon, { duration: 1500 })
+          .finally(() => sceneSettings.setConfig("perimeter-intro"));
         break;
-      case 'drawing':
-        view.current?.goTo(drawViewpoint, { duration: 1500 })
-          .finally(() => sceneSettings.setConfig("drawing"))
+      case "drawing":
+        view.current
+          ?.goTo(drawViewpoint, { duration: 1500 })
+          .finally(() => sceneSettings.setConfig("drawing"));
     }
-  }, [cameFromDeepLink, drawViewpoint, initialViewpoint, polygon, sceneSettings, vp]);
+  }, [
+    cameFromDeepLink,
+    drawViewpoint,
+    initialViewpoint,
+    polygon,
+    sceneSettings,
+    vp,
+  ]);
 
-  const buildingLayerView = useAccessorValue(() => view.current?.allLayerViews.find(lv => lv.layer.type === 'scene') as SceneLayerView | undefined);
+  const buildingLayerView = useAccessorValue(
+    () =>
+      view.current?.allLayerViews.find((lv) => lv.layer.type === "scene") as
+        | SceneLayerView
+        | undefined,
+  );
 
   useLayoutEffect(() => {
     if (buildingLayerView == null) return;
@@ -102,8 +129,8 @@ export function View({ children }: PropsWithChildren) {
     if (!showBuildings) {
       const filter = new FeatureFilter({
         geometry: polygon,
-        spatialRelationship: 'disjoint'
-      })
+        spatialRelationship: "disjoint",
+      });
       buildingLayerView.filter = filter;
     } else {
       buildingLayerView.filter = null!;
@@ -117,20 +144,18 @@ export function View({ children }: PropsWithChildren) {
         hidden={showBasemap}
       />
       <GraphicsLayer elevationMode="on-the-ground">
-        {
-          showPerimeter ? (
-            <PerimeterGraphic
-              perimeter={settings.planningArea}
-              onComplete={() => sceneSettings.setConfig('surface-intro')}
-              isActive={showPerimeter}
-            />
-          ) : null
-        }
+        {showPerimeter ? (
+          <PerimeterGraphic
+            perimeter={settings.planningArea}
+            onComplete={() => sceneSettings.setConfig("surface-intro")}
+            isActive={showPerimeter}
+          />
+        ) : null}
         {showSurface ? (
           <SurfaceGraphic
             surface={settings.planningArea}
             isActive={showSurface}
-            onComplete={() => sceneSettings.setConfig('drawing-overview')}
+            onComplete={() => sceneSettings.setConfig("drawing-overview")}
           />
         ) : null}
       </GraphicsLayer>
@@ -144,5 +169,5 @@ export function View({ children }: PropsWithChildren) {
         ) : null}
       </GraphicsLayer>
     </SceneView>
-  )
+  );
 }
