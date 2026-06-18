@@ -90,12 +90,11 @@ function NewPlan(props: { onStart: () => void; onSkip: () => void }) {
 
   const { data: settings } = useSuspenseQuery(useSettingsQueryOptions());
 
-  const thumbnailUrl = useAccessorValue(
-    () => (
-      scene.portalItem.thumbnailUrl,
-      scene.portalItem.getThumbnailUrl(400)
-    ),
-  );
+  const thumbnailUrl = useAccessorValue(() => {
+    const portalItem = scene.portalItem;
+    if (portalItem == null) return undefined;
+    return portalItem.thumbnailUrl ?? portalItem.getThumbnailUrl(400);
+  });
 
   const navigate = useSearchPreservingNavigate();
 

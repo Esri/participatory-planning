@@ -95,7 +95,9 @@ export function View({ children }: PropsWithChildren) {
   useEffect(() => {
     switch (vp) {
       case "initial":
-        view.current?.goTo(initialViewpoint, { duration: 1500 });
+        if (initialViewpoint) {
+          view.current?.goTo(initialViewpoint, { duration: 1500 });
+        }
         break;
       case "perimeter":
         view.current
@@ -103,9 +105,11 @@ export function View({ children }: PropsWithChildren) {
           .finally(() => sceneSettings.setConfig("perimeter-intro"));
         break;
       case "drawing":
-        view.current
-          ?.goTo(drawViewpoint, { duration: 1500 })
-          .finally(() => sceneSettings.setConfig("drawing"));
+        if (drawViewpoint) {
+          view.current
+            ?.goTo(drawViewpoint, { duration: 1500 })
+            .finally(() => sceneSettings.setConfig("drawing"));
+        }
     }
   }, [
     cameFromDeepLink,

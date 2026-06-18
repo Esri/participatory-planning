@@ -219,17 +219,21 @@ function createSketchViewModel({
   view: SceneView;
   layer: GraphicsLayer;
 }) {
+  const map = view.map;
   const sketch = new SketchViewModel({
     view,
     layer,
     snappingOptions: {
       enabled: true,
-      featureSources: view.map.layers
-        .filter((layer) => layer.type === "graphics")
-        .map((layer) => ({
-          enabled: true,
-          layer: layer as GraphicsLayer,
-        })),
+      featureSources:
+        map == null
+          ? []
+          : map.layers
+              .filter((layer) => layer.type === "graphics")
+              .map((layer) => ({
+                enabled: true,
+                layer: layer as GraphicsLayer,
+              })),
     },
   });
 
@@ -244,7 +248,7 @@ function createPoint({
 }: {
   view: SceneView;
   layer: GraphicsLayer;
-  symbol: SketchViewModel["pointSymbol"];
+  symbol: Symbol;
   boundary?: Polygon;
 }) {
   const operation = new Operation((complete, cancel) => {
@@ -260,7 +264,11 @@ function createPoint({
           // important to prevent an infinite loop
           if (position?.equals(old)) return;
 
-          if (position != null && boundary != null) {
+          if (
+            position != null &&
+            boundary != null &&
+            sketch.createGraphic != null
+          ) {
             const containedPosition = proximityOperator.getNearestCoordinate(
               boundary,
               position,
@@ -272,11 +280,12 @@ function createPoint({
     ]);
 
     sketch.on("create", (event) => {
-      if (event.state === "complete") complete({ graphics: [event.graphic] });
+      if (event.state === "complete" && event.graphic != null)
+        complete({ graphics: [event.graphic] });
       if (event.state === "cancel") cancel();
     });
 
-    sketch.pointSymbol = symbol;
+    sketch.pointSymbol = symbol as SketchViewModel["pointSymbol"];
 
     sketch.create("point");
 
@@ -293,7 +302,7 @@ function createPolygon({
 }: {
   view: SceneView;
   layer: GraphicsLayer;
-  symbol: SketchViewModel["polygonSymbol"];
+  symbol: Symbol;
 }) {
   const operation = new Operation((complete, cancel) => {
     const sketch = createSketchViewModel({
@@ -302,11 +311,12 @@ function createPolygon({
     });
 
     sketch.on("create", (event) => {
-      if (event.state === "complete") complete({ graphics: [event.graphic] });
+      if (event.state === "complete" && event.graphic != null)
+        complete({ graphics: [event.graphic] });
       if (event.state === "cancel") cancel();
     });
 
-    sketch.polygonSymbol = symbol;
+    sketch.polygonSymbol = symbol as SketchViewModel["polygonSymbol"];
 
     sketch.create("polygon");
 
@@ -323,7 +333,7 @@ function createPolyline({
 }: {
   view: SceneView;
   layer: GraphicsLayer;
-  symbol: SketchViewModel["polylineSymbol"];
+  symbol: Symbol;
 }) {
   const operation = new Operation((complete, cancel) => {
     const sketch = createSketchViewModel({
@@ -332,11 +342,12 @@ function createPolyline({
     });
 
     sketch.on("create", (event) => {
-      if (event.state === "complete") complete({ graphics: [event.graphic] });
+      if (event.state === "complete" && event.graphic != null)
+        complete({ graphics: [event.graphic] });
       if (event.state === "cancel") cancel();
     });
 
-    sketch.polylineSymbol = symbol;
+    sketch.polylineSymbol = symbol as SketchViewModel["polylineSymbol"];
 
     sketch.create("polyline");
 
@@ -397,7 +408,11 @@ export function placeMesh({
       reactiveUtils.watch(
         () => (sketch.createGraphic?.geometry as Mesh)?.origin,
         (position) => {
-          if (position != null && boundary != null) {
+          if (
+            position != null &&
+            boundary != null &&
+            sketch.createGraphic != null
+          ) {
             const mesh = sketch.createGraphic.geometry as Mesh;
             const containedPosition = proximityOperator.getNearestCoordinate(
               boundary,
@@ -411,7 +426,8 @@ export function placeMesh({
     );
 
     sketch.on("create", (event) => {
-      if (event.state === "complete") complete({ graphics: [event.graphic] });
+      if (event.state === "complete" && event.graphic != null)
+        complete({ graphics: [event.graphic] });
       if (event.state === "cancel") cancel();
     });
 
@@ -459,6 +475,10 @@ export function EditorProvider(props: PropsWithChildren) {
 
     const layer = graphic.layer as GraphicsLayer;
     const geometry = graphic.geometry;
+    if (geometry == null) {
+      layer.remove(graphic);
+      return;
+    }
     const intersection = intersectionOperator.execute(
       polygon,
       geometry,
@@ -522,15 +542,18 @@ function splitPolyline(polyline: Polyline) {
 }
 
 function splitGraphic(graphic: Graphic) {
-  switch (graphic.geometry.type) {
+  const geometry = graphic.geometry;
+  if (geometry == null) return [graphic];
+
+  switch (geometry.type) {
     case "polygon":
-      return splitPolygon(graphic.geometry as Polygon).map((ring) => {
+      return splitPolygon(geometry as Polygon).map((ring) => {
         const clone = graphic.clone();
         clone.geometry = ring;
         return clone;
       });
     case "polyline":
-      return splitPolyline(graphic.geometry as Polyline).map((path) => {
+      return splitPolyline(geometry as Polyline).map((path) => {
         const clone = graphic.clone();
         clone.geometry = path;
         return clone;
