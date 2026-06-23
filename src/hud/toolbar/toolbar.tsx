@@ -263,14 +263,14 @@ function DynamicTools(props: { toolkit: ToolkitConfig, item: PortalItem }) {
   return (
     data.map(style => (
       <GridButtonToolTrigger
-        key={style.webSymbol.name}
-        id={style.webSymbol.name}
-        label={style.webSymbol.name}
+        key={style.name}
+        id={style.name}
+        label={style.name}
         symbol={style.symbol}
         toolkit={props.toolkit.id}
         drawingMode={props.toolkit.drawingMode}
       >
-        <img src={style.thumbnail} alt={style.webSymbol.name} />
+        <img src={style.thumbnail} alt={style.name} />
       </GridButtonToolTrigger>
     ))
   )

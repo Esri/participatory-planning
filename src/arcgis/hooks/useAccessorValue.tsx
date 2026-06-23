@@ -15,10 +15,11 @@
 
 import { useRef, useCallback, useSyncExternalStore, useEffect } from "react";
 import * as ru from "@arcgis/core/core/reactiveUtils";
+import type { ReactiveWatchOptions } from "@arcgis/core/core/reactiveUtils";
 
 export function useAccessorValue<Value>(
   getValue: () => Value,
-  options?: __esri.ReactiveWatchOptions & {
+  options?: ReactiveWatchOptions & {
     getServerValue?: () => Value | undefined;
   },
 ): Value | undefined {

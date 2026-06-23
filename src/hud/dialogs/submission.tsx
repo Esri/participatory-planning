@@ -22,6 +22,7 @@ import { useSceneSettings } from "../../scene/scene-store";
 import SceneView from "@arcgis/core/views/SceneView";
 import { useSceneView } from "../../arcgis/components/scene-view";
 import { useEffect, useState } from "react";
+import type { Screenshot } from "@arcgis/core/views/types";
 
 export function Submission(props: { onOpen?: () => void; }) {
   const view = useSceneView()
@@ -81,8 +82,8 @@ export function Submission(props: { onOpen?: () => void; }) {
 
 function drawImage(props: {
   canvas: HTMLCanvasElement,
-  before: __esri.SceneViewScreenshot,
-  after: __esri.SceneViewScreenshot
+  before: Screenshot,
+  after: Screenshot
 }) {
   const canvas = props.canvas;
   const before = props.before;
@@ -158,8 +159,8 @@ function useScreenshotPreviewMutation() {
 function useDownloadScreenshotMutation() {
   return useMutation({
     mutationFn: async (props: {
-      before: __esri.SceneViewScreenshot,
-      after: __esri.SceneViewScreenshot
+      before: Screenshot,
+      after: Screenshot
     }) => {
       const filename = "ParticipatoryPlanning.png";
       const canvas = document.createElement('canvas');

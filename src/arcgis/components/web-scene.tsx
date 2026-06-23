@@ -13,24 +13,29 @@
  * limitations under the License.
  */
 
-import { createContext, PropsWithChildren, useContext, useEffect, useLayoutEffect, useState } from "react"
-import ArcgisWebScene from '@arcgis/core/WebScene';
-import PortalItem from '@arcgis/core/portal/PortalItem';
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
+import ArcgisWebScene from "@arcgis/core/WebScene";
+import PortalItem from "@arcgis/core/portal/PortalItem";
 
-export function WebScene(props: PropsWithChildren<{
-  websceneId: string;
-}>) {
+export function WebScene(
+  props: PropsWithChildren<{
+    websceneId: string;
+  }>,
+) {
   const [map] = useState(() => new ArcgisWebScene());
 
   useLayoutEffect(() => {
-    map.portalItem = new PortalItem({ id: props.websceneId })
-  }, [map, props.websceneId])
+    map.portalItem = new PortalItem({ id: props.websceneId });
+  }, [map, props.websceneId]);
 
-  return (
-    <WebSceneProvider scene={map}>
-      {props.children}
-    </WebSceneProvider>
-  )
+  return <WebSceneProvider scene={map}>{props.children}</WebSceneProvider>;
 }
 
 export function useWebScene() {
@@ -39,14 +44,17 @@ export function useWebScene() {
 
 const WebSceneContext = createContext<ArcgisWebScene>(null!);
 
-function WebSceneProvider({ scene, children }: PropsWithChildren<{ scene: ArcgisWebScene }>) {
+function WebSceneProvider({
+  scene,
+  children,
+}: PropsWithChildren<{ scene: ArcgisWebScene }>) {
   useEffect(() => {
-    scene.portalItem.load();
-  }, [scene])
+    scene.portalItem?.load();
+  }, [scene]);
 
   return (
     <WebSceneContext.Provider value={scene}>
       {children}
     </WebSceneContext.Provider>
-  )
+  );
 }

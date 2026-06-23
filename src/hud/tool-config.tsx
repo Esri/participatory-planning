@@ -20,13 +20,13 @@ import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import WaterSymbol3DLayer from "@arcgis/core/symbols/WaterSymbol3DLayer.js";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel";
-import { Symbol } from "@arcgis/core/symbols";
+import Symbol from "@arcgis/core/symbols/Symbol";
 import SolidEdges3D from "@arcgis/core/symbols/edges/SolidEdges3D.js";
 
 export type ToolkitConfig = {
   id: string;
   name: string;
-  elevationMode: GraphicsLayer['elevationInfo']['mode'];
+  elevationMode: NonNullable<GraphicsLayer["elevationInfo"]>["mode"];
   closeWhenActive: boolean,
   icon: FA.IconDefinition,
   tools?: EditorToolConfig[],

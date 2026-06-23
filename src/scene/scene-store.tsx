@@ -14,7 +14,10 @@
  */
 
 import Accessor from "@arcgis/core/core/Accessor";
-import { property, subclass } from "@arcgis/core/core/accessorSupport/decorators";
+import {
+  property,
+  subclass,
+} from "@arcgis/core/core/accessorSupport/decorators";
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 import { useMatch } from "react-router-dom";
 
@@ -39,15 +42,13 @@ export class SceneSettings extends Accessor {
   graphics!: boolean;
 
   @property()
-  viewpoint:
-    | 'initial'
-    | 'perimeter'
-    | 'drawing'
-    | null = null;
+  viewpoint: "initial" | "perimeter" | "drawing" | null = null;
 
-  setConfig(config: keyof typeof SceneStateConfig | keyof typeof SceneStateConfigIndex) {
+  setConfig(
+    config: keyof typeof SceneStateConfig | keyof typeof SceneStateConfigIndex,
+  ) {
     const preset =
-      typeof config === 'number'
+      typeof config === "number"
         ? SceneStateConfig[SceneStateConfigIndex[config]]
         : SceneStateConfig[config];
 
@@ -62,103 +63,108 @@ export class SceneSettings extends Accessor {
 }
 
 const SceneStateConfigIndex = {
-  0: 'new-plan',
-  1: 'perimeter-overview',
-  2: 'perimeter-intro',
-  3: 'surface-intro',
-  4: 'drawing-overview',
-  5: 'drawing',
-  6: 'screenshot-before',
-  7: 'screenshot-after',
+  0: "new-plan",
+  1: "perimeter-overview",
+  2: "perimeter-intro",
+  3: "surface-intro",
+  4: "drawing-overview",
+  5: "drawing",
+  6: "screenshot-before",
+  7: "screenshot-after",
 } as const;
 
 const SceneStateConfig = {
-  'new-plan': {
+  "new-plan": {
     perimeter: false,
     surface: false,
     focusArea: false,
     basemap: true,
     buildings: true,
     graphics: false,
-    viewpoint: 'initial'
+    viewpoint: "initial",
   },
-  'perimeter-overview': {
+  "perimeter-overview": {
     perimeter: false,
     surface: false,
     focusArea: false,
     basemap: true,
     buildings: true,
     graphics: false,
-    viewpoint: 'perimeter'
+    viewpoint: "perimeter",
   },
-  'perimeter-intro': {
+  "perimeter-intro": {
     perimeter: true,
     surface: false,
     focusArea: true,
     basemap: true,
     buildings: true,
     graphics: false,
-    viewpoint: 'perimeter'
+    viewpoint: "perimeter",
   },
-  'surface-intro': {
+  "surface-intro": {
     perimeter: true,
     surface: true,
     focusArea: true,
     basemap: true,
     buildings: true,
     graphics: false,
-    viewpoint: 'perimeter'
+    viewpoint: "perimeter",
   },
-  'drawing-overview': {
+  "drawing-overview": {
     perimeter: false,
     surface: false,
     focusArea: true,
     basemap: false,
     buildings: false,
     graphics: false,
-    viewpoint: 'drawing'
+    viewpoint: "drawing",
   },
-  'drawing': {
+  drawing: {
     perimeter: false,
     surface: false,
     focusArea: true,
     basemap: false,
     buildings: false,
     graphics: true,
-    viewpoint: null
+    viewpoint: null,
   },
-  'screenshot-before': {
+  "screenshot-before": {
     perimeter: false,
     surface: false,
     focusArea: false,
     basemap: true,
     buildings: true,
     graphics: false,
-    viewpoint: null
+    viewpoint: null,
   },
-  'screenshot-after': {
+  "screenshot-after": {
     perimeter: false,
     surface: false,
     focusArea: false,
     basemap: false,
     buildings: false,
     graphics: true,
-    viewpoint: null
-  }
-} as const
+    viewpoint: null,
+  },
+} as const;
 
 const SceneSettingsContext = createContext<SceneSettings>(null!);
 
 export function SceneSettingsProvider(props: PropsWithChildren) {
   const isRootRoute = useMatch("/") != null;
-  const [settings] = useState(() => new SceneSettings(
-    isRootRoute ? SceneStateConfig["new-plan"] : SceneStateConfig['drawing']
-  ));
+  const [settings] = useState(
+    () =>
+      new SceneSettings(
+        isRootRoute
+          ? SceneStateConfig["new-plan"]
+          : SceneStateConfig["drawing"],
+      ),
+  );
   return (
     <SceneSettingsContext.Provider value={settings}>
       {props.children}
     </SceneSettingsContext.Provider>
-  )
+  );
 }
 
 export function useSceneSettings() {
