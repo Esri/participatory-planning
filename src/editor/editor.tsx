@@ -226,14 +226,12 @@ function createSketchViewModel({
     snappingOptions: {
       enabled: true,
       featureSources:
-        map == null
-          ? []
-          : map.layers
-              .filter((layer) => layer.type === "graphics")
-              .map((layer) => ({
-                enabled: true,
-                layer: layer as GraphicsLayer,
-              })),
+        map?.layers
+          .filter((layer) => layer.type === "graphics")
+          .map((layer) => ({
+            enabled: true,
+            layer: layer as GraphicsLayer,
+          })) ?? [],
     },
   });
 
@@ -280,8 +278,10 @@ function createPoint({
     ]);
 
     sketch.on("create", (event) => {
-      if (event.state === "complete" && event.graphic != null)
-        complete({ graphics: [event.graphic] });
+      if (event.state === "complete") {
+        if (event.graphic == null) cancel();
+        else complete({ graphics: [event.graphic] });
+      }
       if (event.state === "cancel") cancel();
     });
 
@@ -311,8 +311,10 @@ function createPolygon({
     });
 
     sketch.on("create", (event) => {
-      if (event.state === "complete" && event.graphic != null)
-        complete({ graphics: [event.graphic] });
+      if (event.state === "complete") {
+        if (event.graphic == null) cancel();
+        else complete({ graphics: [event.graphic] });
+      }
       if (event.state === "cancel") cancel();
     });
 
@@ -342,8 +344,10 @@ function createPolyline({
     });
 
     sketch.on("create", (event) => {
-      if (event.state === "complete" && event.graphic != null)
-        complete({ graphics: [event.graphic] });
+      if (event.state === "complete") {
+        if (event.graphic == null) cancel();
+        else complete({ graphics: [event.graphic] });
+      }
       if (event.state === "cancel") cancel();
     });
 
@@ -426,8 +430,10 @@ export function placeMesh({
     );
 
     sketch.on("create", (event) => {
-      if (event.state === "complete" && event.graphic != null)
-        complete({ graphics: [event.graphic] });
+      if (event.state === "complete") {
+        if (event.graphic == null) cancel();
+        else complete({ graphics: [event.graphic] });
+      }
       if (event.state === "cancel") cancel();
     });
 
